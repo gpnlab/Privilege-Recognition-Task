@@ -21,6 +21,6 @@ class GameObject:
         distance = self.position.distance_to(other_obj.position)
         return distance < self.radius + other_obj.radius
 
-class Player:
+class Player(GameObject):
     def __init__(self, position):
-    super().__init__(position, load_sprite("spaceship"), Vector2(0))
+        super().__init__(position, load_sprite("player"), Vector2(0))

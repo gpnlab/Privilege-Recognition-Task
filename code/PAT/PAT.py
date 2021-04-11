@@ -29,13 +29,13 @@ class PAT:
                 quit()
 
     def _process_game_logic(self):
-        self.coin.move()
-        self.player.move()
+        #self.coin.move()
+        self.player1.move()
 
     def _draw(self):
         self.screen.fill((0, 0, 255)) #The argument here is an RGB channel.
-        self.player.draw(self.screen)
-        self.coin.draw(self.screen)
+        self.player1.draw(self.screen)
+        #self.coin.draw(self.screen)
         pygame.display.flip()
         self.clock.tick(60) #This ticks the clock so that the game runs at the same speed on any machine.
-        print("Collides:", self.coin.collides_with(self.player))
+        #print("Collides:", self.coin.collides_with(self.player))
