@@ -12,14 +12,14 @@ class PAT:
         self.clock = pygame.time.Clock()
         num_coins = 2 #If there's a property that has to be changed by editing more than 2-3 lines, make a variable for it! Plus, naming the variable makes it so much clearer to read.
         self.coins = [Coin(get_random_position(self.screen)) for i in range(num_coins)] #This is amazing! Make sure to check out how this code works if you haven't already. It's called list comprehension and it's extremely useful.
-        self.player1 = Player((400,300))
+        self.player1 = Player((100,75))
 
         for i in range(len(self.coins)): #What does this do? I can tell, but the code was very spaced out. For blocks like this that take a few lines to do one thing, describe what that one this is.
             while True: #Ex: This code finds an optimal position for each coin.
                 position = get_random_position(self.screen)
                 if(position.distance_to(self.player1.position) > self.MIN_COIN_DISTANCE):
                     break
-            self.coins.append(Coin(position))
+            #self.coins.append(Coin(position)) #This is causing an error, what is it?
 
     def main_loop(self):
         while True:

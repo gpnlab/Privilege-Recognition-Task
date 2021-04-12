@@ -1,3 +1,6 @@
+#Shelby VanVliet and Sean Steinle
+#starter code from: https://simplegametutorials.github.io/pygamezero/asteroids/
+
 import math
 import random
 

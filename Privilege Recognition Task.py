@@ -4,7 +4,7 @@
 # In[1]:
 
 
-get_ipython().system('pip install pygame')
+#get_ipython().system('pip install pygame')
 
 import pygame, sys, os, random
 
