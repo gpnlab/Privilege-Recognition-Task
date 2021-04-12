@@ -10,19 +10,15 @@ class PAT:
         self._init_pygame()
         self.screen = pygame.display.set_mode((800, 600))
         self.clock = pygame.time.Clock()
-
-        self.coins = [Coin(get_random_position(self.screen)) for _ in range(6)]
+        num_coins = 2 #If there's a property that has to be changed by editing more than 2-3 lines, make a variable for it! Plus, naming the variable makes it so much clearer to read.
+        self.coins = [Coin(get_random_position(self.screen)) for i in range(num_coins)] #This is amazing! Make sure to check out how this code works if you haven't already. It's called list comprehension and it's extremely useful.
         self.player1 = Player((400,300))
 
-        for _ in range(6):
-            while True:
+        for i in range(len(self.coins)): #What does this do? I can tell, but the code was very spaced out. For blocks like this that take a few lines to do one thing, describe what that one this is.
+            while True: #Ex: This code finds an optimal position for each coin.
                 position = get_random_position(self.screen)
-                    if (
-                    position.distance_to(self.player1.position)
-                    > self.MIN_COIN_DISTANCE
-                ):
+                if(position.distance_to(self.player1.position) > self.MIN_COIN_DISTANCE):
                     break
-
             self.coins.append(Coin(position))
 
     def main_loop(self):
@@ -57,9 +53,8 @@ class PAT:
     def _process_game_logic(self):
         #self.coin.move()
         for game_object in self._get_game_objects():
-            game_object.move(self.screen)
+            game_object.move(self.screen) #You had game_object.move() here, why would that cause an error?
         self.player1.move(self.screen)
-        self.player1.move()
 
     def _draw(self):
         self.screen.fill((0, 0, 255)) #The argument here is an RGB channel.

@@ -21,6 +21,6 @@ def wrap_position(position, surface):
 
 def get_random_position(surface):
     return Vector2(
-        random.randrange(surface.get_width()).
+        random.randrange(surface.get_width()),
         random.randrange(surface.get_height())
     )

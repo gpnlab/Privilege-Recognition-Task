@@ -18,7 +18,7 @@ class GameObject:
         blit_position = self.position - Vector2(self.radius) #(0,0) is the top left edge of the screen. Thus, we have to adapt our position to this.
         surface.blit(self.sprite, blit_position)
 
-    def move(self):
+    def move(self, surface):
         self.position = wrap_position(self.position + self.velocity, surface)
 
     def collides_with(self, other_obj):
@@ -30,7 +30,7 @@ class Player(GameObject):
     ACCELERATION = 0.25
 
     def __init__(self, position):
-        self.direction = vector2(UP)
+        self.direction = Vector2(UP)
         super().__init__(position, load_sprite("player"), Vector2(0))
 
     def rotate(self, clockwise=True):
@@ -49,5 +49,5 @@ class Player(GameObject):
         self.velocity += self.direction * self.ACCELERATION
 
 class Coin(GameObject):
-    def_init_(self, position):
-        super()._init_(position, load_sprite("coin"), (0,0))
+    def __init__(self, position):
+        super().__init__(position, load_sprite("coin"), (0,0))
