@@ -27,7 +27,7 @@ class GameObject:
 
 class Player(GameObject):
     MANEUVERABILITY = 3
-    ACCELERATION = 0.25
+    ACCELERATION = 0.1
 
     def __init__(self, position):
         self.direction = Vector2(UP)
@@ -47,6 +47,9 @@ class Player(GameObject):
 
     def accelerate(self):
         self.velocity += self.direction * self.ACCELERATION
+
+    def decelerate(self):
+        self.velocity -= self.direction * self.ACCELERATION
 
 class Coin(GameObject):
     def __init__(self, position):
