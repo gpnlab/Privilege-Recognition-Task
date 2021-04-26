@@ -17,7 +17,14 @@ class PAT:
         for i in range(len(self.coins)): #What does this do? I can tell, but the code was very spaced out. For blocks like this that take a few lines to do one thing, describe what that one this is.
             while True: #Ex: This code finds an optimal position for each coin.
                 position = get_random_position(self.screen)
+<<<<<<< Updated upstream
                 if(position.distance_to(self.player1.position) > self.MIN_COIN_DISTANCE):
+=======
+                if (
+                    position.distance_to(self.player1.position)
+                    > self.MIN_COIN_DISTANCE
+                ):
+>>>>>>> Stashed changes
                     break
             #self.coins.append(Coin(position)) #This is causing an error, what is it?
 
