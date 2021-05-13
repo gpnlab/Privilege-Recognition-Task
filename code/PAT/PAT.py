@@ -13,7 +13,7 @@ class PAT:
         num_coins = 10 #If there's a property that has to be changed by editing more than 2-3 lines, make a variable for it! Plus, naming the variable makes it so much clearer to read.
         self.coins = [Coin(get_random_position(self.screen)) for i in range(num_coins)] #This is amazing! Make sure to check out how this code works if you haven't already. It's called list comprehension and it's extremely useful.
         self.player1 = Player((400,100))
-        self.score = 0
+        self.score = 0 #This should almost certainly go in Player
         self.opponents = [Player((100,300)), Player((700,300)), Player((400,500))]
 
         #Soooo I think this was two different ways of making coins? The first (and more effective way) was above, and this is an alternative approach?
