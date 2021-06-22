@@ -1,12 +1,13 @@
 #This file will handle images of objects and loading of them.
-import random
 
+#IMPORTS
+import random
 from pygame.image import load
 from pygame.math import Vector2
 import os
 
-def load_sprite(name, with_alpha=True, filetype='png'):
-    path = f"PAT/assets/sprites/{name}.{filetype}"
+def load_sprite(name, with_alpha=True):
+    path = f"PAT/assets/sprites/{name}"
     loaded_sprite = load(path)
 
     if with_alpha:
