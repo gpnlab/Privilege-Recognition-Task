@@ -5,6 +5,7 @@ import pygame
 from models import Coin, Player
 from utils import get_random_position, load_sprite
 from time import time
+from random import random
 
 #The remainder of this file details an object, which is a collection of code that is consistently used in the same way.
 #A class describes how an object works (methods) and what makes it up (attributes). We define methods in Python with the keyword "def",
@@ -23,8 +24,7 @@ class PAT:
         num_coins = 10
         self.coins = [Coin(get_random_position(self.screen)) for i in range(num_coins)]
         self.player1 = Player((400,100))
-        self.score = 0 #This should almost certainly go in Player
-        #self.opponents = [Player((100,300)), Player((700,300)), Player((400,500))]
+        self.opponents = [Player((100,300)), Player((700,300)), Player((400,500))]
 
     #This initializes pygame commands and names the screen.
     def _init_pygame(self):
@@ -60,26 +60,48 @@ class PAT:
             self.player1.decelerate()
 
     def _get_game_objects(self):
-        return [*self.coins, self.player1] #PUT BACK IN LATER: *self.opponents
+        return [*self.coins, *self.opponents, self.player1]
 
     #This is the "doing stuff".
     def _process_game_logic(self):
-        #self.coin.move()
         for game_object in self._get_game_objects():
             game_object.move(self.screen)
         self.player1.move(self.screen)
+
+        #CREATE OPPONENT MOVEMENT
+        for opponent in self.opponents:
+            accel = random() > 0.5
+            rotate = random() > 0.5
+            if(accel):
+                opponent.accelerate()
+            else:
+                opponent.decelerate()
+            if(rotate):
+                opponent.rotate(clockwise=True)
+            else:
+                opponent.rotate(clockwise=False)
+
 
         #HANDLE COIN COLLISIONS
         if(self.player1):
             for coin in self.coins:
                 if(self.player1.collides_with(coin)):
-                    print("COLLISION AT: ", time()-self.start)
+                    #print("COLLISION AT: ", time()-self.start)
                     self.coins.remove(coin)
-                    self.score+=1
+                    self.player1.score+=1
+                if(coin):
+                    for opponent in self.opponents:
+                        if(opponent.collides_with(coin)):
+                            self.coins.remove(coin)
+                            opponent.score+=1
 
         #IF NO COINS LEFT, END GAME
         if(len(self.coins)<=0):
-            print("Your final score is:", self.score)
+            print("Your final score is:", self.player1.score)
+            i=1
+            for opponent in self.opponents:
+                print(f"Opponent #{i}'s final score is: {opponent.score}")
+                i+=1
             quit()
 
     #This is the "updating the screen".
