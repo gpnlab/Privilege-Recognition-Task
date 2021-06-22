@@ -3,10 +3,12 @@
 import pygame
 from models import Coin, Player
 from utils import get_random_position, load_sprite
+from time import time
 
 class PAT:
     MIN_COIN_DISTANCE = 250
     def __init__(self):
+        self.start = time()
         self._init_pygame()
         self.screen = pygame.display.set_mode((800, 600))
         self.clock = pygame.time.Clock()
@@ -14,7 +16,7 @@ class PAT:
         self.coins = [Coin(get_random_position(self.screen)) for i in range(num_coins)] #This is amazing! Make sure to check out how this code works if you haven't already. It's called list comprehension and it's extremely useful.
         self.player1 = Player((400,100))
         self.score = 0 #This should almost certainly go in Player
-        self.opponents = [Player((100,300)), Player((700,300)), Player((400,500))]
+        #self.opponents = [Player((100,300)), Player((700,300)), Player((400,500))]
 
         #Soooo I think this was two different ways of making coins? The first (and more effective way) was above, and this is an alternative approach?
         for i in range(len(self.coins)): #What does this do? I can tell, but the code was very spaced out. For blocks like this that take a few lines to do one thing, describe what that one this is.
@@ -57,7 +59,7 @@ class PAT:
             self.player1.decelerate()
 
     def _get_game_objects(self):
-        return [*self.coins, *self.opponents, self.player1]
+        return [*self.coins, self.player1] #PUT BACK IN LATER: *self.opponents
 
     def _process_game_logic(self):
         #self.coin.move()
@@ -69,6 +71,7 @@ class PAT:
         if(self.player1): #check to make sure player exists
             for coin in self.coins:
                 if(self.player1.collides_with(coin)):
+                    print("COLLISION AT: ", time()-self.start)
                     self.coins.remove(coin)
                     self.score+=1
 
