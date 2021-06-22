@@ -34,6 +34,7 @@ class Player(GameObject):
 
     def __init__(self, position):
         self.direction = Vector2(0,-1)
+        self.score = 0
         super().__init__(position, load_sprite("small_sprite.jfif"), Vector2(0))
 
     def rotate(self, clockwise=True):
