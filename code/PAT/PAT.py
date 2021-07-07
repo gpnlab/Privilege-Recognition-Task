@@ -7,11 +7,6 @@ from utils import get_random_position, load_sprite
 from time import time
 from random import random
 
-#The remainder of this file details an object, which is a collection of code that is consistently used in the same way.
-#A class describes how an object works (methods) and what makes it up (attributes). We define methods in Python with the keyword "def",
-#and we define attributes with the keyword "self.". After we create a specific instance of this object somewhere else in our code, we
-#can access its methods and attributes with ".". For example, "PAT.coins" refers to the list of coins in the game.
-#The object we're making here describes the game as a whole. There will only be one instance, because there is only one game.
 class PAT:
     MIN_COIN_DISTANCE = 250
     #__init__ is a special method that is run the moment that an instance of an object is created. Thus, we see many attributes being
@@ -23,16 +18,14 @@ class PAT:
         self.clock = pygame.time.Clock()
         num_coins = 10
         self.coins = [Coin(get_random_position(self.screen)) for i in range(num_coins)]
-        self.player1 = Player((400,100))
-        self.opponents = [Player((100,300)), Player((700,300)), Player((400,500))]
+        self.player1 = Player((400,100), 'other_player.png')
+        self.opponents = [Player((100,300), 'small_sprite.jfif'), Player((700,300), 'small_sprite.jfif'), Player((400,500), 'small_sprite.jfif')]
 
     #This initializes pygame commands and names the screen.
     def _init_pygame(self):
         pygame.init()
         pygame.display.set_caption("Privilege Awareness Task")
         #This does under the hood things to get pygame ready to run.
-
-    #Everything above this line happens the moment a game instance is created. Everything below happens as the game progresses.
 
     #This is the main game loop. #There are three main sections to every game. Getting input, doing stuff, and updating the screen.
     def main_loop(self):
