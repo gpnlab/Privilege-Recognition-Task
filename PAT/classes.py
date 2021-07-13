@@ -1,16 +1,15 @@
 import pygame
-from pathlib import Path
-import os
+from os import path
 
 class PAT:
     def __init__(self):
         #fixed res for now (TODO)
 
-        
 
         pygame.init()
         self.background = Background((800,800))
         self.clock = pygame.time.Clock()
+        self.player = Player(self.background.screen,(0,0))
         
 
     def main_loop(self):
@@ -25,9 +24,17 @@ class PAT:
     def _process_game_logic(self):
         events = pygame.event.get()
 
+        for event in events:
+            if event.type == pygame.QUIT: 
+                pygame.quit()
+                exit()
+        self.player.update()
+
+
     def _draw(self):
 
         self.background.draw()
+        self.player.draw()
         
         pygame.display.flip()
         pygame.display.update()
@@ -45,18 +52,17 @@ class Background(pygame.sprite.Sprite):
 
     def imgLoad(self,img):
 
-        relPath = os.path.join(os.path.dirname(__file__),f"images/background/{img}")
-
-        print(relPath)
-        #pathLib fixes problems with differnet path conventions between linux and windows
+        relPath = path.join(path.dirname(__file__),f"images/background/{img}")
         backImg = pygame.image.load(relPath).convert_alpha()
         backImg = pygame.transform.scale(backImg,self.res)
         return backImg
     
     def draw(self):
         #fills a black screen
-        self.screen.fill((0,0,0))
-        self.screen.blit(self.image,(0,0))
+        self.screen.fill((255,255,255))
+        
+        #not a fan of this dark background :P
+        #self.screen.blit(self.image,(0,0))
 
         
 
@@ -64,8 +70,11 @@ class Background(pygame.sprite.Sprite):
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self,coord,imgName,velocity = 0,acceleration = 0):
+    def __init__(self,screen,coord,imgName,velocity = 1,acceleration = 0):
         pygame.sprite.Sprite.__init__(self)
+
+        #screen tells us where to draw to
+        self.screen = screen
 
         self.x,self.y = coord
         self.vel = velocity
@@ -75,6 +84,8 @@ class GameObject(pygame.sprite.Sprite):
 
         #add additional argument if resize is needed
         self.image = self.imgLoad(imgName)
+
+
         
         #store the dimension of the sprite
         self.xDim,self.yDim = self.image.get_rect().size
@@ -89,9 +100,9 @@ class GameObject(pygame.sprite.Sprite):
     @staticmethod
     def imgLoad(img,resizeDim = (80,80)):
 
-        relPath = Path(f"images/objects/{img}")
-        #pathLib fixes problems with differnet path conventions between linux and windows
-        playerImg = pygame.image.load(relPath.name).convert_alpha()
+        relPath = path.join(path.dirname(__file__),f"images/objects/{img}")
+        
+        playerImg = pygame.image.load(relPath).convert_alpha()
         playerImg = pygame.transform.scale(playerImg,resizeDim)
         return playerImg
 
@@ -102,13 +113,15 @@ class GameObject(pygame.sprite.Sprite):
                                 self.xDim,self.yDim)
 
     #direction is horizontal, then veritical
-    def move(self,horizontal = False, vertical = False):
+    def move(self,horizontal = 0, vertical = 0):
         self.x += horizontal * self.vel
         self.y += vertical * self.vel
 
         #TODO: check for out of bounds
         self.setRect()
-
+    
+    def draw(self):
+        self.screen.blit(self.image,(self.x,self.y))
 
 class Player(GameObject):
     
@@ -117,8 +130,8 @@ class Player(GameObject):
     def preload(self):
         return
     
-    def __init__(self,coord):
-        super.__init__(coord,"pacman.png")
+    def __init__(self,screen,coord):
+        super().__init__(screen,coord,"placeHolder.png")
 
     
     def update(self,horiz=1,vert=1):
@@ -131,21 +144,15 @@ class Player(GameObject):
         
     
         if keys[pygame.K_w]:
-            yUpdate = vert*self.vel
+            self.move(0,-1)
         elif keys[pygame.K_s]:
-            self.yVel = abs(self.yVel)
-            yUpdate = vert*self.yVel
+            self.move(0,1)
             
         if keys[pygame.K_a]:
-            self.xVel = -abs(self.xVel)
-            xUpdate = horiz*self.xVel  
+            self.move(-1,0)  
         elif keys[pygame.K_d]:
-            self.xVel = abs(self.xVel)
-            xUpdate = horiz*self.xVel
+            self.move(1,0)
 
-
-        self.x += xUpdate
-        self.y += yUpdate
 
 class Coin:
     def __init__(self):
