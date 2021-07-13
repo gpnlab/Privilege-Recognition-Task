@@ -1,15 +1,27 @@
 import pygame
+import random
 from os import path
 
 class PAT:
     def __init__(self):
         #fixed res for now (TODO)
-
+        self.res = (800,800)
 
         pygame.init()
-        self.background = Background((800,800))
+        self.background = Background(self.res)
         self.clock = pygame.time.Clock()
-        self.player = Player(self.background.screen,(0,0))
+
+        self.pGroup = pygame.sprite.GroupSingle()
+        self.cGroup = pygame.sprite.Group()
+
+        self.player = Player(self.background.screen,self.pGroup,(0,0))
+
+        #TODO: fixed number of coins currently 
+        for i in range(5):
+            spawnCoord = random.randint(50,self.res[0]),random.randint(50,self.res[1])
+            coin = Coin(self.cGroup,self.background.screen,spawnCoord)
+            
+
         
 
     def main_loop(self):
@@ -34,7 +46,11 @@ class PAT:
     def _draw(self):
 
         self.background.draw()
-        self.player.draw()
+
+        #sprite groups are great because they allow you
+        #to draw all sprites of the group at the same time
+        self.pGroup.draw(self.background.screen)
+        self.cGroup.draw(self.background.screen)
         
         pygame.display.flip()
         pygame.display.update()
@@ -45,7 +61,7 @@ class Background(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.res = res
         self.screen = pygame.display.set_mode(res)
-        self.drawTo = pygame.Surface(res)
+        self.surface = pygame.Surface(res)
         self.image = self.imgLoad(image)
 
         pygame.display.set_caption(caption)
@@ -70,9 +86,11 @@ class Background(pygame.sprite.Sprite):
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self,screen,coord,imgName,velocity = 1,acceleration = 0):
+    def __init__(self,screen,group,coord,imgName,resize = (80,80), velocity = 1,acceleration = 0):
         pygame.sprite.Sprite.__init__(self)
 
+        self.group = group 
+        self.group.add(self)
         #screen tells us where to draw to
         self.screen = screen
 
@@ -83,7 +101,7 @@ class GameObject(pygame.sprite.Sprite):
         self.acc = acceleration
 
         #add additional argument if resize is needed
-        self.image = self.imgLoad(imgName)
+        self.image = self.imgLoad(imgName,resize)
 
 
         
@@ -124,14 +142,13 @@ class GameObject(pygame.sprite.Sprite):
         self.screen.blit(self.image,(self.x,self.y))
 
 class Player(GameObject):
-    
 
     #TODO: preload sprites for each eight direcitons
     def preload(self):
         return
     
-    def __init__(self,screen,coord):
-        super().__init__(screen,coord,"placeHolder.png")
+    def __init__(self,screen,group,coord):
+        super().__init__(screen,group,coord,"placeHolder.png")
 
     
     def update(self,horiz=1,vert=1):
@@ -154,6 +171,9 @@ class Player(GameObject):
             self.move(1,0)
 
 
-class Coin:
-    def __init__(self):
-        pass
+class Coin(GameObject):
+    #have the coin give itself a random coordinate for now
+    #TODO: implement "placement bias"
+    def __init__(self,group,screen,coord):
+        super().__init__(screen,group,coord,"coin.png",(40,40))
+        
