@@ -8,6 +8,7 @@ class PAT:
         self.res = (800,800)
 
         pygame.init()
+        self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
         self.clock = pygame.time.Clock()
 
@@ -44,7 +45,11 @@ class PAT:
         #collisions
         collectFlag = pygame.sprite.groupcollide(self.pGroup,self.cGroup,False,True)
 
-        if collectFlag: print("collected coin!")
+        if collectFlag: 
+            print("collected coin!")
+            #when more players are added, this will be done via group.items (see level.py of Social Heroes)
+            self.player.coins += 1
+
         
 
 
@@ -56,20 +61,24 @@ class PAT:
         #to draw all sprites of the group at the same time
         self.pGroup.draw(self.background.screen)
         self.cGroup.draw(self.background.screen)
+        self.drawHUD()
         
         pygame.display.flip()
         pygame.display.update()
 
-
+    #TODO: figure out a better place to put this function
+    def drawHUD(self):
+        coinTxt = self.font.render(f"Coins: {self.player.coins}",True,(0,0,0))
+        self.background.screen.blit(coinTxt,(0,self.background.res[1]//16))
 class Background(pygame.sprite.Sprite):
-    def __init__(self,res,image = "pacman.png",caption = "Privilege Recognition Task"):
+    def __init__(self,res,image = "pacman.png"):
         pygame.sprite.Sprite.__init__(self)
         self.res = res
         self.screen = pygame.display.set_mode(res)
         self.surface = pygame.Surface(res)
         self.image = self.imgLoad(image)
 
-        pygame.display.set_caption(caption)
+        pygame.display.set_caption("Privilege Recognition Task")
 
     def imgLoad(self,img):
 
@@ -81,11 +90,11 @@ class Background(pygame.sprite.Sprite):
     def draw(self):
         #fills a black screen
         self.screen.fill((255,255,255))
-        
+    
         #not a fan of this dark background :P
         #self.screen.blit(self.image,(0,0))
 
-        
+    
 
 
 
@@ -154,6 +163,7 @@ class Player(GameObject):
     
     def __init__(self,screen,group,coord):
         super().__init__(screen,group,coord,"placeHolder.png")
+        self.coins = 0
 
     
     def getInput(self,horiz=1,vert=1):
