@@ -1,5 +1,6 @@
 #Justin Zhang's imported game object class
 import pygame
+from pathlib import Path
 
 class GameObject(pygame.sprite.Sprite):
     def __init__(self,coord,imgName,velocity = 0,acceleration = 0):
@@ -24,7 +25,10 @@ class GameObject(pygame.sprite.Sprite):
     #default size will be 80x80
     @staticmethod
     def imgLoad(img,resizeDim = (80,80)):
-        playerImg = pygame.image.load(f"images/objects/{img}").convert_alpha()
+
+        relPath = Path(f"images/objects/{img}")
+        #pathLib fixes problems with differnet path conventions between linux and windows
+        playerImg = pygame.image.load(relPath.name).convert_alpha()
         playerImg = pygame.transform.scale(playerImg,resizeDim)
         return playerImg
 
