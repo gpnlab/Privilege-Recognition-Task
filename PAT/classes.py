@@ -31,7 +31,7 @@ class PAT:
             self._draw()
 
     def _handle_input(self):
-        pass
+        self.player.getInput()
 
     def _process_game_logic(self):
         events = pygame.event.get()
@@ -40,7 +40,12 @@ class PAT:
             if event.type == pygame.QUIT: 
                 pygame.quit()
                 exit()
-        self.player.update()
+
+        #collisions
+        collectFlag = pygame.sprite.groupcollide(self.pGroup,self.cGroup,False,True)
+
+        if collectFlag: print("collected coin!")
+        
 
 
     def _draw(self):
@@ -151,7 +156,7 @@ class Player(GameObject):
         super().__init__(screen,group,coord,"placeHolder.png")
 
     
-    def update(self,horiz=1,vert=1):
+    def getInput(self,horiz=1,vert=1):
         keys = pygame.key.get_pressed()
         xUpdate = 0
         yUpdate = 0
