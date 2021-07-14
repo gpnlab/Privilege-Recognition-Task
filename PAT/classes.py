@@ -1,3 +1,4 @@
+import math
 import pygame
 import random
 from os import path
@@ -166,26 +167,29 @@ class GameObject(pygame.sprite.Sprite):
     def draw(self):
         self.screen.blit(self.image,(self.x,self.y))
 
-class Player(GameObject):
+
+#Agent as in player/enemies
+class Agent(GameObject):
 
     #TODO: preload sprites for each eight direcitons
     def preload(self):
         return
     
-    def __init__(self,background,group,coord):
-        super().__init__(background,group,coord,"placeHolder.png")
+    def __init__(self,background,group,coord,imgName = "placeholder.png"):
+        super().__init__(background,group,coord,imgName)
         self.coins = 0
 
     
+class Player(Agent):
+    def __init__(self,background,group,coord,imgName = "placeholder.png"):
+        super().__init__(background,group,coord,imgName)
+
     def getInput(self,horiz=1,vert=1):
         keys = pygame.key.get_pressed()
-        xUpdate = 0
-        yUpdate = 0
         
         #self.imgUpdate(keys)
         #when 8 directions added, this will update with corresponding sprite
         
-    
         if keys[pygame.K_w]:
             self.move(0,-1)
         elif keys[pygame.K_s]:
@@ -196,6 +200,26 @@ class Player(GameObject):
         elif keys[pygame.K_d]:
             self.move(1,0)
 
+
+#is calling them enemies a form of bias within itself hmmmmmm
+#"OtherPlayers" doesn't really roll off the tongue
+class Enemies(Agent):
+    #need to pass in coin group for AI to find nearest coin
+    def __init__(self,background,group,cGroup,coord,imgName = "placeholder.png"):
+        super().__init__(background,group,coord,imgName)
+        self.coinGroup = cGroup
+
+    def dist(c1,c2):
+        (x1,y1),(x2,y2) = c1,c2
+        return math.sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
+    #loop through everything in coin group
+    def getNearestCoinCoord(self):
+        pass
+
+    #optimal movement toward nearest coin
+    def optMove(self):
+        pass
 
 class Coin(GameObject):
     #have the coin give itself a random coordinate for now
