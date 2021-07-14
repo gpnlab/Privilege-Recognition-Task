@@ -1,7 +1,7 @@
 import math
 import pygame
 import random
-from os import path
+from os import path, stat
 
 class PAT:
     def __init__(self):
@@ -13,10 +13,20 @@ class PAT:
         self.background = Background(self.res)
         self.clock = pygame.time.Clock()
 
-        self.pGroup = pygame.sprite.GroupSingle()
+        #aGroup is the group of all agents
+        #cGroup is the group of all coins
+        self.aGroup = pygame.sprite.Group()
         self.cGroup = pygame.sprite.Group()
 
-        self.player = Player(self.background,self.pGroup,(self.res[0] // 4, self.res[1] // 4))
+        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4))
+        
+        #TODO: change the temporary spawn points of enemies, and change sprite
+        # aaand make it so this is less disgusting code
+        self.enemy1 = Enemy(self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4))
+
+        self.enemy2 = Enemy(self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4))
+        
+        self.enemy3 = Enemy(self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4))
 
         #TODO: fixed number of coins currently 
         for i in range(5):
@@ -44,7 +54,7 @@ class PAT:
                 exit()
 
         #collisions
-        collectFlag = pygame.sprite.groupcollide(self.pGroup,self.cGroup,False,True)
+        collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
 
         if collectFlag: 
             print("collected coin!")
@@ -60,7 +70,7 @@ class PAT:
 
         #sprite groups are great because they allow you
         #to draw all sprites of the group at the same time
-        self.pGroup.draw(self.background.screen)
+        self.aGroup.draw(self.background.screen)
         self.cGroup.draw(self.background.screen)
         self.drawHUD()
         
@@ -101,7 +111,7 @@ class Background(pygame.sprite.Sprite):
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self,background,group,coord,imgName,resize = (80,80), velocity = 1,acceleration = 0):
+    def __init__(self,background,group,coord,imgName,resize = (40,40), velocity = 1,acceleration = 0):
         pygame.sprite.Sprite.__init__(self)
 
         self.group = group 
@@ -203,7 +213,7 @@ class Player(Agent):
 
 #is calling them enemies a form of bias within itself hmmmmmm
 #"OtherPlayers" doesn't really roll off the tongue
-class Enemies(Agent):
+class Enemy(Agent):
     #need to pass in coin group for AI to find nearest coin
     def __init__(self,background,group,cGroup,coord,imgName = "placeholder.png"):
         super().__init__(background,group,coord,imgName)
@@ -212,6 +222,7 @@ class Enemies(Agent):
     def dist(c1,c2):
         (x1,y1),(x2,y2) = c1,c2
         return math.sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2)
+
 
     #loop through everything in coin group
     def getNearestCoinCoord(self):
@@ -225,5 +236,5 @@ class Coin(GameObject):
     #have the coin give itself a random coordinate for now
     #TODO: implement "placement bias"
     def __init__(self,group,background,coord):
-        super().__init__(background,group,coord,"coin.png",(40,40))
+        super().__init__(background,group,coord,"coin.png",(20,20))
         
