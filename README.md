@@ -2,13 +2,13 @@
 
 ## Sprint Tasks:
 1. ~~Basic File Structure~~
-2. ~~Screen Setup and Design - P
-	- sprite sizes, display score, timers, other screen requirements~~
-3. ~~Movement and AI Logic - P
-	- Player movement
-	- Enemy movement
-		- optimal
-		- random~~
+2. ~~Screen Setup and Design - P~~
+	- ~~sprite sizes, display score, timers, other screen requirements~~
+3. ~~Movement and AI Logic - P~~
+	- ~~Player movement~~
+	- ~~Enemy movement~~
+		- ~~optimal~~
+		- ~~random~~
 
 4. Multiple Rounds, Questions Between Rounds - P
 	- split games into rounds, display scores, ask questions
