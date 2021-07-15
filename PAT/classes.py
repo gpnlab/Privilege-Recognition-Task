@@ -28,22 +28,22 @@ class PAT:
         self.eGroup = pygame.sprite.Group()
         self.cGroup = pygame.sprite.Group()
 
-        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4))
+        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4), "p1.png")
         
         #TODO: change the temporary spawn points of enemies, and change sprite
         # aaand make it so this is less disgusting code
-        self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4))
+        self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),"p2.png")
 
-        self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4))
+        self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),"p3.png")
         
-        self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4))
+        self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),"p4.png")
 
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
         self.eGroup.add(self.enemy3)
 
         #Pass background and player into HUD
-        self.HUD = HUD(self.background, self.player) 
+        self.HUD = HUD(self.background, self.aGroup) 
 
         #TODO: fixed number of coins currently 
         for i in range(30):
@@ -133,10 +133,11 @@ class Background(pygame.sprite.Sprite):
         #self.screen.blit(self.image,(0,0))
 
 class HUD:
-    def __init__(self, background, player):
+    def __init__(self, background, agents):
         self.background = background
-        self.player = player
-        self.fontHUD = pygame.font.SysFont('arial', int(min(self.background.res[0],self.background.res[1]) * 0.1))
+        self.agents = agents
+        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
+        self.fontHUD = pygame.font.SysFont('arial', self.size)
         self.timer = 0
     
     def updateTimer(self):
@@ -146,9 +147,11 @@ class HUD:
         self.timer = 0
 
     def drawHUD(self):
-        #Coins
-        coinTxt = self.fontHUD.render(f"Coins: {self.player.coins}",True,(0,0,0))
-        self.background.screen.blit(coinTxt,(0,0))
+        i = 0
+        for agent in self.agents:
+            coinTxt = self.fontHUD.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
+            self.background.screen.blit(coinTxt,(0,self.size * i))
+            i += 1
 
         #Timer
         timerTxt = self.fontHUD.render(f"Time: {self.timer // 1000}" ,True,(0,0,0))
