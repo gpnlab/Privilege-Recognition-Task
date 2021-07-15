@@ -5,13 +5,19 @@ from os import path, stat
 
 class PAT:
     def __init__(self):
-        #fixed res for now (TODO)
-        self.res = (800,800)
+        #TODO: fixed coins for now
+        self.coinsLeft = 30
 
         #TODO: fixed coins for now
         self.coinsLeft = 30
 
         pygame.init()
+
+        #RES is fullScreen
+        self.displayInfo = pygame.display.Info()
+        self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
+
+        
         self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
         self.clock = pygame.time.Clock()
@@ -35,6 +41,9 @@ class PAT:
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
         self.eGroup.add(self.enemy3)
+
+        #Pass background and player into HUD
+        self.HUD = HUD(self.background, self.player) 
 
         #TODO: fixed number of coins currently 
         for i in range(30):
@@ -64,6 +73,10 @@ class PAT:
             if event.type == pygame.QUIT: 
                 pygame.quit()
                 exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
+                pygame.quit()
+                exit()
+
 
         #collisions
         collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
@@ -74,6 +87,9 @@ class PAT:
             #when more players are added, this will be done via group.items (see level.py of Social Heroes)
             agent.coins += 1
             self.coinsLeft -= 1
+
+        #Clock updates
+        self.HUD.updateTimer()
 
         
 
@@ -86,15 +102,12 @@ class PAT:
         #to draw all sprites of the group at the same time
         self.aGroup.draw(self.background.screen)
         self.cGroup.draw(self.background.screen)
-        self.drawHUD()
+        self.HUD.drawHUD()
         
         pygame.display.flip()
         pygame.display.update()
 
-    #TODO: figure out a better place to put this function
-    def drawHUD(self):
-        coinTxt = self.font.render(f"Coins: {self.player.coins}",True,(0,0,0))
-        self.background.screen.blit(coinTxt,(0,self.background.res[1]//16))
+    
 class Background(pygame.sprite.Sprite):
     def __init__(self,res,image = "pacman.png"):
         pygame.sprite.Sprite.__init__(self)
@@ -119,8 +132,29 @@ class Background(pygame.sprite.Sprite):
         #not a fan of this dark background :P
         #self.screen.blit(self.image,(0,0))
 
+class HUD:
+    def __init__(self, background, player):
+        self.background = background
+        self.player = player
+        self.fontHUD = pygame.font.SysFont('arial', int(min(self.background.res[0],self.background.res[1]) * 0.1))
+        self.timer = 0
     
+    def updateTimer(self):
+        self.timer = pygame.time.get_ticks()
 
+    def resetTimer(self):
+        self.timer = 0
+
+    def drawHUD(self):
+        #Coins
+        coinTxt = self.fontHUD.render(f"Coins: {self.player.coins}",True,(0,0,0))
+        self.background.screen.blit(coinTxt,(0,0))
+
+        #Timer
+        timerTxt = self.fontHUD.render(f"Time: {self.timer // 1000}" ,True,(0,0,0))
+        timerRect = timerTxt.get_rect()
+        timerRect.topright = (self.background.res[0],0)
+        self.background.screen.blit(timerTxt,timerRect)
 
 
 
