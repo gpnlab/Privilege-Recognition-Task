@@ -8,6 +8,9 @@ class PAT:
         #fixed res for now (TODO)
         self.res = (800,800)
 
+        #TODO: fixed coins for now
+        self.coinsLeft = 30
+
         pygame.init()
         self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
@@ -16,26 +19,31 @@ class PAT:
         #aGroup is the group of all agents
         #cGroup is the group of all coins
         self.aGroup = pygame.sprite.Group()
+        self.eGroup = pygame.sprite.Group()
         self.cGroup = pygame.sprite.Group()
 
         self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4))
         
         #TODO: change the temporary spawn points of enemies, and change sprite
         # aaand make it so this is less disgusting code
-        self.enemy1 = Enemy(self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4))
+        self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4))
 
-        self.enemy2 = Enemy(self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4))
+        self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4))
         
-        self.enemy3 = Enemy(self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4))
+        self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4))
+
+        self.eGroup.add(self.enemy1)
+        self.eGroup.add(self.enemy2)
+        self.eGroup.add(self.enemy3)
 
         #TODO: fixed number of coins currently 
-        for i in range(5):
+        for i in range(30):
             spawnCoord = random.randint(50,self.res[0]),random.randint(50,self.res[1])
             coin = Coin(self.cGroup,self.background,spawnCoord)
             
 
         
-
+    #TODO: handle logistics of rounds changing
     def main_loop(self):
         while True:
             self._handle_input()
@@ -47,6 +55,10 @@ class PAT:
 
     def _process_game_logic(self):
         events = pygame.event.get()
+        
+        #TODO: flag whenever all coins are gone to end "level"
+        for e in self.eGroup:
+            if self.coinsLeft > 0: e.optMove()
 
         for event in events:
             if event.type == pygame.QUIT: 
@@ -56,10 +68,12 @@ class PAT:
         #collisions
         collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
 
-        if collectFlag: 
-            print("collected coin!")
+        #allows us to access and update selected agent coin count
+        for (agent,_) in collectFlag.items(): 
+            print(f"{agent.name} has collected a coin!")
             #when more players are added, this will be done via group.items (see level.py of Social Heroes)
-            self.player.coins += 1
+            agent.coins += 1
+            self.coinsLeft -= 1
 
         
 
@@ -111,7 +125,7 @@ class Background(pygame.sprite.Sprite):
 
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self,background,group,coord,imgName,resize = (40,40), velocity = 1,acceleration = 0):
+    def __init__(self,background,group,coord,imgName,resize = (40,40), velocity = .5,acceleration = 0):
         pygame.sprite.Sprite.__init__(self)
 
         self.group = group 
@@ -164,7 +178,6 @@ class GameObject(pygame.sprite.Sprite):
         self.x += horizontal * self.vel
         self.y += vertical * self.vel
 
-        #TODO: check for out of bounds
         #check oob
         if (self.x < 0 + self.xDim // 2 or self.x > self.bg.res[0] - self.xDim // 2):
             self.x -= horizontal * self.vel
@@ -185,14 +198,15 @@ class Agent(GameObject):
     def preload(self):
         return
     
-    def __init__(self,background,group,coord,imgName = "placeholder.png"):
+    def __init__(self,name,background,group,coord,imgName = "placeholder.png"):
         super().__init__(background,group,coord,imgName)
+        self.name = name
         self.coins = 0
 
     
 class Player(Agent):
     def __init__(self,background,group,coord,imgName = "placeholder.png"):
-        super().__init__(background,group,coord,imgName)
+        super().__init__("player",background,group,coord,imgName)
 
     def getInput(self,horiz=1,vert=1):
         keys = pygame.key.get_pressed()
@@ -215,22 +229,42 @@ class Player(Agent):
 #"OtherPlayers" doesn't really roll off the tongue
 class Enemy(Agent):
     #need to pass in coin group for AI to find nearest coin
-    def __init__(self,background,group,cGroup,coord,imgName = "placeholder.png"):
-        super().__init__(background,group,coord,imgName)
+    def __init__(self,name,background,group,cGroup,coord,imgName = "placeholder.png"):
+        super().__init__(name,background,group,coord,imgName)
         self.coinGroup = cGroup
 
-    def dist(c1,c2):
+    def dist(self,c1,c2):
         (x1,y1),(x2,y2) = c1,c2
         return math.sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 
     #loop through everything in coin group
     def getNearestCoinCoord(self):
-        pass
+        #default "max" distance
+        bestDist = self.bg.res[0]
+        for coin in self.coinGroup:
+            currDist = self.dist((self.x,self.y),(coin.x,coin.y))
+
+            if currDist < bestDist:
+                bestCoin = coin
+                bestDist = currDist
+
+        return (bestCoin.x,bestCoin.y)
+
 
     #optimal movement toward nearest coin
+    #will have to normalize vector to the velocity of the enemy (yay linear algebra)
     def optMove(self):
-        pass
+        (cX,cY) = self.getNearestCoinCoord()
+        d = self.dist((cX,cY),(self.x,self.y))
+
+        #normalize
+        xMov = self.vel * (cX - self.x) / d
+        yMov = self.vel * (self.y - cY) / d
+
+        self.move(xMov,-yMov)
+
+
 
 class Coin(GameObject):
     #have the coin give itself a random coordinate for now
