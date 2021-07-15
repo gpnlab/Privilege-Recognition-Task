@@ -5,6 +5,9 @@ from os import path, stat
 
 class PAT:
     def __init__(self):
+        #TODO: fixed coins for now
+        self.coinsLeft = 30
+
         pygame.init()
 
         #RES is fullScreen
