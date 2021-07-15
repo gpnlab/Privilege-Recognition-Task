@@ -67,7 +67,8 @@ class PAT:
         
         #TODO: flag whenever all coins are gone to end "level"
         for e in self.eGroup:
-            if self.coinsLeft > 0: e.optMove()
+            if self.coinsLeft > 0: e.randomWalk(self.HUD.timer)
+                
 
         for event in events:
             if event.type == pygame.QUIT: 
@@ -269,6 +270,16 @@ class Enemy(Agent):
     def __init__(self,name,background,group,cGroup,coord,imgName = "placeholder.png"):
         super().__init__(name,background,group,coord,imgName)
         self.coinGroup = cGroup
+        
+        #3 states:
+        #0 - optimal path towards closest coin
+        #1 - random direction
+        #2 - stay still
+        #transfer probabilities will be listed in the readme
+        self.state = 0
+
+        #probability matrix for transfering
+        self.pMatrix = [[8,1,1],[7,1,2],[7,1,2]]
 
     def dist(self,c1,c2):
         (x1,y1),(x2,y2) = c1,c2
@@ -300,6 +311,34 @@ class Enemy(Agent):
         yMov = self.vel * (self.y - cY) / d
 
         self.move(xMov,-yMov)
+    
+    def getRandMove(self):
+        self.randX = random.uniform(-1,1)
+        self.randY = math.sqrt(1 - self.randX ** 2) * random.choice([-1,1])
+    
+    def randMove(self):
+        #return a randomized and normalized movement
+        self.move(self.randX,self.randY)
+
+    def getNewState(self):
+        return random.choices([0,1,2],self.pMatrix[self.state])[0]
+
+    def randomWalk(self,time):
+        #0 - optimal path towards closest coin
+        #1 - random direction
+        #2 - stay still
+        #Currently, wait 60 - 120 ticks before considering state chang
+        if time % random.randint(60,120) == 0: 
+            self.state = self.getNewState()
+            if self.state == 1: self.getRandMove() #get new random movement
+
+        if self.state == 0:
+            self.optMove()
+        elif self.state == 1:
+            
+            self.randMove()
+        #state 2 do nothing
+
 
 
 
