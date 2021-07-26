@@ -1,4 +1,6 @@
+import numpy
 import pygame
+from configReader import ConfigReader
 from background import *
 from objects import *
 
@@ -6,11 +8,11 @@ from objects import *
 #TODO: repurpose as "level" class so we can have multiple levels
 class PAT:
     def __init__(self):
-        #TODO: fixed coins for now
-        self.coinsLeft = 30
 
-        #TODO: fixed coins for now
-        self.coinsLeft = 30
+        #TODO: have a config file for each player
+        config = ConfigReader.parseToDict("config.txt")
+        print(config)
+        self.coinsLeft = config["numberOfCoins"]
 
         pygame.init()
 
@@ -29,15 +31,15 @@ class PAT:
         self.eGroup = pygame.sprite.Group()
         self.cGroup = pygame.sprite.Group()
 
-        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4), "p1.png")
+        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4), config["playerVel"], "p1.png")
         
         #TODO: change the temporary spawn points of enemies, and change sprite
         # aaand make it so this is less disgusting code
-        self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),"p2.png")
+        self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),config["enemy1Vel"],"p2.png")
 
-        self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),"p3.png")
+        self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),config["enemy2Vel"],"p3.png")
         
-        self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),"p4.png")
+        self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),config["enemy3Vel"],"p4.png")
 
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
@@ -46,9 +48,28 @@ class PAT:
         #Pass background and player into HUD
         self.HUD = HUD(self.background, self.aGroup) 
 
-        #TODO: fixed number of coins currently 
-        for i in range(30):
-            spawnCoord = random.randint(50,self.res[0]),random.randint(50,self.res[1])
+        #set mean acoording to biases:
+        meanCoor = (self.res[0] / 2, self.res[1] / 2)
+        
+        #TODO: get a stronger notion of 'bias', right now its just an arbitrary adjustment to mean
+
+        if config["playerBias"]:
+            print("playerBias detected")
+            meanCoor = self.player.x,self.player.y
+        
+        if config["enemy1Bias"]:
+            meanCoor = self.enemy1.x,self.enemy1.y
+        if config["enemy2Bias"]:
+            meanCoor = self.enemy2.x,self.enemy2.y
+        if config["enemy3Bias"]:
+            meanCoor = self.enemy3.x,self.enemy3.y
+
+        for i in range(int(config["numberOfCoins"])):
+            spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 4)
+            
+            while spawnCoord[0] < 50 or spawnCoord[0] > self.res[0] or spawnCoord[1] < 50 or spawnCoord[1] > self.res[1]:
+                spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 4)
+            
             coin = Coin(self.cGroup,self.background,spawnCoord)
             
 
