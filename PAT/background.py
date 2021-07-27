@@ -32,12 +32,13 @@ class HUD:
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
         self.fontHUD = pygame.font.SysFont('arial', self.size)
         self.timer = 0
+        self.baseTime = 0
     
     def updateTimer(self):
-        self.timer = pygame.time.get_ticks()
+        self.timer = pygame.time.get_ticks() - self.baseTime
 
     def resetTimer(self):
-        self.timer = 0
+        self.baseTime = pygame.time.get_ticks()
 
     def drawHUD(self):
         i = 0

@@ -9,9 +9,6 @@ class PAT:
         #TODO: fixed coins for now
         self.coinsLeft = 30
 
-        #TODO: fixed coins for now
-        self.coinsLeft = 30
-
         pygame.init()
 
         #RES is fullScreen
@@ -50,6 +47,9 @@ class PAT:
         for i in range(30):
             spawnCoord = random.randint(50,self.res[0]),random.randint(50,self.res[1])
             coin = Coin(self.cGroup,self.background,spawnCoord)
+
+        #TODO: Write game data into CSV file after each round; for now just save final game state into a list
+        self.finisedRounds = [] 
             
 
         
@@ -91,7 +91,44 @@ class PAT:
             self.coinsLeft -= 1
 
         #Clock updates
-        self.HUD.updateTimer()
+        if self.coinsLeft > 0: #TODO: condense this logic with everything else so the entire game stops when there are no coins left
+            self.HUD.updateTimer()
+
+        #End of round/reset [TODO: make this a function, or restructure PAT class so we can just call it again instead of doing this mess]
+        if self.coinsLeft <= 0:
+            #Add each score
+            endState = dict()
+            endState["scores"] = dict()
+            for a in self.aGroup:
+                endState["scores"][a.name] = a.coins
+
+            #Add the timer and reset
+            endState["time"] = self.HUD.timer
+            self.HUD.resetTimer()
+
+            #Remove old object and declare new ones in their place [there must be a better way to to this, TODO]
+            self.aGroup.empty()
+            self.eGroup.empty()
+
+            self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4), "p1.png")
+            self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),"p2.png")
+            self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),"p3.png")
+            self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),"p4.png")
+
+            self.eGroup.add(self.enemy1)
+            self.eGroup.add(self.enemy2)
+            self.eGroup.add(self.enemy3)
+
+            #Respawn Coins
+            for i in range(30):
+                spawnCoord = random.randint(50,self.res[0]),random.randint(50,self.res[1])
+                coin = Coin(self.cGroup,self.background,spawnCoord)
+            
+            self.coinsLeft = 30
+            
+            #add endstate to the list
+            self.finisedRounds.append(endState)
+            print(self.finisedRounds)
 
         
 
