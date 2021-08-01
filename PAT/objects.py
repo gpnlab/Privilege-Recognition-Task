@@ -4,7 +4,7 @@ import random
 from os import path, stat
 
 class GameObject(pygame.sprite.Sprite):
-    def __init__(self,background,group,coord,imgName,resize = (40,40), velocity = .5,acceleration = 0):
+    def __init__(self,background,group,coord,imgName,velocity = .5,acceleration = 0,resize = (40,40)):
         pygame.sprite.Sprite.__init__(self)
 
         self.group = group 
@@ -77,15 +77,15 @@ class Agent(GameObject):
     def preload(self):
         return
     
-    def __init__(self,name,background,group,coord,imgName = "placeholder.png"):
-        super().__init__(background,group,coord,imgName)
+    def __init__(self,name,background,group,coord,velocity,imgName = "placeholder.png"):
+        super().__init__(background,group,coord,imgName,velocity)
         self.name = name
         self.coins = 0
 
     
 class Player(Agent):
-    def __init__(self,background,group,coord,imgName = "placeholder.png"):
-        super().__init__("player",background,group,coord,imgName)
+    def __init__(self,background,group,coord,velocity,imgName = "placeholder.png"):
+        super().__init__("player",background,group,coord,velocity,imgName)
 
     def getInput(self,horiz=1,vert=1):
         keys = pygame.key.get_pressed()
@@ -108,8 +108,8 @@ class Player(Agent):
 #"OtherPlayers" doesn't really roll off the tongue
 class Enemy(Agent):
     #need to pass in coin group for AI to find nearest coin
-    def __init__(self,name,background,group,cGroup,coord,imgName = "placeholder.png"):
-        super().__init__(name,background,group,coord,imgName)
+    def __init__(self,name,background,group,cGroup,coord,velocity,imgName = "placeholder.png"):
+        super().__init__(name,background,group,coord,velocity,imgName)
         self.coinGroup = cGroup
         
         #3 states:

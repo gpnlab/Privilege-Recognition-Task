@@ -13,7 +13,7 @@ class Background(pygame.sprite.Sprite):
 
     def imgLoad(self,img):
 
-        relPath = path.join(path.dirname(__file__),f"images/background/{img}")
+        relPath = path.join(path.dirname(__file__),"images","background",f"{img}")
         backImg = pygame.image.load(relPath).convert_alpha()
         backImg = pygame.transform.scale(backImg,self.res)
         return backImg
@@ -30,6 +30,9 @@ class HUD:
         self.background = background
         self.agents = agents
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
+        
+        fontPath = path.join("fonts","arial.TTF")
+
         self.fontHUD = pygame.font.SysFont('arial', self.size)
         self.timer = 0
     
