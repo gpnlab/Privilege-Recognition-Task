@@ -21,7 +21,7 @@ class PAT:
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
 
         
-        self.font = pygame.font.SysFont('arial',20)
+        #self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
         self.clock = pygame.time.Clock()
 
