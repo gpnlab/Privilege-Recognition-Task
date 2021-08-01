@@ -4,19 +4,12 @@ from configReader import ConfigReader
 from background import *
 from objects import *
 
-
-#TODO: repurpose as "level" class so we can have multiple levels
 class PAT:
-    def __init__(self):
-
-        #TODO: have a config file for each player
-        config = ConfigReader.parseToDict("config.txt")
-        print(config)
-        self.coinsLeft = config["numberOfCoins"]
-
+    def __init__(self,levels = 1):
         pygame.init()
 
         #RES is fullScreen
+        self.levels = levels
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
 
@@ -25,6 +18,32 @@ class PAT:
         self.background = Background(self.res)
         self.clock = pygame.time.Clock()
 
+    def main_loop(self):
+        for i in range(self.levels):
+            currLevel = Level(self,i)
+
+            while currLevel.inProgress:
+                currLevel.main_loop()
+            
+            currLevel.reset()
+
+#TODO: repurpose as "level" class so we can have multiple levels
+class Level:
+    def __init__(self,Pat,level = 0):
+
+        #TODO: have a config file for each level
+        config = ConfigReader.parseToDict(f"config{level}.txt")
+        print(config)
+        self.background = Pat.background
+        self.res = Pat.res
+        self.coinsLeft = config["numberOfCoins"]
+        self.inProgress = True
+
+
+        #pygame.init()
+
+        
+        #kill all sprites at the end of each level
         #aGroup is the group of all agents
         #cGroup is the group of all coins
         self.aGroup = pygame.sprite.Group()
@@ -87,10 +106,14 @@ class PAT:
     def _process_game_logic(self):
         events = pygame.event.get()
         
-        #TODO: flag whenever all coins are gone to end "level"
+        
+
         for e in self.eGroup:
-            if self.coinsLeft > 0: e.randomWalk(self.HUD.timer)
-                
+            e.randomWalk(self.HUD.timer)
+        
+        #TODO: flag whenever all coins are gone to end "level"
+        if self.coinsLeft <= 0:
+            self.inProgress = False
 
         for event in events:
             if event.type == pygame.QUIT: 
@@ -129,6 +152,11 @@ class PAT:
         
         pygame.display.flip()
         pygame.display.update()
+
+    def reset(self):
+        pygame.sprite.Group.empty(self.aGroup)
+        pygame.sprite.Group.empty(self.eGroup)
+        pygame.sprite.Group.empty(self.cGroup)
 
     
 

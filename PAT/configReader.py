@@ -5,6 +5,7 @@ class ConfigReader:
         d = dict()
         config = open(path.join(path.dirname(__file__),f"config/{filename}"),"r+")
         
+        print(f"loaded config {filename}")
         for line in config.readlines():
 
             #parse line by =
