@@ -25,6 +25,7 @@ class PAT:
             while currLevel.inProgress:
                 currLevel.main_loop()
             
+            print("finished level!")
             currLevel.reset()
 
 #TODO: repurpose as "level" class so we can have multiple levels
@@ -95,7 +96,7 @@ class Level:
         
     #TODO: handle logistics of rounds changing
     def main_loop(self):
-        while True:
+        while self.inProgress:
             self._handle_input()
             self._process_game_logic()
             self._draw()
@@ -105,14 +106,28 @@ class Level:
 
     def _process_game_logic(self):
         events = pygame.event.get()
+
+        #collisions
+        collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
+
+        #allows us to access and update selected agent coin count
+        for (agent,_) in collectFlag.items(): 
+            print(f"{agent.name} has collected a coin!")
+            #when more players are added, this will be done via group.items (see level.py of Social Heroes)
+            agent.coins += 1
+            self.coinsLeft -= 1
         
         
 
+        
         for e in self.eGroup:
-            e.randomWalk(self.HUD.timer)
+            if self.coinsLeft > 0:
+                e.randomWalk(self.HUD.timer)
         
         #TODO: flag whenever all coins are gone to end "level"
+
         if self.coinsLeft <= 0:
+            print("finished level")
             self.inProgress = False
 
         for event in events:
@@ -124,15 +139,7 @@ class Level:
                 exit()
 
 
-        #collisions
-        collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
-
-        #allows us to access and update selected agent coin count
-        for (agent,_) in collectFlag.items(): 
-            print(f"{agent.name} has collected a coin!")
-            #when more players are added, this will be done via group.items (see level.py of Social Heroes)
-            agent.coins += 1
-            self.coinsLeft -= 1
+        
 
         #Clock updates
         self.HUD.updateTimer()
