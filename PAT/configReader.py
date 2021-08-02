@@ -12,5 +12,5 @@ class ConfigReader:
             i = line.find("=")
             d[line[:i].strip()] = float(line[i + 1 :])
         
-        
+        config.close()
         return d

@@ -128,8 +128,11 @@ class Enemy(Agent):
 
     #loop through everything in coin group
     def getNearestCoinCoord(self):
+        if len(self.coinGroup) == 0: return
+
         #default "max" distance
         bestDist = self.bg.res[0]
+
         for coin in self.coinGroup:
             currDist = self.dist((self.x,self.y),(coin.x,coin.y))
 

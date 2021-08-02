@@ -1,6 +1,7 @@
 import numpy
 import pygame
 from configReader import ConfigReader
+from logWriter import LogWriter
 from background import *
 from objects import *
 
@@ -25,8 +26,8 @@ class PAT:
 
             while currLevel.inProgress:
                 currLevel.main_loop()
-            
 
+            LogWriter.writeLevelLog(currLevel.info,i)
             currLevel.reset()
 
 
@@ -189,7 +190,7 @@ class Level:
             keysPressedStr += "d"
 
         #TODO: This hurts
-        self.info.append([self.time,self.coinsLeft,keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
+        self.info.append([str(self.time),str(self.coinsLeft),keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
         
     def reset(self):
         pygame.sprite.Group.empty(self.aGroup)
