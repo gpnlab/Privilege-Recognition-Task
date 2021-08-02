@@ -16,7 +16,7 @@ class PAT:
         
         #self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
-        self.clock = pygame.time.Clock()
+        
 
     def main_loop(self):
         for i in range(self.levels):
@@ -26,22 +26,28 @@ class PAT:
                 currLevel.main_loop()
             
             print("finished level!")
+            print(currLevel.info)
             currLevel.reset()
 
-#TODO: repurpose as "level" class so we can have multiple levels
+
 class Level:
     def __init__(self,Pat,level = 0):
-
-        #TODO: have a config file for each level
         config = ConfigReader.parseToDict(f"config{level}.txt")
         print(config)
         self.background = Pat.background
         self.res = Pat.res
         self.coinsLeft = config["numberOfCoins"]
         self.inProgress = True
+        self.clock = pygame.time.Clock()
 
+        #TODO: decide if lists would be the best way of storing and updating information
+        # We have to update info with each game tick so efficiency is definitely in question
+        # internet says list appending is constant time so I'll trust that 0.0
 
-        #pygame.init()
+        self.info = [["tick","coins left","player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
+
+        #to make sure info is fast as possible, I will convert everything into strings at the very end
+        
 
         
         #kill all sprites at the end of each level
@@ -97,14 +103,18 @@ class Level:
     #TODO: handle logistics of rounds changing
     def main_loop(self):
         while self.inProgress:
-            self._handle_input()
-            self._process_game_logic()
+            
+            keys = pygame.key.get_pressed()
+
+            self._handle_input(keys)
+            self._process_game_logic(keys)
             self._draw()
 
-    def _handle_input(self):
-        self.player.getInput()
+    def _handle_input(self,keys):
+        #player moves with WASD
+        self.player.getInput(keys)
 
-    def _process_game_logic(self):
+    def _process_game_logic(self,keys):
         events = pygame.event.get()
 
         #collisions
@@ -144,6 +154,8 @@ class Level:
         #Clock updates
         self.HUD.updateTimer()
 
+        self.updateInfo(keys)
+
         
 
 
@@ -160,6 +172,23 @@ class Level:
         pygame.display.flip()
         pygame.display.update()
 
+    def updateInfo(self,keys):
+
+        keysPressedStr = "" 
+
+        if keys[pygame.K_w]:
+            keysPressedStr += "w"
+        elif keys[pygame.K_s]:
+            keysPressedStr += "s"
+            
+        if keys[pygame.K_a]:
+            keysPressedStr += "a"
+        elif keys[pygame.K_d]:
+            keysPressedStr += "d"
+
+        #TODO: This hurts
+        self.info.append([pygame.time.get_ticks(),self.coinsLeft,keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
+        
     def reset(self):
         pygame.sprite.Group.empty(self.aGroup)
         pygame.sprite.Group.empty(self.eGroup)

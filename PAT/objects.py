@@ -87,8 +87,7 @@ class Player(Agent):
     def __init__(self,background,group,coord,velocity,imgName = "placeholder.png"):
         super().__init__("player",background,group,coord,velocity,imgName)
 
-    def getInput(self,horiz=1,vert=1):
-        keys = pygame.key.get_pressed()
+    def getInput(self,keys):
         
         #self.imgUpdate(keys)
         #when 8 directions added, this will update with corresponding sprite
