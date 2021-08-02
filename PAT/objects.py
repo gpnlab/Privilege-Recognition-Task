@@ -87,8 +87,7 @@ class Player(Agent):
     def __init__(self,background,group,coord,velocity,imgName = "placeholder.png"):
         super().__init__("player",background,group,coord,velocity,imgName)
 
-    def getInput(self,horiz=1,vert=1):
-        keys = pygame.key.get_pressed()
+    def getInput(self,keys):
         
         #self.imgUpdate(keys)
         #when 8 directions added, this will update with corresponding sprite
@@ -129,8 +128,11 @@ class Enemy(Agent):
 
     #loop through everything in coin group
     def getNearestCoinCoord(self):
+        if len(self.coinGroup) == 0: return
+
         #default "max" distance
         bestDist = self.bg.res[0]
+
         for coin in self.coinGroup:
             currDist = self.dist((self.x,self.y),(coin.x,coin.y))
 
@@ -168,8 +170,8 @@ class Enemy(Agent):
         #0 - optimal path towards closest coin
         #1 - random direction
         #2 - stay still
-        #Currently, wait 60 - 120 ticks before considering state chang
-        if time % random.randint(60,120) == 0: 
+        #Currently, wait 10 - 60 ticks before considering state chang
+        if time % random.randint(10,60) == 0: 
             self.state = self.getNewState()
             if self.state == 1: self.getRandMove() #get new random movement
 

@@ -1,30 +1,58 @@
 import numpy
 import pygame
 from configReader import ConfigReader
+from logWriter import LogWriter
 from background import *
 from objects import *
 
-
-#TODO: repurpose as "level" class so we can have multiple levels
 class PAT:
-    def __init__(self):
-
-        #TODO: have a config file for each player
-        config = ConfigReader.parseToDict("config.txt")
-        print(config)
-        self.coinsLeft = config["numberOfCoins"]
-
+    def __init__(self,levels = 1):
         pygame.init()
 
         #RES is fullScreen
+        self.levels = levels
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
+        self.clock = pygame.time.Clock()
 
         
         #self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
-        self.clock = pygame.time.Clock()
+        
 
+    def main_loop(self):
+        for i in range(self.levels):
+            currLevel = Level(self,i)
+
+            while currLevel.inProgress:
+                currLevel.main_loop()
+
+            LogWriter.writeLevelLog(currLevel.info,i)
+            currLevel.reset()
+
+
+class Level:
+    def __init__(self,Pat,level = 0):
+        config = ConfigReader.parseToDict(f"config{level}.txt")
+        print(config)
+        self.background = Pat.background
+        self.res = Pat.res
+        self.coinsLeft = config["numberOfCoins"]
+        self.inProgress = True
+        self.time = 0
+        
+
+        #TODO: decide if lists would be the best way of storing and updating information
+        # We have to update info with each game tick so efficiency is definitely in question
+        # internet says list appending is constant time so I'll trust that 0.0
+
+        self.info = [["tick","coins left","player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
+
+        #to make sure info is fast as possible, I will convert everything into strings at the very end
+        
+
+        
+        #kill all sprites at the end of each level
         #aGroup is the group of all agents
         #cGroup is the group of all coins
         self.aGroup = pygame.sprite.Group()
@@ -76,30 +104,21 @@ class PAT:
         
     #TODO: handle logistics of rounds changing
     def main_loop(self):
-        while True:
-            self._handle_input()
-            self._process_game_logic()
+        while self.inProgress:
+            
+            keys = pygame.key.get_pressed()
+
+            self._handle_input(keys)
+            self._process_game_logic(keys)
             self._draw()
 
-    def _handle_input(self):
-        self.player.getInput()
+    def _handle_input(self,keys):
+        #player moves with WASD
+        self.player.getInput(keys)
 
-    def _process_game_logic(self):
+    def _process_game_logic(self,keys):
+        self.time += 1
         events = pygame.event.get()
-        
-        #TODO: flag whenever all coins are gone to end "level"
-        for e in self.eGroup:
-            if self.coinsLeft > 0: e.randomWalk(self.HUD.timer)
-                
-
-        for event in events:
-            if event.type == pygame.QUIT: 
-                pygame.quit()
-                exit()
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
-                pygame.quit()
-                exit()
-
 
         #collisions
         collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
@@ -110,9 +129,35 @@ class PAT:
             #when more players are added, this will be done via group.items (see level.py of Social Heroes)
             agent.coins += 1
             self.coinsLeft -= 1
+        
+        
+
+        
+        for e in self.eGroup:
+            if self.coinsLeft > 0:
+                e.randomWalk(self.time)
+        
+        #TODO: flag whenever all coins are gone to end "level"
+
+        if self.coinsLeft <= 0:
+            print("finished level")
+            self.inProgress = False
+
+        for event in events:
+            if event.type == pygame.QUIT: 
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
+                pygame.quit()
+                exit()
+
+
+        
 
         #Clock updates
         self.HUD.updateTimer()
+
+        self.updateInfo(keys)
 
         
 
@@ -129,6 +174,28 @@ class PAT:
         
         pygame.display.flip()
         pygame.display.update()
+
+    def updateInfo(self,keys):
+
+        keysPressedStr = "" 
+
+        if keys[pygame.K_w]:
+            keysPressedStr += "w"
+        elif keys[pygame.K_s]:
+            keysPressedStr += "s"
+            
+        if keys[pygame.K_a]:
+            keysPressedStr += "a"
+        elif keys[pygame.K_d]:
+            keysPressedStr += "d"
+
+        #TODO: This hurts
+        self.info.append([str(self.time),str(self.coinsLeft),keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
+        
+    def reset(self):
+        pygame.sprite.Group.empty(self.aGroup)
+        pygame.sprite.Group.empty(self.eGroup)
+        pygame.sprite.Group.empty(self.cGroup)
 
     
 

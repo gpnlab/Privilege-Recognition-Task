@@ -1,0 +1,10 @@
+numberOfCoins = 5
+playerVel = 5
+enemy1Vel = 3
+enemy2Vel = .5
+enemy3Vel = .5
+enemy4Vel = .5
+playerBias = 0
+enemy1Bias = 0
+enemy2Bias = 0
+enemy3Bias = 0
