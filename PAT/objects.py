@@ -167,8 +167,8 @@ class Enemy(Agent):
         #0 - optimal path towards closest coin
         #1 - random direction
         #2 - stay still
-        #Currently, wait 60 - 120 ticks before considering state chang
-        if time % random.randint(60,120) == 0: 
+        #Currently, wait 10 - 60 ticks before considering state chang
+        if time % random.randint(10,60) == 0: 
             self.state = self.getNewState()
             if self.state == 1: self.getRandMove() #get new random movement
 

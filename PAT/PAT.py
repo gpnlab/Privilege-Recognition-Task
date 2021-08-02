@@ -12,6 +12,7 @@ class PAT:
         self.levels = levels
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
+        self.clock = pygame.time.Clock()
 
         
         #self.font = pygame.font.SysFont('arial',20)
@@ -25,8 +26,7 @@ class PAT:
             while currLevel.inProgress:
                 currLevel.main_loop()
             
-            print("finished level!")
-            print(currLevel.info)
+
             currLevel.reset()
 
 
@@ -38,7 +38,8 @@ class Level:
         self.res = Pat.res
         self.coinsLeft = config["numberOfCoins"]
         self.inProgress = True
-        self.clock = pygame.time.Clock()
+        self.time = 0
+        
 
         #TODO: decide if lists would be the best way of storing and updating information
         # We have to update info with each game tick so efficiency is definitely in question
@@ -115,6 +116,7 @@ class Level:
         self.player.getInput(keys)
 
     def _process_game_logic(self,keys):
+        self.time += 1
         events = pygame.event.get()
 
         #collisions
@@ -132,7 +134,7 @@ class Level:
         
         for e in self.eGroup:
             if self.coinsLeft > 0:
-                e.randomWalk(self.HUD.timer)
+                e.randomWalk(self.time)
         
         #TODO: flag whenever all coins are gone to end "level"
 
@@ -187,7 +189,7 @@ class Level:
             keysPressedStr += "d"
 
         #TODO: This hurts
-        self.info.append([pygame.time.get_ticks(),self.coinsLeft,keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
+        self.info.append([self.time,self.coinsLeft,keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
         
     def reset(self):
         pygame.sprite.Group.empty(self.aGroup)

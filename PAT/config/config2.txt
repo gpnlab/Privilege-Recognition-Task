@@ -1,5 +1,5 @@
-numberOfCoins = 5
-playerVel = 5
+numberOfCoins = 10
+playerVel = 3
 enemy1Vel = 3
 enemy2Vel = .5
 enemy3Vel = .5
