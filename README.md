@@ -2,7 +2,7 @@
 
 ## 08/02 Week Tasks:
 1. Bias as a gradient
-2. A result screen/ questions screen before
+2. A result screen after/questions screen before each level (Reach Min Viable Project after this step)
 3. Updated AI to include semi-optimal movement (to be explained further in doc) + add AI to config
 4. Create documentation for program setup
 
