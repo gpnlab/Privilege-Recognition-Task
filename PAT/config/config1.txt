@@ -1,3 +1,4 @@
+rounds = 4
 numberOfCoins = 5
 playerVel = 5
 enemy1Vel = 3

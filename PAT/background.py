@@ -54,3 +54,6 @@ class HUD:
         timerRect = timerTxt.get_rect()
         timerRect.topright = (self.background.res[0],0)
         self.background.screen.blit(timerTxt,timerRect)
+
+    def drawPause(self):
+        pass
