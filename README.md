@@ -1,10 +1,10 @@
 # Privilege-Recognition-Task
 
-## 08/02 Week Tasks:
+## 08/07 Week Tasks:
 1. Bias as a gradient
-2. A result screen after/questions screen 
-3. Updated AI to include semi-optimal movement (to be explained further in doc) + add AI to config
-4. Create documentation for program setup
+2. Fine tuning the result screen after/questions screen (buttons for question answering) 
+3. Read literature about "human like" AI
+4. Change config files to JSON
 
 ## Completed:
 
