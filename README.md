@@ -1,10 +1,9 @@
 # Privilege-Recognition-Task
 
 ## 08/07 Week Tasks:
-1. Bias as a gradient
-2. Fine tuning the result screen after/questions screen (buttons for question answering) 
-3. Read literature about "human like" AI
-4. Change config files to JSON
+1. Fine tuning the result screen after/questions screen (buttons for question answering, different type of questions) 
+2. Change optimal AI to sub-optimal (exclude half button presses)
+3. Change config files to JSON
 
 ## Completed:
 
@@ -16,3 +15,4 @@
 - AI either has optimal, random, or "stay still" movement (random walk via markov chain)
 - Feedback: Number of Coins per player/enemy
 - Configuration for each "level"
+- Gradient Setting for bias
