@@ -29,8 +29,7 @@ class PAT:
             level.main_loop()
             
             
-
-            #LogWriter.writeLevelLog(currLevel.info,currLevel)
+            
             
             
 
@@ -43,11 +42,19 @@ class Level:
         print(self.config)
         self.background = Pat.background
         self.res = Pat.res
+        self.pauseFlag = True
+
+        #keep track of total coins
+        self.pCoins = 0
+        self.e1Coins = 0
+        self.e2Coins = 0
+        self.e3Coins = 0
         #self.coinsLeft = config["numberOfCoins"]
         #self.inProgress = True
         
         
         self.rounds = int(self.config["rounds"])
+        self.currRound = 0
         #self.time = 0
         
 
@@ -72,15 +79,46 @@ class Level:
         self.eGroup.add(self.enemy2)
         self.eGroup.add(self.enemy3)
 
-    #main loop will check what 
     def main_loop(self):
 
+        #blit questions here
+        levelStartPause = PauseScreen(self.levelNum,self.currRound,self.background,self.config)
+        while levelStartPause.paused:
+            levelStartPause.updateLoop()
+        
         for currRound in range(self.rounds):
-                round = Round(self.Pat,self.levelNum,currRound,self.config)
-                while round.inProgress:
-                    round.main_loop()
-                
-                round.reset()
+              
+
+            round = Round(self.Pat,self.levelNum,currRound,self.config)
+
+            
+            while round.inProgress:
+                round.main_loop()
+            
+            self.pCoins += round.player.coins
+            self.e1Coins += round.enemy1.coins
+            self.e2Coins += round.enemy2.coins
+            self.e3Coins += round.enemy3.coins
+
+            
+            
+            LogWriter.writeLevelLog(round.info,self.levelNum,self.currRound)
+            self.currRound += 1
+            
+
+
+            #have pause screen display round stats
+            pauseScreen = PauseScreen(self.levelNum,self.currRound,self.background,round.config,round.aGroup,1)
+
+            while pauseScreen.paused:
+                pauseScreen.updateLoop() 
+
+            round.reset()
+        
+        finalPause = PauseScreen(self.levelNum,self.currRound,self.background,self.config,[],3)
+
+        while finalPause.paused:
+            finalPause.updateLoop([self.pCoins,self.e1Coins,self.e2Coins,self.e3Coins])
             
         #keys = pygame.key.get_pressed()
 
@@ -112,8 +150,7 @@ class Level:
         for e in self.eGroup:
             if self.coinsLeft > 0:
                 e.randomWalk(self.time)
-        
-        #TODO: flag whenever all coins are gone to end "level"
+
 
         if self.coinsLeft <= 0:
             print("finished level")
@@ -148,6 +185,7 @@ class Level:
         self.cGroup.draw(self.background.screen)
         self.HUD.drawHUD()
         
+
         pygame.display.flip()
         pygame.display.update()
 
@@ -254,6 +292,8 @@ class Round:
         self._handle_input(keys)
         self._process_game_logic(keys)
         self._draw()
+
+        
 
     def _handle_input(self,keys):
         #player moves with WASD

@@ -9,3 +9,4 @@ playerBias = 0
 enemy1Bias = 0
 enemy2Bias = 0
 enemy3Bias = 0
+question = On a scale from 1 to 10, how do you feel
