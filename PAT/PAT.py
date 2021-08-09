@@ -246,21 +246,37 @@ class Round:
         #set mean acoording to biases:
         meanCoor = (self.res[0] / 2, self.res[1] / 2)
         
-        #TODO: get a stronger notion of 'bias', right now its just an arbitrary adjustment to mean
-
-        if config["playerBias"]:
-            print("playerBias detected")
-            meanCoor = self.player.x,self.player.y
         
-        if config["enemy1Bias"]:
-            meanCoor = self.enemy1.x,self.enemy1.y
-        if config["enemy2Bias"]:
-            meanCoor = self.enemy2.x,self.enemy2.y
-        if config["enemy3Bias"]:
-            meanCoor = self.enemy3.x,self.enemy3.y
 
+        if config["playerBias"] > 0:
+            print("playerBias detected")
+
+            dx = meanCoor[0] - self.player.x
+            dy = meanCoor[1] - self.player.y 
+            meanCoor = ((meanCoor[0] - config["playerBias"] * dx),(meanCoor[1] - config["playerBias"] * dy))
+
+        
+        if config["enemy1Bias"] > 0:
+            print("e1 bias")
+            dx = meanCoor[0] - self.enemy1.x
+            dy = meanCoor[1] - self.enemy1.y 
+            meanCoor = ((meanCoor[0] - config["enemy1Bias"] * dx),(meanCoor[1] - config["enemy1Bias"] * dy))
+
+        if config["enemy2Bias"] > 0:
+            print("e2 bias")
+            dx = meanCoor[0] - self.enemy2.x
+            dy = meanCoor[1] - self.enemy2.y 
+            meanCoor = ((meanCoor[0] - config["enemy2Bias"] * dx),(meanCoor[1] - config["enemy2Bias"] * dy))
+        if config["enemy3Bias"] > 0:
+            print("e3 bias")
+            dx = meanCoor[0] - self.enemy3.x
+            dy =  meanCoor[1] - self.enemy3.y 
+            meanCoor = ((meanCoor[0] - config["enemy3Bias"] * dx),(meanCoor[1] - config["enemy3Bias"] * dy))
+
+        print(f"e3: {self.player.x,self.player.y}")
+        print(meanCoor)
         for i in range(int(config["numberOfCoins"])):
-            spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 4)
+            spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
             
             while spawnCoord[0] < 50 or spawnCoord[0] > self.res[0] or spawnCoord[1] < 50 or spawnCoord[1] > self.res[1]:
                 spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 4)

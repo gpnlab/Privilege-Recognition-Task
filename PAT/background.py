@@ -114,6 +114,9 @@ class PauseScreen:
             self.background.screen.blit(qText,(0,yOff,self.background.res[0],self.background.res[1]))
             
             yOff += 100
+        
+        startText = self.font.render('Start',True,(0,0,0))
+        self.background.screen.blit(startText,self.startRect)
     
     def blitSumStats(self):
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}",True,(0,0,0))
@@ -123,6 +126,9 @@ class PauseScreen:
             coinTxt = self.font.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
             self.background.screen.blit(coinTxt,(0,yOff,self.background.res[0],self.background.res[1]))
             yOff += 100
+        
+        startText = self.font.render('Next Round',True,(0,0,0))
+        self.background.screen.blit(startText,self.startRect)
 
     
     def blitFinalStats(self,cList):
@@ -139,6 +145,8 @@ class PauseScreen:
         self.background.screen.blit(e2Txt,(0,300,self.background.res[0],self.background.res[1]))
         self.background.screen.blit(e3Txt,(0,400,self.background.res[0],self.background.res[1]))
 
+        startText = self.font.render('End Level',True,(0,0,0))
+        self.background.screen.blit(startText,self.startRect)
     def updateLoop(self,x=[]):
         #self.autoScrollTimeUpdate()
         #self.autoScroll()
@@ -167,9 +175,9 @@ class PauseScreen:
         self.background.screen.fill((255,255,255))
         pygame.draw.rect(self.background.surface,(255,255,0),self.startRect)
         #pygame.draw.rect(self.background,(255,0,0),self.quitRect)
-        startText = self.font.render('Start',True,(0,0,0))
+        
         #self.background.blit(self.titleImage,(300,180,400,400))
-        self.background.screen.blit(startText,self.startRect)
+        
 
         if self.levelStart == 0:
             self.blitQuestions()
