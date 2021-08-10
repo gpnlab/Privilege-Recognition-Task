@@ -10,7 +10,7 @@ class PAT:
         pygame.init()
 
         #RES is fullScreen
-        self.mainConfig = ConfigReader.parseToDict("mainConfig.txt")
+        self.mainConfig = ConfigReader.parseToDict("mainConfig.json")
         self.levels = int(self.mainConfig["levels"])
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
@@ -38,7 +38,7 @@ class Level:
     def __init__(self,Pat,level = 0):
         self.Pat = Pat
         self.levelNum = level
-        self.config = ConfigReader.parseToDict(f"config{level}.txt")
+        self.config = ConfigReader.parseToDict(f"config{level}.json")
         print(self.config)
         self.background = Pat.background
         self.res = Pat.res
@@ -279,7 +279,7 @@ class Round:
             spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
             
             while spawnCoord[0] < 50 or spawnCoord[0] > self.res[0] or spawnCoord[1] < 50 or spawnCoord[1] > self.res[1]:
-                spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 4)
+                spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
             
             coin = Coin(self.cGroup,self.background,spawnCoord)
             

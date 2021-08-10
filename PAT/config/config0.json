@@ -1,0 +1,23 @@
+{
+    "rounds" : 2,
+    "numberOfCoins" : 5,
+    "playerVel": 5,
+    "enemy1Vel": 0.5,
+    "enemy2Vel": 0.5,
+    "enemy3Vel": 0.5,
+    "playerBias": 0.8,
+    "enemy1Bias": 0,
+    "enemy2Bias": 0,
+    "enemy3Bias": 0,
+    "questions" : [
+        {
+            "question" : "How are you",
+            "answers" : ["Good", "Bad"] 
+        },
+        {
+            "question" : "How was your day?",
+            "answers" : ["0","1","2","3"]
+        }
+    ]
+}
+

@@ -105,8 +105,8 @@ class PauseScreen:
         #self.titleImage = self.imgLoad("logo.png")
 
     def renderQuestions(self):
-        for q in self.config["question"]:
-            self.qTextList.append(self.font.render(q,True,(0,0,0)))
+        for q in self.config["questions"]:
+            self.qTextList.append(self.font.render(q["question"],True,(0,0,0)))
 
     def blitQuestions(self):
         yOff = 0
