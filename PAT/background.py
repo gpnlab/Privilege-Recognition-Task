@@ -68,8 +68,9 @@ class PauseScreen:
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
         self.font = pygame.font.SysFont('arial',self.size)
 
-        #keep all question texts here
+        #keep all question and answer texts here
         self.qTextList = []
+        self.aTextList = []
 
         self.renderQuestions()
 
@@ -107,13 +108,26 @@ class PauseScreen:
     def renderQuestions(self):
         for q in self.config["questions"]:
             self.qTextList.append(self.font.render(q["question"],True,(0,0,0)))
+            
+            answers = []
+            for a in q["answers"]:
+                answers.append(self.font.render(a,True,(0,0,0)))
+            
+            self.aTextList.append(answers)
+    
 
     def blitQuestions(self):
         yOff = 0
+        print(self.aTextList)
         for qText in self.qTextList:
-            self.background.screen.blit(qText,(0,yOff,self.background.res[0],self.background.res[1]))
-            
-            yOff += 100
+            self.background.screen.blit(qText,(0,yOff * 100,self.background.res[0],self.background.res[1]))
+
+            ansList = self.aTextList[yOff]
+            xOff = 0
+            for ans in ansList:
+                self.background.screen.blit(ans,(xOff,yOff * 100  + 50,self.background.res[0],self.background.res[1]))
+                xOff += ans.get_width()
+            yOff += 1
         
         startText = self.font.render('Start',True,(0,0,0))
         self.background.screen.blit(startText,self.startRect)
