@@ -70,6 +70,8 @@ class PauseScreen:
 
         #keep all question and answer texts here
         self.qTextList = []
+
+        #a list of tuples: (font render, rect)
         self.aTextList = []
 
         self.renderQuestions()
@@ -106,27 +108,33 @@ class PauseScreen:
         #self.titleImage = self.imgLoad("logo.png")
 
     def renderQuestions(self):
+        yOff = 0
         for q in self.config["questions"]:
-            self.qTextList.append(self.font.render(q["question"],True,(0,0,0)))
-            
+            qRendered = self.font.render(f"{yOff + 1}. {q['question']}",True,(0,0,0))
+            qRenderedRect = (0,yOff * qRendered.get_height() * 2,self.background.res[0],self.background.res[1])
+            self.qTextList.append((qRendered,qRenderedRect))
             answers = []
+            xOff = 0
             for a in q["answers"]:
-                answers.append(self.font.render(a,True,(0,0,0)))
+                aRendered = self.font.render(a,True,(0,0,0))
+                aRenderedRect = (xOff, yOff * qRendered.get_height() * 2 + qRendered.get_height() ,self.background.res[0],self.background.res[1])
+                answers.append((aRendered,aRenderedRect))
+                xOff += aRendered.get_width() * 2
             
             self.aTextList.append(answers)
+            yOff += 1
     
 
     def blitQuestions(self):
         yOff = 0
         print(self.aTextList)
-        for qText in self.qTextList:
-            self.background.screen.blit(qText,(0,yOff * 100,self.background.res[0],self.background.res[1]))
+        for (que,queRect) in self.qTextList:
+            self.background.screen.blit(que,queRect)
 
             ansList = self.aTextList[yOff]
-            xOff = 0
-            for ans in ansList:
-                self.background.screen.blit(ans,(xOff,yOff * 100  + 50,self.background.res[0],self.background.res[1]))
-                xOff += ans.get_width()
+
+            for (ans,ansRect) in ansList:
+                self.background.screen.blit(ans,ansRect)
             yOff += 1
         
         startText = self.font.render('Start',True,(0,0,0))
