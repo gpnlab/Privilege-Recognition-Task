@@ -1,9 +1,9 @@
 # Privilege-Recognition-Task
 
-## 08/07 Week Tasks:
-1. Fine tuning the result screen after/questions screen (buttons for question answering, different type of questions) 
-2. Change optimal AI to sub-optimal (exclude half button presses)
-3. Change config files to JSON
+## 08/16 Week Tasks:
+1. Wrap program in a single executable 
+2. Add suport for more question types (short answer)
+3. Make HUD look 'nicer'
 
 ## Completed:
 
@@ -16,3 +16,6 @@
 - Feedback: Number of Coins per player/enemy
 - Configuration for each "level"
 - Gradient Setting for bias
+- Single choice questions
+- Multiple choice questions
+- JSON configuration file
