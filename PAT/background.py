@@ -59,9 +59,12 @@ class HUD:
 
 
 class PauseScreen:
-    def __init__(self,level,round,background,config,agents = [],levelStart = 0):
+    def __init__(self,level,levels,round,rounds,background,config,agents = [],levelStart = 0):
         self.level,self.round = level,round
         self.levelStart = levelStart
+        self.levels = levels
+        self.rounds = rounds
+
         self.agents = agents
         self.background = background
         self.config = config
@@ -91,34 +94,54 @@ class PauseScreen:
         #self.levelSelect = self.font.render('Level Select',True,self.black,pygame.SRCALPHA)
 
         self.nextRect = (600, self.background.res[1] - 50 - self.font.size('Next')[1]) + self.font.size('Next')
-        #self.levelSelectRect = (self.xDim/2 - self.font.size("Level Select")[0]/2,100) + self.font.size('Level Select')
-        #self.l1Rect = (100,150) + self.font.size('Level1: Chaos on Cat Street')
-        #self.l2Rect = (100,250) + self.font.size('Level2: Rat Trap Crusaders')
-        #self.backRect = (100,self.yDim - 50 - self.font.size('Back')[1]) + self.font.size('Back')
 
-        #self.story = self.imgLoad("story.png")
-        #self.l1Story = self.imgLoad('l1story.png')
-        #self.l2Story = self.imgLoad('l2story.png')
 
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
-        self.startRect = (320,680,100,50)
+        self.startRect = (320,680,self.font.size('Next Round')[0],self.font.size('Next Round')[1])
         #self.quitRect  = (470,680,100,50)
         #self.titleRect = (119,134,400,100)
         #self.image = self.imgLoad("highwayright.png")
         #self.titleImage = self.imgLoad("logo.png")
 
+    def returnQuestionText(self):
+        retList = []
+        for q in self.config["questions"]:
+            retList.append(q["question"])
+        return retList
+
+    def returnAnswerText(self):
+        retList = []
+        for aList in self.aTextList:
+            currAnsList = []
+            for (ansTxt,ansRender,ansRect,choice) in aList:
+                if choice:
+                    currAnsList.append(ansTxt)
+            retList.append(currAnsList)
+        
+        return retList
+
     def renderQuestions(self):
         yOff = 0
         for q in self.config["questions"]:
             qRendered = self.font.render(f"{yOff + 1}. {q['question']}",True,(0,0,0))
-            qRenderedRect = (0,yOff * qRendered.get_height() * 2,self.background.res[0],self.background.res[1])
-            self.qTextList.append((qRendered,qRenderedRect))
+            qRenderedRect = (0,yOff * qRendered.get_height() * 3,self.font.size(f"{yOff + 1}. {q['question']}")[0],self.font.size(f"{yOff + 1}. {q['question']}")[1])
+            qType = q["type"]
+            self.qTextList.append((qRendered,qRenderedRect,qType))
             answers = []
             xOff = 0
+
+
+            #each question is a dictionary of question, question type, and answers
+            #TODO: implement questionType, so we can choose multiple answers or single
+            #FOR NOW
+
+            #0: single answer
+            #1: multiple answer
+            #2: short response
             for a in q["answers"]:
                 aRendered = self.font.render(a,True,(0,0,0))
-                aRenderedRect = (xOff, yOff * qRendered.get_height() * 2 + qRendered.get_height() ,self.background.res[0],self.background.res[1])
-                answers.append((aRendered,aRenderedRect))
+                aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
+                answers.append((a,aRendered,aRenderedRect,False))
                 xOff += aRendered.get_width() * 2
             
             self.aTextList.append(answers)
@@ -126,34 +149,45 @@ class PauseScreen:
     
 
     def blitQuestions(self):
-        yOff = 0
-        print(self.aTextList)
-        for (que,queRect) in self.qTextList:
-            self.background.screen.blit(que,queRect)
+        self.background.screen.fill((255,255,255))
 
+        yOff = 0
+        for (q,qRect,qType) in self.qTextList:
+            self.background.screen.blit(q,qRect)
+
+            #questions and answers share same index
             ansList = self.aTextList[yOff]
 
-            for (ans,ansRect) in ansList:
-                self.background.screen.blit(ans,ansRect)
+            
+
+            for (_,ansRend,ansRect,_) in ansList:
+                self.background.screen.blit(ansRend,ansRect)
             yOff += 1
         
         startText = self.font.render('Start',True,(0,0,0))
         self.background.screen.blit(startText,self.startRect)
     
+    #this is for after round is over
     def blitSumStats(self):
-        levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}",True,(0,0,0))
-        self.background.screen.blit(levelTxt,(0,0,self.background.res[0],self.background.res[1]))
-        yOff = 100
-        for agent in self.agents:
-            coinTxt = self.font.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
-            self.background.screen.blit(coinTxt,(0,yOff,self.background.res[0],self.background.res[1]))
-            yOff += 100
+
+        #draw only a rectangle to display stats, unlike other blit functions
+        pygame.draw.rect(self.background.screen,(234,0,120),(200,200,1000,600),0)
+
+        levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
+        self.background.screen.blit(levelTxt,(200,200,self.background.res[0],self.background.res[1]))
+        #yOff = 100
+        #for agent in self.agents:
+        #    coinTxt = self.font.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
+        #    self.background.screen.blit(coinTxt,(0,yOff,self.background.res[0],self.background.res[1]))
+        #    yOff += 100
         
         startText = self.font.render('Next Round',True,(0,0,0))
+        pygame.draw.rect(self.background.screen,(100,100,100),(self.startRect[0],self.startRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
         self.background.screen.blit(startText,self.startRect)
 
     
     def blitFinalStats(self,cList):
+        self.background.screen.fill((255,255,255))
         levelTxt = self.font.render(f"Level {self.level + 1} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(0,0,self.background.res[0],self.background.res[1]))
         yOff = 100
@@ -194,8 +228,7 @@ class PauseScreen:
 
     def drawAll(self,x):
         
-        self.background.screen.fill((255,255,255))
-        pygame.draw.rect(self.background.surface,(255,255,0),self.startRect)
+
         #pygame.draw.rect(self.background,(255,0,0),self.quitRect)
         
         #self.background.blit(self.titleImage,(300,180,400,400))
@@ -216,10 +249,46 @@ class PauseScreen:
     def menuInteraction(self,mousePos):
         x,y = mousePos
 
+        #starting game
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
         if (inX and inY):
-
             self.paused = False
 
-        #
+        #answering questions - aTextList is indexed by the question number, list list of answers
+        currInd1 = 0
+        for aList in self.aTextList:
+            currInd2 = 0
+            for (ansTxt,ansRender,ansRect,choice) in aList:
+                inX = x in range(ansRect[0], ansRect[0] + ansRect[2])
+                inY = y in range(ansRect[1],ansRect[1] + ansRect[3])
+
+                if (inX and inY):
+
+                    newChoice = not choice
+                    
+                    #before the answer is chosen, check the question type, and unchoose all other answers before hand if needed
+                    if (self.qTextList[currInd1][2] == 0):
+                        print("question type 0")
+                        #unselect all items in that answer list
+                        aListIndex = 0
+                        for (aTxt,aRender,aRect,c) in aList:
+                            newR = self.font.render(aTxt,True,(0,0,0))
+
+                            self.aTextList[currInd1][aListIndex] = (aTxt,newR,aRect,False)
+                            aListIndex += 1
+                        
+
+                    #choose the answer
+                
+                    if newChoice: 
+                        newCol = (0,255,0) 
+                    else: 
+                        newCol = (0,0,0)
+
+                    nAnsRender = self.font.render(ansTxt,True,newCol)
+
+                    self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
+                currInd2 += 1
+            currInd1 += 1
+
