@@ -1,6 +1,6 @@
 # Privilege-Recognition-Task
 
-## 08/16 Week Tasks:
+## 08/23 Week Tasks:
 1. Wrap program in a single executable 
 2. Add suport for more question types (short answer)
 3. Make HUD look 'nicer'
