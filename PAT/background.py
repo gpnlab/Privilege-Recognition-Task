@@ -68,7 +68,7 @@ class PauseScreen:
         self.agents = agents
         self.background = background
         self.config = config
-        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
+        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.02)
         self.font = pygame.font.SysFont('arial',self.size)
 
         #keep all question and answer texts here
@@ -97,7 +97,8 @@ class PauseScreen:
 
 
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
-        self.startRect = (320,680,self.font.size('Next Round')[0],self.font.size('Next Round')[1])
+        self.startRect = (460,800,self.font.size('Start')[0] + 10,self.font.size('Start')[1] + 10)
+        self.nextRoundRect = (460,550,self.font.size('Next Round')[0] + 10,self.font.size('Next Round')[1] + 10)
         #self.quitRect  = (470,680,100,50)
         #self.titleRect = (119,134,400,100)
         #self.image = self.imgLoad("highwayright.png")
@@ -142,7 +143,7 @@ class PauseScreen:
                 aRendered = self.font.render(a,True,(0,0,0))
                 aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
                 answers.append((a,aRendered,aRenderedRect,False))
-                xOff += aRendered.get_width() * 2
+                xOff += aRendered.get_width() + 20
             
             self.aTextList.append(answers)
             yOff += 1
@@ -161,20 +162,24 @@ class PauseScreen:
             
 
             for (_,ansRend,ansRect,_) in ansList:
+                pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
                 self.background.screen.blit(ansRend,ansRect)
             yOff += 1
         
         startText = self.font.render('Start',True,(0,0,0))
+
+        #create a rectangle below the text
+        pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
         self.background.screen.blit(startText,self.startRect)
     
     #this is for after round is over
     def blitSumStats(self):
 
         #draw only a rectangle to display stats, unlike other blit functions
-        pygame.draw.rect(self.background.screen,(234,0,120),(200,200,1000,600),0)
+        pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
 
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
-        self.background.screen.blit(levelTxt,(200,200,self.background.res[0],self.background.res[1]))
+        self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
         #yOff = 100
         #for agent in self.agents:
         #    coinTxt = self.font.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
@@ -182,8 +187,8 @@ class PauseScreen:
         #    yOff += 100
         
         startText = self.font.render('Next Round',True,(0,0,0))
-        pygame.draw.rect(self.background.screen,(100,100,100),(self.startRect[0],self.startRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
-        self.background.screen.blit(startText,self.startRect)
+        pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
+        self.background.screen.blit(startText,self.nextRoundRect)
 
     
     def blitFinalStats(self,cList):
@@ -216,6 +221,7 @@ class PauseScreen:
 
     #custom designed for start menu
     def startInteraction(self):
+        print(pygame.mouse.get_pos())
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.menuInteraction(pygame.mouse.get_pos())
@@ -252,6 +258,12 @@ class PauseScreen:
         #starting game
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
+        if (inX and inY):
+            self.paused = False
+
+        #starting game
+        inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
+        inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
         if (inX and inY):
             self.paused = False
 
@@ -292,3 +304,38 @@ class PauseScreen:
                 currInd2 += 1
             currInd1 += 1
 
+class FinalScreen:
+    def __init__(self, background):
+        self.background = background
+        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
+        
+        fontPath = path.join("fonts","arial.TTF")
+
+        self.font = pygame.font.SysFont('arial', self.size)
+
+        drawTxt = "You have completed the game! Press esc on your keyboard to exit."
+        self.txt = self.font.render(drawTxt,True,(0,0,0))
+
+
+    def draw(self):
+        self.background.screen.fill((255,255,255))
+
+        self.background.screen.blit(self.txt,(self.size // 2, self.size // 2))
+    
+    def mainLoop(self):
+        
+        while True:
+            events = pygame.event.get()
+
+            for event in events:
+                if event.type == pygame.QUIT: 
+                    pygame.quit()
+                    exit()
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
+                    pygame.quit()
+                    exit()
+
+            self.draw()
+
+            pygame.display.flip()
+            pygame.display.update()
