@@ -24,20 +24,33 @@ class PAT:
     def main_loop(self):
 
         for currLevel in range(int(self.levels)):
-            level = Level(self,currLevel)
+            level = Level(self,currLevel,int(self.levels))
 
             level.main_loop()
+
+        final = FinalScreen(self.background)
+
+        final.mainLoop()
+
             
             
             
             
-            
+    def finalScreen(self):
+        self.background.screen.fill((200,200,200))
+
+        finalTxt = "Game Complete! Press esc on your keyboard to exit."
+
+
+
+
 
 
 class Level:
-    def __init__(self,Pat,level = 0):
+    def __init__(self,Pat,level = 0,totalLevels=0):
         self.Pat = Pat
         self.levelNum = level
+        self.levels = totalLevels
         self.config = ConfigReader.parseToDict(f"config{level}.json")
         print(self.config)
         self.background = Pat.background
@@ -69,11 +82,11 @@ class Level:
         
         #TODO: change the temporary spawn points of enemies, and change sprite
         # aaand make it so this is less disgusting code
-        self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),self.config["enemy1Vel"],"p2.png")
+        self.enemy1 = Enemy("player2",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),self.config["enemy1Vel"],"p2.png")
 
-        self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy2Vel"],"p3.png")
+        self.enemy2 = Enemy("player3",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy2Vel"],"p3.png")
         
-        self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy3Vel"],"p4.png")
+        self.enemy3 = Enemy("player4",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy3Vel"],"p4.png")
 
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
@@ -82,10 +95,14 @@ class Level:
     def main_loop(self):
 
         #blit questions here
-        levelStartPause = PauseScreen(self.levelNum,self.currRound,self.background,self.config)
+        levelStartPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config)
         while levelStartPause.paused:
             levelStartPause.updateLoop()
-        
+
+        #record what answers were chosen
+
+        LogWriter.writeLevelQA(levelStartPause.returnQuestionText(),levelStartPause.returnAnswerText(),self.levelNum)
+
         for currRound in range(self.rounds):
               
 
@@ -108,14 +125,15 @@ class Level:
 
 
             #have pause screen display round stats
-            pauseScreen = PauseScreen(self.levelNum,self.currRound,self.background,round.config,round.aGroup,1)
+            pauseScreen = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,round.config,round.aGroup,1)
 
             while pauseScreen.paused:
+                #TODO: only have a "box" display, so it doesn't block the entire screen
                 pauseScreen.updateLoop() 
 
             round.reset()
         
-        finalPause = PauseScreen(self.levelNum,self.currRound,self.background,self.config,[],3)
+        finalPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config,[],3)
 
         while finalPause.paused:
             finalPause.updateLoop([self.pCoins,self.e1Coins,self.e2Coins,self.e3Coins])
@@ -228,8 +246,9 @@ class Round:
         self.info = [["tick","coins left","player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
 
         #to make sure info is fast as possible, I will convert everything into strings at the very end
-        
 
+
+        #TODO: make sure coins don't spawn on top of players
         
         #kill all sprites at the end of each level
         #aGroup is the group of all agents
@@ -256,6 +275,7 @@ class Round:
             meanCoor = ((meanCoor[0] - config["playerBias"] * dx),(meanCoor[1] - config["playerBias"] * dy))
 
         
+
         if config["enemy1Bias"] > 0:
             print("e1 bias")
             dx = meanCoor[0] - self.enemy1.x
@@ -273,12 +293,11 @@ class Round:
             dy =  meanCoor[1] - self.enemy3.y 
             meanCoor = ((meanCoor[0] - config["enemy3Bias"] * dx),(meanCoor[1] - config["enemy3Bias"] * dy))
 
-        print(f"e3: {self.player.x,self.player.y}")
-        print(meanCoor)
+
         for i in range(int(config["numberOfCoins"])):
-            spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
+            spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 5),numpy.random.normal(meanCoor[1],self.res[1] / 5)
             
-            while spawnCoord[0] < 50 or spawnCoord[0] > self.res[0] or spawnCoord[1] < 50 or spawnCoord[1] > self.res[1]:
+            while spawnCoord[0] < 100 or spawnCoord[0] > self.res[0] - 100 or spawnCoord[1] < 100 or spawnCoord[1] > self.res[1] - 100:
                 spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
             
             coin = Coin(self.cGroup,self.background,spawnCoord)
@@ -290,11 +309,11 @@ class Round:
         
         #TODO: change the temporary spawn points of enemies, and change sprite
         # aaand make it so this is less disgusting code
-        self.enemy1 = Enemy("enemy1",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),self.config["enemy1Vel"],"p2.png")
+        self.enemy1 = Enemy("player 2",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),self.config["enemy1Vel"],"p2.png")
 
-        self.enemy2 = Enemy("enemy2",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy2Vel"],"p3.png")
+        self.enemy2 = Enemy("player 3",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy2Vel"],"p3.png")
         
-        self.enemy3 = Enemy("enemy3",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy3Vel"],"p4.png")
+        self.enemy3 = Enemy("player 4",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy3Vel"],"p4.png")
 
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
@@ -338,7 +357,7 @@ class Round:
         
         #TODO: flag whenever all coins are gone to end "level"
 
-        if self.coinsLeft <= 0:
+        if self.coinsLeft <= 0 or len(self.cGroup) == 0:
             print("finished level")
             self.inProgress = False
 

@@ -85,7 +85,7 @@ class Agent(GameObject):
     
 class Player(Agent):
     def __init__(self,background,group,coord,velocity,imgName = "placeholder.png"):
-        super().__init__("player",background,group,coord,velocity,imgName)
+        super().__init__("Player 1",background,group,coord,velocity,imgName)
 
     def getInput(self,keys):
         
@@ -146,7 +146,10 @@ class Enemy(Agent):
     #optimal movement toward nearest coin
     #will have to normalize vector to the velocity of the enemy (yay linear algebra)
     def optMove(self):
-        (cX,cY) = self.getNearestCoinCoord()
+        try:
+            (cX,cY) = self.getNearestCoinCoord()
+        except:
+            (cX,cY) = (0,0)
         d = self.dist((cX,cY),(self.x,self.y))
 
         #normalize
