@@ -3,9 +3,10 @@
 ## 08/31 Week Tasks:
 
 1. Add suport for more question types (slider)
-2. Create the preset config with configurable order
-3. Test out the bias thresholds
-4. Save the question and answers to json rather than csv
+2. Save seed + add to config
+3. Create the preset config with configurable order
+4. Test out the bias thresholds
+5. Save the question and answers to json rather than csv
 
 ## Completed:
 
