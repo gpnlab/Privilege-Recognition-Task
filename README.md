@@ -1,9 +1,11 @@
 # Privilege-Recognition-Task
 
 ## 08/31 Week Tasks:
+
 1. Add suport for more question types (slider)
-2. Test out the bias thresholds
-3. Save the question and answers to json rather than csv
+2. Create the preset config with configurable order
+3. Test out the bias thresholds
+4. Save the question and answers to json rather than csv
 
 ## Completed:
 
