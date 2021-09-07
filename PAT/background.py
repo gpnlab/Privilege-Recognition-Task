@@ -198,7 +198,7 @@ class PauseScreen:
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
                 #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen (lets us know that it has been chosen)
-                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,350 + 20 - qRendered.get_height()),currVal,currValRender,False))
+                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 20 - qRendered.get_height()),currVal,currValRender,False))
                 #generate a ball
 
             
@@ -218,7 +218,7 @@ class PauseScreen:
 
             if qType == 2:
                 (x,y,lenX,lenY) = qRect
-                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),350,lenY),1)
+                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
 
             for aa in ansList:
                 if qType < 2:
