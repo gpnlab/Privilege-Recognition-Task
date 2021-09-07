@@ -110,14 +110,56 @@ class PauseScreen:
             retList.append(q["question"])
         return retList
 
+    def allAnswered(self):
+        currIndex = 0
+        for aList in self.aTextList:
+
+            qType = self.qTextList[currIndex][2]
+
+            currAnsList = []
+
+            chosenForAny = False
+            for aa in aList:
+
+                if qType < 2:
+                    (ansTxt,ansRender,ansRect,choice) = aa
+                    if choice:
+                        chosenForAny = True
+
+                        
+                else:
+                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
+                    if not choice:
+                        return False
+                    chosenForAny = True
+            if not chosenForAny:
+                return False
+
+            currIndex += 1
+        
+        return True
+
+
     def returnAnswerText(self):
         retList = []
+        currIndex = 0
         for aList in self.aTextList:
+
+            qType = self.qTextList[currIndex][2]
+
             currAnsList = []
-            for (ansTxt,ansRender,ansRect,choice) in aList:
-                if choice:
-                    currAnsList.append(ansTxt)
+            for aa in aList:
+                if qType < 2:
+                    (ansTxt,ansRender,ansRect,choice) = aa
+                    if choice:
+                        currAnsList.append(ansTxt)
+                else:
+                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
+                    if choice:
+                        currAnsList.append(f"{currVal}")
             retList.append(currAnsList)
+
+            currIndex += 1
         
         return retList
 
@@ -138,12 +180,27 @@ class PauseScreen:
 
             #0: single answer
             #1: multiple answer
-            #2: short response
-            for a in q["answers"]:
-                aRendered = self.font.render(a,True,(0,0,0))
-                aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
-                answers.append((a,aRendered,aRenderedRect,False))
-                xOff += aRendered.get_width() + 20
+            #2: slider
+            if qType < 2:
+                for a in q["answers"]:
+                    aRendered = self.font.render(a,True,(0,0,0))
+                    aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
+                    answers.append((a,aRendered,aRenderedRect,False))
+                    xOff += aRendered.get_width() + 20
+            
+                
+            
+            elif qType == 2:
+                (x,y,lenX,lenY) = qRenderedRect
+                #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
+
+                currVal = 0
+                currValRender = self.font.render(f"0",True,(0,0,0))
+                #ball should start at the start of the slider
+                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen (lets us know that it has been chosen)
+                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 20 - qRendered.get_height()),currVal,currValRender,False))
+                #generate a ball
+
             
             self.aTextList.append(answers)
             yOff += 1
@@ -159,12 +216,26 @@ class PauseScreen:
             #questions and answers share same index
             ansList = self.aTextList[yOff]
 
-            
+            if qType == 2:
+                (x,y,lenX,lenY) = qRect
+                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
 
-            for (_,ansRend,ansRect,_) in ansList:
-                pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-                self.background.screen.blit(ansRend,ansRect)
+            for aa in ansList:
+                if qType < 2:
+                    (_,ansRend,ansRect,_) = aa
+                    pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
+                    self.background.screen.blit(ansRend,ansRect)
+                elif qType == 2:
+                    #blit current value
+                    
+
+                    ##if qType is 2, then the aa list should just be the rect of the slider ball
+                    pygame.draw.circle(self.background.screen,(0,0,0),aa[0],aa[1],1)
+                    self.background.screen.blit(aa[4],(aa[0][0] + aa[1],aa[0][1] + aa[1],self.background.res[0],self.background.res[1]))
+
             yOff += 1
+
+            
         
         startText = self.font.render('Start',True,(0,0,0))
 
@@ -221,15 +292,19 @@ class PauseScreen:
 
     #custom designed for start menu
     def startInteraction(self):
-        print(pygame.mouse.get_pos())
+
         for event in pygame.event.get():
+            
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.menuInteraction(pygame.mouse.get_pos())
 
 
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
                 pygame.quit()
                 exit()
+        #moved outside the event loop to support holding mouse button
+        if pygame.mouse.get_pressed()[0] == True: 
+            self.sliderInteraction(pygame.mouse.get_pos())
     
 
     def drawAll(self,x):
@@ -259,50 +334,103 @@ class PauseScreen:
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
         if (inX and inY):
-            self.paused = False
+            
+            #check if all answered
+            if self.allAnswered():
+                self.paused = False
+            
+
+
 
         #starting game
         inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
         inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
         if (inX and inY):
-            self.paused = False
+            if self.allAnswered():
+                self.paused = False
 
         #answering questions - aTextList is indexed by the question number, list list of answers
         currInd1 = 0
         for aList in self.aTextList:
-            currInd2 = 0
-            for (ansTxt,ansRender,ansRect,choice) in aList:
-                inX = x in range(ansRect[0], ansRect[0] + ansRect[2])
-                inY = y in range(ansRect[1],ansRect[1] + ansRect[3])
+            
 
-                if (inX and inY):
+            (q,qRect,qType) = self.qTextList[currInd1]
 
-                    newChoice = not choice
+            if qType < 2:
+                currInd2 = 0
+
+                for (ansTxt,ansRender,ansRect,choice) in aList:
+                    inX = x in range(ansRect[0], ansRect[0] + ansRect[2])
+                    inY = y in range(ansRect[1],ansRect[1] + ansRect[3])
+
+                    if (inX and inY):
+
+                        newChoice = not choice
                     
-                    #before the answer is chosen, check the question type, and unchoose all other answers before hand if needed
-                    if (self.qTextList[currInd1][2] == 0):
-                        print("question type 0")
-                        #unselect all items in that answer list
-                        aListIndex = 0
-                        for (aTxt,aRender,aRect,c) in aList:
-                            newR = self.font.render(aTxt,True,(0,0,0))
+                        #before the answer is chosen, check the question type, and unchoose all other answers before hand if needed
+                        if (qType == 0):
+                            #unselect all items in that answer list
+                            aListIndex = 0
+                            for (aTxt,aRender,aRect,c) in aList:
+                                newR = self.font.render(aTxt,True,(0,0,0))
 
-                            self.aTextList[currInd1][aListIndex] = (aTxt,newR,aRect,False)
-                            aListIndex += 1
+                                self.aTextList[currInd1][aListIndex] = (aTxt,newR,aRect,False)
+                                aListIndex += 1
                         
 
                     #choose the answer
                 
-                    if newChoice: 
-                        newCol = (0,255,0) 
-                    else: 
-                        newCol = (0,0,0)
+                        if newChoice: 
+                            newCol = (0,255,0) 
+                        else: 
+                            newCol = (0,0,0)
 
-                    nAnsRender = self.font.render(ansTxt,True,newCol)
+                        nAnsRender = self.font.render(ansTxt,True,newCol)
 
-                    self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
-                currInd2 += 1
+                        print(newChoice)
+
+                        self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
+                    currInd2 += 1
             currInd1 += 1
+
+    def sliderInteraction(self,mousePos):
+        x,y = mousePos
+
+        #answering questions - aTextList is indexed by the question number, list list of answers
+        currInd1 = 0
+        for aList in self.aTextList:     
+
+            (q,qRect,qType) = self.qTextList[currInd1]
+
+
+            #Slider: move depending on mouse distance from center
+            if qType == 2:
+                (aCenter,aRadius,aLim,val,valRender,choice) = aList[0]
+
+                #allow the mouse to be a little further out
+                inX = aCenter[0] - aRadius * 2 < x and x < aCenter[0] + aRadius * 2
+                inY = aCenter[1] - aRadius * 2 < y and y < aCenter[1] + aRadius * 2
+
+                if inX and inY:
+
+                    #set new center according to where mouse is in the circle
+                    if x <= aLim[0]:
+                        newPos = aLim[0]
+                    elif x >= aLim[1]:
+                        newPos = aLim[1]
+                    else:
+                        newPos = x
+                    
+                                        #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
+                    #slider min/max
+                    sMin = aLim[0]
+                    sMax = aLim[1]
+                    currVal = int ((newPos - sMin) * 11 / sMax)
+                    currValRender = self.font.render(f"{currVal}",True,(0,0,0))
+
+                    self.aTextList[currInd1][0] = ((newPos,aCenter[1]),aRadius,aLim,currVal,currValRender,True)
+            currInd1 += 1
+        
 
 class FinalScreen:
     def __init__(self, background):
