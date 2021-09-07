@@ -110,14 +110,56 @@ class PauseScreen:
             retList.append(q["question"])
         return retList
 
+    def allAnswered(self):
+        currIndex = 0
+        for aList in self.aTextList:
+
+            qType = self.qTextList[currIndex][2]
+
+            currAnsList = []
+
+            chosenForAny = False
+            for aa in aList:
+
+                if qType < 2:
+                    (ansTxt,ansRender,ansRect,choice) = aa
+                    if choice:
+                        chosenForAny = True
+
+                        
+                else:
+                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
+                    if not choice:
+                        return False
+                    chosenForAny = True
+            if not chosenForAny:
+                return False
+
+            currIndex += 1
+        
+        return True
+
+
     def returnAnswerText(self):
         retList = []
+        currIndex = 0
         for aList in self.aTextList:
+
+            qType = self.qTextList[currIndex][2]
+
             currAnsList = []
-            for (ansTxt,ansRender,ansRect,choice) in aList:
-                if choice:
-                    currAnsList.append(ansTxt)
+            for aa in aList:
+                if qType < 2:
+                    (ansTxt,ansRender,ansRect,choice) = aa
+                    if choice:
+                        currAnsList.append(ansTxt)
+                else:
+                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
+                    if choice:
+                        currAnsList.append(f"{currVal}")
             retList.append(currAnsList)
+
+            currIndex += 1
         
         return retList
 
@@ -155,8 +197,8 @@ class PauseScreen:
                 currVal = 0
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
-                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender
-                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,qRendered.get_width() + 20 - qRendered.get_height()),currVal,currValRender))
+                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen (lets us know that it has been chosen)
+                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,350 + 20 - qRendered.get_height()),currVal,currValRender,False))
                 #generate a ball
 
             
@@ -176,7 +218,7 @@ class PauseScreen:
 
             if qType == 2:
                 (x,y,lenX,lenY) = qRect
-                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),lenX,lenY),1)
+                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),350,lenY),1)
 
             for aa in ansList:
                 if qType < 2:
@@ -292,13 +334,20 @@ class PauseScreen:
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
         if (inX and inY):
-            self.paused = False
+            
+            #check if all answered
+            if self.allAnswered():
+                self.paused = False
+            
+
+
 
         #starting game
         inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
         inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
         if (inX and inY):
-            self.paused = False
+            if self.allAnswered():
+                self.paused = False
 
         #answering questions - aTextList is indexed by the question number, list list of answers
         currInd1 = 0
@@ -338,6 +387,8 @@ class PauseScreen:
 
                         nAnsRender = self.font.render(ansTxt,True,newCol)
 
+                        print(newChoice)
+
                         self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
                     currInd2 += 1
             currInd1 += 1
@@ -354,7 +405,7 @@ class PauseScreen:
 
             #Slider: move depending on mouse distance from center
             if qType == 2:
-                (aCenter,aRadius,aLim,val,valRender) = aList[0]
+                (aCenter,aRadius,aLim,val,valRender,choice) = aList[0]
 
                 #allow the mouse to be a little further out
                 inX = aCenter[0] - aRadius * 2 < x and x < aCenter[0] + aRadius * 2
@@ -377,7 +428,7 @@ class PauseScreen:
                     currVal = int ((newPos - sMin) * 11 / sMax)
                     currValRender = self.font.render(f"{currVal}",True,(0,0,0))
 
-                    self.aTextList[currInd1][0] = ((newPos,aCenter[1]),aRadius,aLim,currVal,currValRender)
+                    self.aTextList[currInd1][0] = ((newPos,aCenter[1]),aRadius,aLim,currVal,currValRender,True)
             currInd1 += 1
         
 

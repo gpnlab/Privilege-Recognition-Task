@@ -16,34 +16,34 @@
             
         },
         {
-            "question" : "Happy?",
-            "type" : 0,
+            "question" : "To what extent do you feel happy right now?",
+            "type" : 1,
             "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
         },
 
         {
             "question" : "Confident?",
-            "type" : 0,
+            "type" : 2,
             "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
         },
         {
             "question" : "Stressed?",
-            "type" : 0,
+            "type" : 2,
             "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
         },
         {
             "question" : "Excited?",
-            "type" : 0,
+            "type" : 2,
             "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
         },
         {
             "question" : "Frustrated?",
-            "type" : 1,
+            "type" : 2,
             "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
         },
         {
             "question" : "Proud?",
-            "type" : 1,
+            "type" : 2,
             "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
         }
     ]
