@@ -138,12 +138,23 @@ class PauseScreen:
 
             #0: single answer
             #1: multiple answer
-            #2: short response
-            for a in q["answers"]:
-                aRendered = self.font.render(a,True,(0,0,0))
-                aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
-                answers.append((a,aRendered,aRenderedRect,False))
-                xOff += aRendered.get_width() + 20
+            #2: slider
+            if qType < 1:
+                for a in q["answers"]:
+                    aRendered = self.font.render(a,True,(0,0,0))
+                    aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
+                    answers.append((a,aRendered,aRenderedRect,False))
+                    xOff += aRendered.get_width() + 20
+            
+                
+            
+            elif qType == 2:
+                (x,y,lenX,lenY) = qRenderedRect
+                #ball should start at the start of the slider
+                #stored as the center coord,radius
+                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2))
+                #generate a ball
+
             
             self.aTextList.append(answers)
             yOff += 1
@@ -159,12 +170,23 @@ class PauseScreen:
             #questions and answers share same index
             ansList = self.aTextList[yOff]
 
-            
+            if qType == 2:
+                (x,y,lenX,lenY) = qRect
+                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),lenX,lenY),1)
 
-            for (_,ansRend,ansRect,_) in ansList:
-                pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-                self.background.screen.blit(ansRend,ansRect)
+            for aa in ansList:
+                if qType < 2:
+                    (_,ansRend,ansRect,_) = aa
+                    pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
+                    self.background.screen.blit(ansRend,ansRect)
+                elif qType == 2:
+                    print(aa)
+                    ##if qType is 2, then the aa list should just be the rect of the slider ball
+                    pygame.draw.circle(self.background.screen,(0,0,0),aa[0],aa[1],1)
+
             yOff += 1
+
+            
         
         startText = self.font.render('Start',True,(0,0,0))
 
@@ -270,38 +292,44 @@ class PauseScreen:
         #answering questions - aTextList is indexed by the question number, list list of answers
         currInd1 = 0
         for aList in self.aTextList:
-            currInd2 = 0
-            for (ansTxt,ansRender,ansRect,choice) in aList:
-                inX = x in range(ansRect[0], ansRect[0] + ansRect[2])
-                inY = y in range(ansRect[1],ansRect[1] + ansRect[3])
+            
 
-                if (inX and inY):
+            (q,qRect,qType) = self.qTextList[currInd1]
 
-                    newChoice = not choice
+            if qType < 2:
+                currInd2 = 0
+                
+                for (ansTxt,ansRender,ansRect,choice) in aList:
+                    inX = x in range(ansRect[0], ansRect[0] + ansRect[2])
+                    inY = y in range(ansRect[1],ansRect[1] + ansRect[3])
+
+                    if (inX and inY):
+
+                        newChoice = not choice
                     
-                    #before the answer is chosen, check the question type, and unchoose all other answers before hand if needed
-                    if (self.qTextList[currInd1][2] == 0):
-                        print("question type 0")
-                        #unselect all items in that answer list
-                        aListIndex = 0
-                        for (aTxt,aRender,aRect,c) in aList:
-                            newR = self.font.render(aTxt,True,(0,0,0))
+                        #before the answer is chosen, check the question type, and unchoose all other answers before hand if needed
+                        if (qType == 0):
+                            print("question type 0")
+                            #unselect all items in that answer list
+                            aListIndex = 0
+                            for (aTxt,aRender,aRect,c) in aList:
+                                newR = self.font.render(aTxt,True,(0,0,0))
 
-                            self.aTextList[currInd1][aListIndex] = (aTxt,newR,aRect,False)
-                            aListIndex += 1
+                                self.aTextList[currInd1][aListIndex] = (aTxt,newR,aRect,False)
+                                aListIndex += 1
                         
 
                     #choose the answer
                 
-                    if newChoice: 
-                        newCol = (0,255,0) 
-                    else: 
-                        newCol = (0,0,0)
+                        if newChoice: 
+                            newCol = (0,255,0) 
+                        else: 
+                            newCol = (0,0,0)
 
-                    nAnsRender = self.font.render(ansTxt,True,newCol)
+                        nAnsRender = self.font.render(ansTxt,True,newCol)
 
-                    self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
-                currInd2 += 1
+                        self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
+                    currInd2 += 1
             currInd1 += 1
 
 class FinalScreen:
