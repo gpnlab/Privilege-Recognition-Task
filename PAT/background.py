@@ -139,7 +139,7 @@ class PauseScreen:
             #0: single answer
             #1: multiple answer
             #2: slider
-            if qType < 1:
+            if qType < 2:
                 for a in q["answers"]:
                     aRendered = self.font.render(a,True,(0,0,0))
                     aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
@@ -150,9 +150,13 @@ class PauseScreen:
             
             elif qType == 2:
                 (x,y,lenX,lenY) = qRenderedRect
+                #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
+
+                currVal = 0
+                currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
-                #stored as the center coord,radius
-                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2))
+                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender
+                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,qRendered.get_width() + 20 - qRendered.get_height()),currVal,currValRender))
                 #generate a ball
 
             
@@ -180,9 +184,12 @@ class PauseScreen:
                     pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
                     self.background.screen.blit(ansRend,ansRect)
                 elif qType == 2:
-                    print(aa)
+                    #blit current value
+                    
+
                     ##if qType is 2, then the aa list should just be the rect of the slider ball
                     pygame.draw.circle(self.background.screen,(0,0,0),aa[0],aa[1],1)
+                    self.background.screen.blit(aa[4],(aa[0][0] + aa[1],aa[0][1] + aa[1],self.background.res[0],self.background.res[1]))
 
             yOff += 1
 
@@ -243,15 +250,19 @@ class PauseScreen:
 
     #custom designed for start menu
     def startInteraction(self):
-        print(pygame.mouse.get_pos())
+
         for event in pygame.event.get():
+            
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.menuInteraction(pygame.mouse.get_pos())
 
 
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
                 pygame.quit()
                 exit()
+        #moved outside the event loop to support holding mouse button
+        if pygame.mouse.get_pressed()[0] == True: 
+            self.sliderInteraction(pygame.mouse.get_pos())
     
 
     def drawAll(self,x):
@@ -298,7 +309,7 @@ class PauseScreen:
 
             if qType < 2:
                 currInd2 = 0
-                
+
                 for (ansTxt,ansRender,ansRect,choice) in aList:
                     inX = x in range(ansRect[0], ansRect[0] + ansRect[2])
                     inY = y in range(ansRect[1],ansRect[1] + ansRect[3])
@@ -309,7 +320,6 @@ class PauseScreen:
                     
                         #before the answer is chosen, check the question type, and unchoose all other answers before hand if needed
                         if (qType == 0):
-                            print("question type 0")
                             #unselect all items in that answer list
                             aListIndex = 0
                             for (aTxt,aRender,aRect,c) in aList:
@@ -331,6 +341,45 @@ class PauseScreen:
                         self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
                     currInd2 += 1
             currInd1 += 1
+
+    def sliderInteraction(self,mousePos):
+        x,y = mousePos
+
+        #answering questions - aTextList is indexed by the question number, list list of answers
+        currInd1 = 0
+        for aList in self.aTextList:     
+
+            (q,qRect,qType) = self.qTextList[currInd1]
+
+
+            #Slider: move depending on mouse distance from center
+            if qType == 2:
+                (aCenter,aRadius,aLim,val,valRender) = aList[0]
+
+                #allow the mouse to be a little further out
+                inX = aCenter[0] - aRadius * 2 < x and x < aCenter[0] + aRadius * 2
+                inY = aCenter[1] - aRadius * 2 < y and y < aCenter[1] + aRadius * 2
+
+                if inX and inY:
+
+                    #set new center according to where mouse is in the circle
+                    if x <= aLim[0]:
+                        newPos = aLim[0]
+                    elif x >= aLim[1]:
+                        newPos = aLim[1]
+                    else:
+                        newPos = x
+                    
+                                        #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
+                    #slider min/max
+                    sMin = aLim[0]
+                    sMax = aLim[1]
+                    currVal = int ((newPos - sMin) * 11 / sMax)
+                    currValRender = self.font.render(f"{currVal}",True,(0,0,0))
+
+                    self.aTextList[currInd1][0] = ((newPos,aCenter[1]),aRadius,aLim,currVal,currValRender)
+            currInd1 += 1
+        
 
 class FinalScreen:
     def __init__(self, background):
