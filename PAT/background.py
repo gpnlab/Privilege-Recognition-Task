@@ -218,28 +218,12 @@ class PauseScreen:
         for (q,qRect,qType) in self.qTextList:
             self.background.screen.blit(q,qRect)
 
-            
-
-            #questions and answers share same index
+            qTuple = (q,qRect,qType)
+            #question and corresponding answers will share same index
             ansList = self.aTextList[yOff]
 
-            if qType == 2:
-                (x,y,lenX,lenY) = qRect
-                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
-
-            for aa in ansList:
-                if qType < 2:
-                    (_,ansRender,ansRect,_) = aa
-                    pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-                    self.background.screen.blit(ansRender,ansRect)
-                elif qType == 2:
-
-                    (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
-                    (cX,cY) = center
-                    #draw a progress bar + the circle to where the current position is
-                    pygame.draw.rect(self.background.screen,(0,150,0),(x+10,y + q.get_height(),cX - (x + 10),lenY))
-                    pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
-                    self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
+            self.blitAnswers(qTuple,ansList)
+            
 
             yOff += 1
 
@@ -250,6 +234,25 @@ class PauseScreen:
         #create a rectangle below the text
         pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
         self.background.screen.blit(startText,self.startRect)
+
+    def blitAnswers(self,qTup,ansList):
+        (q,qRect,qType) = qTup
+        if qType == 2:
+            (x,y,lenX,lenY) = qRect
+            pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
+
+        for aa in ansList:
+            if qType < 2:
+                (_,ansRender,ansRect,_) = aa
+                pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
+                self.background.screen.blit(ansRender,ansRect)
+            elif qType == 2:
+                (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
+                (cX,cY) = center
+                #draw a progress bar + the circle to where the current position is
+                pygame.draw.rect(self.background.screen,(0,150,0),(x+10,y + q.get_height(),cX - (x + 10),lenY))
+                pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
+                self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
     
     #this is for after round is over
     def blitSumStats(self):
@@ -395,7 +398,6 @@ class PauseScreen:
 
                         nAnsRender = self.font.render(ansTxt,True,newCol)
 
-                        print(newChoice)
 
                         self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
                     currInd2 += 1
