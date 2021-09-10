@@ -132,6 +132,7 @@ class PauseScreen:
         
         return retList
 
+    #check that all questions given have been answered
     def allAnswered(self):
         currIndex = 0
         for aList in self.aTextList:
@@ -143,17 +144,19 @@ class PauseScreen:
             chosenForAny = False
             for aa in aList:
 
+                #these are button type answers, just need at least one chosen
                 if qType < 2:
                     (ansTxt,ansRender,ansRect,choice) = aa
                     if choice:
                         chosenForAny = True
 
-                        
-                else:
+                #slider type questions: as long as slider has been 'clicked', chosen == true
+                elif qType == 2:
                     (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
                     if not choice:
                         return False
                     chosenForAny = True
+
             if not chosenForAny:
                 return False
 
