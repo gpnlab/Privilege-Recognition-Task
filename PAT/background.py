@@ -259,13 +259,27 @@ class PauseScreen:
         (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
         (cX,cY) = center
 
-        
+        #segment the bar into 11 spaces
+        incr = (highLim - lowLim) / 11
+
+        offset = 0
+        for i in range(11):
+            offset += incr 
+
+            #render number beforehand
+            nRendered = self.font.render(f"{i}",True,(0,0,0))
+            
+            #blit number and bar here
+            self.background.screen.blit(nRendered,(x + offset + 10,y + q.get_height() * 2,500,500))
+            
         #draw a progress bar + the circle to where the current position is
         #TODO: relative the rects
         pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
         pygame.draw.rect(self.background.screen,(0,150,0),(x+10,y + q.get_height(),cX - (x + 10),lenY))
         pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
         self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
+    
+    
     #this is for after round is over
     def blitSumStats(self):
 
