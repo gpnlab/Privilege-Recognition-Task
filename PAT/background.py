@@ -237,36 +237,45 @@ class PauseScreen:
 
     def blitAnswers(self,qTup,ansList):
         (q,qRect,qType) = qTup
-        if qType == 2:
-            (x,y,lenX,lenY) = qRect
-            pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
+            
 
         for aa in ansList:
             if qType < 2:
-                (_,ansRender,ansRect,_) = aa
-                pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-                self.background.screen.blit(ansRender,ansRect)
+                self.blitButtonAnswer(aa)
             elif qType == 2:
-                (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
-                (cX,cY) = center
-                #draw a progress bar + the circle to where the current position is
-                pygame.draw.rect(self.background.screen,(0,150,0),(x+10,y + q.get_height(),cX - (x + 10),lenY))
-                pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
-                self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
-    
+                self.blitSliderAnswer(qTup,aa)
+
+
+    def blitButtonAnswer(self,aa):
+        (_,ansRender,ansRect,_) = aa
+        pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
+        self.background.screen.blit(ansRender,ansRect)
+
+
+    def blitSliderAnswer(self,qTup,aa):
+        (q,qRect,qType) = qTup
+        (x,y,lenX,lenY) = qRect
+
+        (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
+        (cX,cY) = center
+
+        
+        #draw a progress bar + the circle to where the current position is
+        #TODO: relative the rects
+        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
+        pygame.draw.rect(self.background.screen,(0,150,0),(x+10,y + q.get_height(),cX - (x + 10),lenY))
+        pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
+        self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
     #this is for after round is over
     def blitSumStats(self):
 
-        #draw only a rectangle to display stats, unlike other blit functions
+        #draw a smol rectangle to display stats
+        #TODO: relativize the size
         pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
 
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
-        #yOff = 100
-        #for agent in self.agents:
-        #    coinTxt = self.font.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
-        #    self.background.screen.blit(coinTxt,(0,yOff,self.background.res[0],self.background.res[1]))
-        #    yOff += 100
+
         
         startText = self.font.render('Next Round',True,(0,0,0))
         pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
@@ -277,7 +286,15 @@ class PauseScreen:
         self.background.screen.fill((255,255,255))
         levelTxt = self.font.render(f"Level {self.level + 1} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(0,0,self.background.res[0],self.background.res[1]))
-        yOff = 100
+        #yOff = 100
+
+        #TODO: change the way the level class is maintained so we can do what is in the comment
+        # rather than passing in the coin list
+        #for agent in self.agents:
+        #    currText = self.font.render(f"{agent.name} total coins: {agent.coins}",True,(0,0,0))
+        #    self.background.screen.blit(currText,(0,yOff,self.background.res[0],self.background.res[1]))
+        #    yOff += 100
+        
         pTxt = self.font.render(f"Player total coins: {cList[0]}",True,(0,0,0))
         e1Txt = self.font.render(f"Enemy1 total coins: {cList[1]}",True,(0,0,0))
         e2Txt = self.font.render(f"Enemy2 total coins: {cList[2]}",True,(0,0,0))
@@ -290,6 +307,7 @@ class PauseScreen:
 
         startText = self.font.render('End Level',True,(0,0,0))
         self.background.screen.blit(startText,self.startRect)
+
     def updateLoop(self,x=[]):
         #self.autoScrollTimeUpdate()
         #self.autoScroll()
@@ -353,12 +371,11 @@ class PauseScreen:
 
 
 
-        #starting game
+        #next round
         inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
         inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
         if (inX and inY):
-            if self.allAnswered():
-                self.paused = False
+            self.paused = False
 
         #answering questions - aTextList is indexed by the question number, list list of answers
         currInd1 = 0

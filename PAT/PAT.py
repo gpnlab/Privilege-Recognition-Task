@@ -57,6 +57,11 @@ class Level:
         self.res = Pat.res
         self.pauseFlag = True
 
+        self.aGroup = pygame.sprite.Group()
+        self.eGroup = pygame.sprite.Group()
+        self.cGroup = pygame.sprite.Group()
+
+        self.initGroups()
         #keep track of total coins
         self.pCoins = 0
         self.e1Coins = 0
@@ -133,7 +138,7 @@ class Level:
 
             round.reset()
         
-        finalPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config,[],3)
+        finalPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config,self.agents,3)
 
         while finalPause.paused:
             finalPause.updateLoop([self.pCoins,self.e1Coins,self.e2Coins,self.e3Coins])
