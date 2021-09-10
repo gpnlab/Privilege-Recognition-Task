@@ -1,5 +1,6 @@
-import pygame 
+import pygame
 from os import path
+from configReader import *
 
 from pygame.constants import QUIT
 
@@ -99,47 +100,15 @@ class PauseScreen:
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
         self.startRect = (460,800,self.font.size('Start')[0] + 10,self.font.size('Start')[1] + 10)
         self.nextRoundRect = (460,550,self.font.size('Next Round')[0] + 10,self.font.size('Next Round')[1] + 10)
-        #self.quitRect  = (470,680,100,50)
-        #self.titleRect = (119,134,400,100)
-        #self.image = self.imgLoad("highwayright.png")
-        #self.titleImage = self.imgLoad("logo.png")
 
+    #returns all question strings specified in the given config
     def returnQuestionText(self):
         retList = []
         for q in self.config["questions"]:
             retList.append(q["question"])
         return retList
 
-    def allAnswered(self):
-        currIndex = 0
-        for aList in self.aTextList:
-
-            qType = self.qTextList[currIndex][2]
-
-            currAnsList = []
-
-            chosenForAny = False
-            for aa in aList:
-
-                if qType < 2:
-                    (ansTxt,ansRender,ansRect,choice) = aa
-                    if choice:
-                        chosenForAny = True
-
-                        
-                else:
-                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
-                    if not choice:
-                        return False
-                    chosenForAny = True
-            if not chosenForAny:
-                return False
-
-            currIndex += 1
-        
-        return True
-
-
+    #returns all answer strings specified in the given config
     def returnAnswerText(self):
         retList = []
         currIndex = 0
@@ -162,6 +131,36 @@ class PauseScreen:
             currIndex += 1
         
         return retList
+
+    def allAnswered(self):
+        currIndex = 0
+        for aList in self.aTextList:
+
+            qType = self.qTextList[currIndex][2]
+
+            
+
+            chosenForAny = False
+            for aa in aList:
+
+                if qType < 2:
+                    (ansTxt,ansRender,ansRect,choice) = aa
+                    if choice:
+                        chosenForAny = True
+
+                        
+                else:
+                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
+                    if not choice:
+                        return False
+                    chosenForAny = True
+            if not chosenForAny:
+                return False
+
+            currIndex += 1
+        
+        return True
+
 
     def renderQuestions(self):
         yOff = 0
@@ -197,7 +196,7 @@ class PauseScreen:
                 currVal = 0
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
-                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen (lets us know that it has been chosen)
+                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
                 answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 20 - qRendered.get_height()),currVal,currValRender,False))
                 #generate a ball
 
@@ -210,8 +209,13 @@ class PauseScreen:
         self.background.screen.fill((255,255,255))
 
         yOff = 0
+
+        #first, loop through question
+        #inner loop loops through all the answers of the specific question
         for (q,qRect,qType) in self.qTextList:
             self.background.screen.blit(q,qRect)
+
+            
 
             #questions and answers share same index
             ansList = self.aTextList[yOff]
@@ -222,16 +226,17 @@ class PauseScreen:
 
             for aa in ansList:
                 if qType < 2:
-                    (_,ansRend,ansRect,_) = aa
+                    (_,ansRender,ansRect,_) = aa
                     pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-                    self.background.screen.blit(ansRend,ansRect)
+                    self.background.screen.blit(ansRender,ansRect)
                 elif qType == 2:
-                    #blit current value
-                    
 
-                    ##if qType is 2, then the aa list should just be the rect of the slider ball
-                    pygame.draw.circle(self.background.screen,(0,0,0),aa[0],aa[1],1)
-                    self.background.screen.blit(aa[4],(aa[0][0] + aa[1],aa[0][1] + aa[1],self.background.res[0],self.background.res[1]))
+                    (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
+                    (cX,cY) = center
+                    #draw a progress bar + the circle to where the current position is
+                    pygame.draw.rect(self.background.screen,(0,150,0),(x+10,y + q.get_height(),cX - (x + 10),lenY))
+                    pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
+                    self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
 
             yOff += 1
 
