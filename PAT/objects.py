@@ -40,7 +40,15 @@ class GameObject(pygame.sprite.Sprite):
 
         relPath = path.join(path.dirname(__file__),f"images/objects/{img}")
         
+<<<<<<< Updated upstream
         playerImg = pygame.image.load(relPath).convert_alpha()
+=======
+        
+        #for exe wrapping
+        asset_url = EXE.resource_path(f"images/objects/{img}")
+        
+        playerImg = pygame.image.load(asset_url).convert_alpha()
+>>>>>>> Stashed changes
         playerImg = pygame.transform.scale(playerImg,resizeDim)
         return playerImg
 

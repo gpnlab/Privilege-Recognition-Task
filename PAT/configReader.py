@@ -1,4 +1,5 @@
 from os import path
+from toExe import EXE
 import json
 class ConfigReader:
     def parseToDict(filename,dirName = "default"):

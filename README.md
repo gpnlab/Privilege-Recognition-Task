@@ -1,9 +1,12 @@
 # Privilege-Recognition-Task
 
-## 08/23 Week Tasks:
-1. Wrap program in a single executable 
-2. Add suport for more question types (short answer)
-3. Make HUD look 'nicer'
+## 09/13 Week Tasks:
+
+1. Add suport for more question types (slider)
+2. Save seed + add to config
+3. Create the preset config with configurable order
+4. Test out the bias thresholds
+5. Save the question and answers to json rather than csv
 
 ## Completed:
 
