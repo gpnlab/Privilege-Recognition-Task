@@ -138,7 +138,7 @@ class Level:
 
             round.reset()
         
-        finalPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config,self.agents,3)
+        finalPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config,[],3)
 
         while finalPause.paused:
             finalPause.updateLoop([self.pCoins,self.e1Coins,self.e2Coins,self.e3Coins])
