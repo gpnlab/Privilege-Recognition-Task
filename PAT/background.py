@@ -385,9 +385,9 @@ class PauseScreen:
         if (inX and inY):
             
             #check if all answered
-            if self.allAnswered():
-                self.paused = False
-            
+            #if self.allAnswered():
+            #    self.paused = False
+            self.paused = False
 
 
 
