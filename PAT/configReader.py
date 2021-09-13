@@ -9,3 +9,17 @@ class ConfigReader:
         print(f"loaded config {filename}")
 
         return d
+
+    @staticmethod
+    def returnQuestionText(self):
+        retList = []
+        for q in self.config["questions"]:
+            retList.append(q["question"])
+        return retList
+    
+    @staticmethod
+    def returnQuestionText(self):
+        retList = []
+        for q in self.config["questions"]:
+            retList.append(q["question"])
+        return retList

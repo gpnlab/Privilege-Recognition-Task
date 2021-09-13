@@ -1,5 +1,7 @@
-import pygame 
+import pygame
+import math
 from os import path
+from configReader import *
 
 from pygame.constants import QUIT
 
@@ -99,47 +101,15 @@ class PauseScreen:
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
         self.startRect = (460,800,self.font.size('Start')[0] + 10,self.font.size('Start')[1] + 10)
         self.nextRoundRect = (460,550,self.font.size('Next Round')[0] + 10,self.font.size('Next Round')[1] + 10)
-        #self.quitRect  = (470,680,100,50)
-        #self.titleRect = (119,134,400,100)
-        #self.image = self.imgLoad("highwayright.png")
-        #self.titleImage = self.imgLoad("logo.png")
 
+    #returns all question strings specified in the given config
     def returnQuestionText(self):
         retList = []
         for q in self.config["questions"]:
             retList.append(q["question"])
         return retList
 
-    def allAnswered(self):
-        currIndex = 0
-        for aList in self.aTextList:
-
-            qType = self.qTextList[currIndex][2]
-
-            currAnsList = []
-
-            chosenForAny = False
-            for aa in aList:
-
-                if qType < 2:
-                    (ansTxt,ansRender,ansRect,choice) = aa
-                    if choice:
-                        chosenForAny = True
-
-                        
-                else:
-                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
-                    if not choice:
-                        return False
-                    chosenForAny = True
-            if not chosenForAny:
-                return False
-
-            currIndex += 1
-        
-        return True
-
-
+    #returns all answer strings specified in the given config
     def returnAnswerText(self):
         retList = []
         currIndex = 0
@@ -162,6 +132,39 @@ class PauseScreen:
             currIndex += 1
         
         return retList
+
+    #check that all questions given have been answered
+    def allAnswered(self):
+        currIndex = 0
+        for aList in self.aTextList:
+
+            qType = self.qTextList[currIndex][2]
+
+            
+
+            chosenForAny = False
+            for aa in aList:
+
+                #these are button type answers, just need at least one chosen
+                if qType < 2:
+                    (ansTxt,ansRender,ansRect,choice) = aa
+                    if choice:
+                        chosenForAny = True
+
+                #slider type questions: as long as slider has been 'clicked', chosen == true
+                elif qType == 2:
+                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
+                    if not choice:
+                        return False
+                    chosenForAny = True
+
+            if not chosenForAny:
+                return False
+
+            currIndex += 1
+        
+        return True
+
 
     def renderQuestions(self):
         yOff = 0
@@ -197,8 +200,8 @@ class PauseScreen:
                 currVal = 0
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
-                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen (lets us know that it has been chosen)
-                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 20 - qRendered.get_height()),currVal,currValRender,False))
+                #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
+                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 10 - qRendered.get_height()),currVal,currValRender,False))
                 #generate a ball
 
             
@@ -210,28 +213,18 @@ class PauseScreen:
         self.background.screen.fill((255,255,255))
 
         yOff = 0
+
+        #first, loop through question
+        #inner loop loops through all the answers of the specific question
         for (q,qRect,qType) in self.qTextList:
             self.background.screen.blit(q,qRect)
 
-            #questions and answers share same index
+            qTuple = (q,qRect,qType)
+            #question and corresponding answers will share same index
             ansList = self.aTextList[yOff]
 
-            if qType == 2:
-                (x,y,lenX,lenY) = qRect
-                pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
-
-            for aa in ansList:
-                if qType < 2:
-                    (_,ansRend,ansRect,_) = aa
-                    pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-                    self.background.screen.blit(ansRend,ansRect)
-                elif qType == 2:
-                    #blit current value
-                    
-
-                    ##if qType is 2, then the aa list should just be the rect of the slider ball
-                    pygame.draw.circle(self.background.screen,(0,0,0),aa[0],aa[1],1)
-                    self.background.screen.blit(aa[4],(aa[0][0] + aa[1],aa[0][1] + aa[1],self.background.res[0],self.background.res[1]))
+            self.blitAnswers(qTuple,ansList)
+            
 
             yOff += 1
 
@@ -242,20 +235,67 @@ class PauseScreen:
         #create a rectangle below the text
         pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
         self.background.screen.blit(startText,self.startRect)
+
+    def blitAnswers(self,qTup,ansList):
+        (q,qRect,qType) = qTup
+            
+
+        for aa in ansList:
+            if qType < 2:
+                self.blitButtonAnswer(aa)
+            elif qType == 2:
+                self.blitSliderAnswer(qTup,aa)
+
+
+    def blitButtonAnswer(self,aa):
+        (_,ansRender,ansRect,_) = aa
+        pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
+        self.background.screen.blit(ansRender,ansRect)
+
+
+    def blitSliderAnswer(self,qTup,aa):
+        (q,qRect,qType) = qTup
+        (x,y,lenX,lenY) = qRect
+
+        (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
+        (cX,cY) = center
+
+        #segment the bar into 11 spaces
+        incr = (highLim + 10 - lowLim) / 10
+
+        offset = 0
+
+
+        for i in range(11): 
+
+            #render number beforehand
+            nRendered = self.font.render(f"{i}",True,(0,0,0))
+            
+            #blit number and bar here
+            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 10 + self.font.size(f'i')[0],y + q.get_height() * 2 - 10,1,10))
+            self.background.screen.blit(nRendered,(x + offset + 10,y + q.get_height() * 2,500,500))
+
+            offset += incr
+            
+
+        #draw a progress bar + the circle to where the current position is
+        #TODO: relative the rects
+        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
+        pygame.draw.rect(self.background.screen,(0,150,0),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
+        pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
+        #self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
+    
     
     #this is for after round is over
     def blitSumStats(self):
 
-        #draw only a rectangle to display stats, unlike other blit functions
+        #draw a smol rectangle to display stats
+        #TODO: relativize the size
         pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
 
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
-        #yOff = 100
-        #for agent in self.agents:
-        #    coinTxt = self.font.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
-        #    self.background.screen.blit(coinTxt,(0,yOff,self.background.res[0],self.background.res[1]))
-        #    yOff += 100
+
         
         startText = self.font.render('Next Round',True,(0,0,0))
         pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
@@ -266,7 +306,15 @@ class PauseScreen:
         self.background.screen.fill((255,255,255))
         levelTxt = self.font.render(f"Level {self.level + 1} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(0,0,self.background.res[0],self.background.res[1]))
-        yOff = 100
+        #yOff = 100
+
+        #TODO: change the way the level class is maintained so we can do what is in the comment
+        # rather than passing in the coin list
+        #for agent in self.agents:
+        #    currText = self.font.render(f"{agent.name} total coins: {agent.coins}",True,(0,0,0))
+        #    self.background.screen.blit(currText,(0,yOff,self.background.res[0],self.background.res[1]))
+        #    yOff += 100
+        
         pTxt = self.font.render(f"Player total coins: {cList[0]}",True,(0,0,0))
         e1Txt = self.font.render(f"Enemy1 total coins: {cList[1]}",True,(0,0,0))
         e2Txt = self.font.render(f"Enemy2 total coins: {cList[2]}",True,(0,0,0))
@@ -279,6 +327,7 @@ class PauseScreen:
 
         startText = self.font.render('End Level',True,(0,0,0))
         self.background.screen.blit(startText,self.startRect)
+
     def updateLoop(self,x=[]):
         #self.autoScrollTimeUpdate()
         #self.autoScroll()
@@ -342,12 +391,11 @@ class PauseScreen:
 
 
 
-        #starting game
+        #next round
         inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
         inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
         if (inX and inY):
-            if self.allAnswered():
-                self.paused = False
+            self.paused = False
 
         #answering questions - aTextList is indexed by the question number, list list of answers
         currInd1 = 0
@@ -387,7 +435,6 @@ class PauseScreen:
 
                         nAnsRender = self.font.render(ansTxt,True,newCol)
 
-                        print(newChoice)
 
                         self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
                     currInd2 += 1
@@ -408,12 +455,13 @@ class PauseScreen:
                 (aCenter,aRadius,aLim,val,valRender,choice) = aList[0]
 
                 #allow the mouse to be a little further out
-                inX = aCenter[0] - aRadius * 2 < x and x < aCenter[0] + aRadius * 2
-                inY = aCenter[1] - aRadius * 2 < y and y < aCenter[1] + aRadius * 2
+                inX = aCenter[0] - aRadius * 4 < x and x < aCenter[0] + aRadius * 4
+                inY = aCenter[1] - aRadius * 4 < y and y < aCenter[1] + aRadius * 4
 
                 if inX and inY:
 
                     #set new center according to where mouse is in the circle
+                    #make sure it does not go out of bounds
                     if x <= aLim[0]:
                         newPos = aLim[0]
                     elif x >= aLim[1]:
@@ -421,14 +469,24 @@ class PauseScreen:
                     else:
                         newPos = x
                     
-                                        #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
+                    #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
                     #slider min/max
                     sMin = aLim[0]
-                    sMax = aLim[1]
-                    currVal = int ((newPos - sMin) * 11 / sMax)
+                    sMax = aLim[1] 
+                    currVal = (newPos + 10 - sMin) * 10 / sMax
+
+                    #rounding lol
+                    if currVal - int(currVal) > .7:
+                        currVal = math.ceil(currVal)
+                    elif currVal - int(currVal) < .3:
+                        currVal = int(currVal)
                     currValRender = self.font.render(f"{currVal}",True,(0,0,0))
 
-                    self.aTextList[currInd1][0] = ((newPos,aCenter[1]),aRadius,aLim,currVal,currValRender,True)
+                    #use integer value as new center by recalculating with currVal
+                    #calculated with the eqn used for currVal above
+                    newCenter = ((currVal * sMax / 10) - 10 + sMin,aCenter[1])
+
+                    self.aTextList[currInd1][0] = (newCenter,aRadius,aLim,currVal,currValRender,True)
             currInd1 += 1
         
 
