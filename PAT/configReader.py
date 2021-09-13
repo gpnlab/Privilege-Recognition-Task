@@ -1,8 +1,10 @@
 from os import path
 import json
 class ConfigReader:
+
+    #requires a json formated as in the default directory
     def parseToDict(filename,dirName = "default"):
-        with open(path.join(path.dirname(__file__),f"configs/{dirName}/{filename}"),"r+") as config:
+        with open(path.join(path.dirname(__file__),f"configs/{dirName}/{filename}.json"),"r+") as config:
             d = json.load(config)
         print(f"loaded config {filename}")
 

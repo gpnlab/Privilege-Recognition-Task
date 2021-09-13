@@ -6,12 +6,16 @@ from background import *
 from objects import *
 
 class PAT:
-    def __init__(self):
+    def __init__(self,presetName="default"):
         pygame.init()
 
         #RES is fullScreen
-        self.mainConfig = ConfigReader.parseToDict("mainConfig.json")
-        self.levels = int(self.mainConfig["levels"])
+        self.mainConfig = ConfigReader.parseToDict("mainConfig",presetName)
+        
+        #levels is a list of level names, which will be individual jsons in the respective preset directory
+        self.presetName = presetName
+        self.levels = self.mainConfig["levels"]
+        print(self.levels)
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
         self.clock = pygame.time.Clock()
@@ -23,8 +27,8 @@ class PAT:
 
     def main_loop(self):
 
-        for currLevel in range(int(self.levels)):
-            level = Level(self,currLevel,int(self.levels))
+        for currLevel in range(len(self.levels)):
+            level = Level(self,self.presetName,currLevel,self.levels)
 
             level.main_loop()
 
@@ -47,11 +51,11 @@ class PAT:
 
 
 class Level:
-    def __init__(self,Pat,level = 0,totalLevels=0):
+    def __init__(self,Pat,presetName,level,levelList):
         self.Pat = Pat
         self.levelNum = level
-        self.levels = totalLevels
-        self.config = ConfigReader.parseToDict(f"config{level}.json")
+        self.levels = len(levelList)
+        self.config = ConfigReader.parseToDict(f"{levelList[level]}",presetName)
         print(self.config)
         self.background = Pat.background
         self.res = Pat.res

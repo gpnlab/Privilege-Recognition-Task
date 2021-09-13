@@ -1,0 +1,66 @@
+{
+    "rounds" : 4,
+    "numberOfCoins" : 20,
+    "playerVel": 3,
+    "enemy1Vel": 1.5,
+    "enemy2Vel": 1.5,
+    "enemy3Vel": 1.5,
+    "playerBias": 0,
+    "enemy1Bias": 0,
+    "enemy2Bias": 0,
+    "enemy3Bias": 0,
+    "questions" : [
+        {
+            "question" : "To what extent do you feel guilty right now?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+        {
+            "question" : "Happy?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+
+        {
+            "question" : "Confident?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+        {
+            "question" : "Stressed?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+        {
+            "question" : "Excited?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+        {
+            "question" : "Frustrated?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+        {
+            "question" : "Proud?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+        {
+            "question" : "How much would you like to keep playing this game?",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },
+        {
+            "question" : "How well are you playing this game right now??",
+            "type" : 1,
+            "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
+        },{
+            "question" : "Who was the best player this round?",
+            "type" : 1,
+            "answers" : ["You", "Player 2", "Player 3", "Player 4"] 
+        }
+
+    ]
+}
+
