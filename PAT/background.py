@@ -1,4 +1,5 @@
 import pygame
+import math
 from os import path
 from configReader import *
 
@@ -200,7 +201,7 @@ class PauseScreen:
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
                 #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
-                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 20 - qRendered.get_height()),currVal,currValRender,False))
+                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 10 - qRendered.get_height()),currVal,currValRender,False))
                 #generate a ball
 
             
@@ -260,24 +261,29 @@ class PauseScreen:
         (cX,cY) = center
 
         #segment the bar into 11 spaces
-        incr = (highLim - lowLim) / 11
+        incr = (highLim + 10 - lowLim) / 10
 
         offset = 0
-        for i in range(11):
-            offset += incr 
+
+
+        for i in range(11): 
 
             #render number beforehand
             nRendered = self.font.render(f"{i}",True,(0,0,0))
             
             #blit number and bar here
+            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 10 + self.font.size(f'i')[0],y + q.get_height() * 2 - 10,1,10))
             self.background.screen.blit(nRendered,(x + offset + 10,y + q.get_height() * 2,500,500))
+
+            offset += incr
             
+
         #draw a progress bar + the circle to where the current position is
         #TODO: relative the rects
         pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
-        pygame.draw.rect(self.background.screen,(0,150,0),(x+10,y + q.get_height(),cX - (x + 10),lenY))
+        pygame.draw.rect(self.background.screen,(0,150,0),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
         pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
-        self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
+        #self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
     
     
     #this is for after round is over
@@ -449,12 +455,13 @@ class PauseScreen:
                 (aCenter,aRadius,aLim,val,valRender,choice) = aList[0]
 
                 #allow the mouse to be a little further out
-                inX = aCenter[0] - aRadius * 2 < x and x < aCenter[0] + aRadius * 2
-                inY = aCenter[1] - aRadius * 2 < y and y < aCenter[1] + aRadius * 2
+                inX = aCenter[0] - aRadius * 4 < x and x < aCenter[0] + aRadius * 4
+                inY = aCenter[1] - aRadius * 4 < y and y < aCenter[1] + aRadius * 4
 
                 if inX and inY:
 
                     #set new center according to where mouse is in the circle
+                    #make sure it does not go out of bounds
                     if x <= aLim[0]:
                         newPos = aLim[0]
                     elif x >= aLim[1]:
@@ -462,14 +469,24 @@ class PauseScreen:
                     else:
                         newPos = x
                     
-                                        #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
+                    #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
                     #slider min/max
                     sMin = aLim[0]
-                    sMax = aLim[1]
-                    currVal = int ((newPos - sMin) * 11 / sMax)
+                    sMax = aLim[1] 
+                    currVal = (newPos + 10 - sMin) * 10 / sMax
+
+                    #rounding lol
+                    if currVal - int(currVal) > .7:
+                        currVal = math.ceil(currVal)
+                    elif currVal - int(currVal) < .3:
+                        currVal = int(currVal)
                     currValRender = self.font.render(f"{currVal}",True,(0,0,0))
 
-                    self.aTextList[currInd1][0] = ((newPos,aCenter[1]),aRadius,aLim,currVal,currValRender,True)
+                    #use integer value as new center by recalculating with currVal
+                    #calculated with the eqn used for currVal above
+                    newCenter = ((currVal * sMax / 10) - 10 + sMin,aCenter[1])
+
+                    self.aTextList[currInd1][0] = (newCenter,aRadius,aLim,currVal,currValRender,True)
             currInd1 += 1
         
 
