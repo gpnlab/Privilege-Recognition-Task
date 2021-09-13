@@ -1,6 +1,6 @@
 # Privilege-Recognition-Task
 
-## 08/31 Week Tasks:
+## 09/13 Week Tasks:
 
 1. Add suport for more question types (slider)
 2. Save seed + add to config
