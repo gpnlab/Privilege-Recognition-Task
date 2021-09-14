@@ -2,6 +2,7 @@ import pygame
 import math
 import random
 from os import path, stat
+from exe import EXE
 
 class GameObject(pygame.sprite.Sprite):
     def __init__(self,background,group,coord,imgName,velocity = .5,acceleration = 0,resize = (40,40)):
@@ -38,9 +39,9 @@ class GameObject(pygame.sprite.Sprite):
     @staticmethod
     def imgLoad(img,resizeDim = (80,80)):
 
-        relPath = path.join(path.dirname(__file__),f"images/objects/{img}")
+        asset_url = EXE.resource_path(f"images/objects/{img}")
         
-        playerImg = pygame.image.load(relPath).convert_alpha()
+        playerImg = pygame.image.load(asset_url).convert_alpha()
         playerImg = pygame.transform.scale(playerImg,resizeDim)
         return playerImg
 

@@ -1,13 +1,19 @@
 from os import path
 import json
+from exe import EXE
 class ConfigReader:
 
     #requires a json formated as in the default directory
     def parseToDict(filename,dirName = "default"):
-        with open(path.join(path.dirname(__file__),f"configs/{dirName}/{filename}.json"),"r+") as config:
+
+        asset_url = EXE.resource_path(f"configs/{dirName}/{filename}.json")
+
+        with open(asset_url,"r+") as config:
             d = json.load(config)
         print(f"loaded config {filename}")
 
+        config.close()
+        
         return d
 
     @staticmethod

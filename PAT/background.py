@@ -11,15 +11,19 @@ class Background(pygame.sprite.Sprite):
         self.res = res
         self.screen = pygame.display.set_mode(res)
         self.surface = pygame.Surface(res)
-        self.image = self.imgLoad(image)
+       #self.image = self.imgLoad(image)
 
         pygame.display.set_caption("Privilege Recognition Task")
 
     def imgLoad(self,img):
 
-        relPath = path.join(path.dirname(__file__),"images","background",f"{img}")
-        backImg = pygame.image.load(relPath).convert_alpha()
+        print(f"loading {img}")
+
+        asset_url = EXE.resource_path(f"images/objects/{img}")
+        
+        backImg = pygame.image.load(asset_url).convert_alpha()
         backImg = pygame.transform.scale(backImg,self.res)
+
         return backImg
     
     def draw(self):
