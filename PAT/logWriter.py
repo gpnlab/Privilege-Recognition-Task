@@ -4,10 +4,21 @@ from datetime import datetime
 
 class LogWriter:
 
-    def __init__(self,presetName = "default",name = "NONAME", timeStamp = "NOTIME"):
+    def __init__(self,presetName = "default",name = "NONAME", timeStamp = "NOTIME",seed = 0):
         self.presetName = presetName
         self.name = name
         self.timeStamp = timeStamp
+        self.seed = seed
+
+    def writeSeed(self):
+        url = path.join(path.dirname(path.abspath(__file__)),f"logs/{self.name}/{self.presetName},{self.timeStamp}")
+        if not path.exists(url):
+            os.makedirs(url)
+        
+        newFile = open(url + "/seed.txt","w+")
+
+        newFile.write(str(self.seed))
+
     #TODO: replace all csv writing to json writing
     #pass log as a list of a list of strings (every sub list is a single tick)
 

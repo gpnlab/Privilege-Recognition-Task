@@ -5,7 +5,20 @@ from logWriter import LogWriter
 from background import *
 from objects import *
 from datetime import datetime
+import sys
 
+
+#get seed globally to permeate to classes with more ease
+seed = input("Enter seed (If you want random seed, just press enter): ")
+
+print("hi")
+#if nothing is entered, empty string is false
+if len(seed) == 0:
+    seed = numpy.random.randint(-sys.maxsize - 1,sys.maxsize)
+
+numpy.random.seed(int(seed))
+
+print("there")
 
 class PAT:
     def __init__(self):
@@ -26,9 +39,8 @@ class PAT:
                 continue
 
             break
-        self.seed = input("Enter seed: ")
 
-        numpy.random.seed(self.seed)
+        
 
         self.patientName = input("Please enter your name: ")
         
@@ -81,8 +93,10 @@ class Level:
         self.res = Pat.res
         self.pauseFlag = True
 
-        self.logWriter = LogWriter(presetName,patientName,timestamp)
+        self.logWriter = LogWriter(presetName,patientName,timestamp,seed)
 
+        self.logWriter.writeSeed()
+        
         self.aGroup = pygame.sprite.Group()
         self.eGroup = pygame.sprite.Group()
         self.cGroup = pygame.sprite.Group()
@@ -336,15 +350,15 @@ class Round:
 
     
     def initGroups(self):
-        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4), self.config["playerVel"], "p1.png")
+        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4), self.config["playerVel"], "p1.png",seed)
         
         #TODO: change the temporary spawn points of enemies, and change sprite
         # aaand make it so this is less disgusting code
-        self.enemy1 = Enemy("player 2",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),self.config["enemy1Vel"],"p2.png")
+        self.enemy1 = Enemy("player 2",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),self.config["enemy1Vel"],"p2.png",seed)
 
-        self.enemy2 = Enemy("player 3",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy2Vel"],"p3.png")
+        self.enemy2 = Enemy("player 3",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy2Vel"],"p3.png",seed)
         
-        self.enemy3 = Enemy("player 4",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy3Vel"],"p4.png")
+        self.enemy3 = Enemy("player 4",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy3Vel"],"p4.png",seed)
 
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
