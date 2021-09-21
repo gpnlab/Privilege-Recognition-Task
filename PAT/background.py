@@ -129,8 +129,8 @@ class PauseScreen:
                         currAnsList.append(ansTxt)
                 else:
                     (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
-                    if choice:
-                        currAnsList.append(f"{currVal}")
+                    #if choice:
+                    currAnsList.append(f"{currVal}")
             retList.append(currAnsList)
 
             currIndex += 1

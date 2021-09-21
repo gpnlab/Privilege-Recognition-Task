@@ -13,7 +13,7 @@ class PAT:
 
         
         self.presetName = input("Please enter the preset name: ")
-        
+
         #levels is a list of level names, which will be individual jsons in the respective preset directory
         while True:
             try:
@@ -22,7 +22,7 @@ class PAT:
                 self.mainConfig = ConfigReader.parseToDict("mainConfig",self.presetName)
                 
             except Exception:
-                self.presetName = input(f"Preset{self.presetName} does not exist. Try a different name: ")
+                self.presetName = input(f"Preset {self.presetName} does not exist. Try a different name: ")
                 continue
 
             break

@@ -35,24 +35,41 @@ class LogWriter:
         if not path.exists(url):
             os.makedirs(url)
         
-        url += f"/{levelName}-answers.csv"
+        url += f"/{levelName}-answers.json"
 
         logFile = open(url,"w+")
         
-        initLine = "Question,Answers\n"
+        initLine = '{\n'
         logFile.write(initLine)
 
         index = 0
-        print(Q)
-        print(A)
+
         for q in Q:
-            logFile.write(f"{q},")
+
+            logFile.write(f'\t"Question{index}": {"{"}\n\t\t"name": "{q}",\n\t\t"answer": ')
+
+            aIndex = 0 
+            logFile.write("[")
 
             for a in A[index]:
-                logFile.write(a)
-            logFile.write("\n")
+
+                aIndex += 1
+                if aIndex < len(A[index]):
+                    logFile.write(f'"{a}",')
+                else:
+                    logFile.write(f'"{a}"]')
+            
+
             index += 1
 
+            if index < len(Q):
+                logFile.write("\n\t},\n")
+            else:
+                logFile.write("\n\t}\n")
+
+
+
+        logFile.write("}")
 
         logFile.close()
         
