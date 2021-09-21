@@ -1,9 +1,16 @@
 # Privilege-Recognition-Task
 
-## 08/23 Week Tasks:
-1. Wrap program in a single executable 
-2. Add suport for more question types (short answer)
-3. Make HUD look 'nicer'
+## 09/20 Week Tasks:
+
+1. Improve the ai to be more 'human'
+
+    a. Lit. review
+  
+  
+    b. Implementation
+  
+  
+2. Fix the EXE pathing when writing logs
 
 ## Completed:
 
