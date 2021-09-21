@@ -1,12 +1,16 @@
 # Privilege-Recognition-Task
 
-## 09/13 Week Tasks:
+## 09/20 Week Tasks:
 
-1. Add suport for more question types (slider)
-2. Save seed + add to config
-3. Create the preset config with configurable order
-4. Test out the bias thresholds
-5. Save the question and answers to json rather than csv
+1. Improve the ai to be more 'human'
+
+    a. Lit. review
+  
+  
+    b. Implementation
+  
+  
+2. Fix the EXE pathing when writing logs
 
 ## Completed:
 
