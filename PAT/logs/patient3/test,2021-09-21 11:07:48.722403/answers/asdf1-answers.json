@@ -1,30 +1,30 @@
 {
 	"Question0": {
 		"name": "c0",
-		"answer": ["0"]
+		"answer": ["3"]
 	},
 	"Question1": {
 		"name": "To what extent do you feel happy right now?",
-		"answer": ["10: Extremely"]
+		"answer": ["1"]
 	},
 	"Question2": {
 		"name": "Confident?",
-		"answer": ["0"]
+		"answer": ["1"]
 	},
 	"Question3": {
 		"name": "Stressed?",
-		"answer": ["0"]
+		"answer": ["3"]
 	},
 	"Question4": {
 		"name": "Excited?",
-		"answer": ["0"]
+		"answer": ["2"]
 	},
 	"Question5": {
 		"name": "Frustrated?",
-		"answer": ["0"]
+		"answer": ["1"]
 	},
 	"Question6": {
 		"name": "Proud?",
-		"answer": ["0"]
+		"answer": ["1"]
 	}
 }

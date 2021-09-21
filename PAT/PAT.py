@@ -26,6 +26,10 @@ class PAT:
                 continue
 
             break
+        self.seed = input("Enter seed: ")
+
+        numpy.random.seed(self.seed)
+
         self.patientName = input("Please enter your name: ")
         
         self.levels = self.mainConfig["levels"]
