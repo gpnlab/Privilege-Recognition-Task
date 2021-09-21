@@ -11,7 +11,7 @@
     "enemy3Bias": 0,
     "questions" : [
         {
-            "question" : "c2?",
+            "question" : "c2",
             "type" : 1,
             "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
         },

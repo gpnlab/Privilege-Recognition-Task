@@ -4,22 +4,37 @@ from configReader import ConfigReader
 from logWriter import LogWriter
 from background import *
 from objects import *
+from datetime import datetime
+
 
 class PAT:
-    def __init__(self,presetName="default"):
+    def __init__(self):
         pygame.init()
 
-        #RES is fullScreen
-        self.mainConfig = ConfigReader.parseToDict("mainConfig",presetName)
+        
+        self.presetName = input("Please enter the preset name: ")
         
         #levels is a list of level names, which will be individual jsons in the respective preset directory
-        self.presetName = presetName
+        while True:
+            try:
+                
+                #RES is fullScreen
+                self.mainConfig = ConfigReader.parseToDict("mainConfig",self.presetName)
+                
+            except Exception:
+                self.presetName = input(f"Preset{self.presetName} does not exist. Try a different name: ")
+                continue
+
+            break
+        self.patientName = input("Please enter your name: ")
+        
         self.levels = self.mainConfig["levels"]
         print(self.levels)
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
         self.clock = pygame.time.Clock()
 
+        self.time = datetime.now()
         
         #self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
@@ -28,7 +43,7 @@ class PAT:
     def main_loop(self):
 
         for currLevel in range(len(self.levels)):
-            level = Level(self,self.presetName,currLevel,self.levels)
+            level = Level(self,self.time,self.patientName,self.presetName,currLevel,self.levels)
 
             level.main_loop()
 
@@ -51,8 +66,9 @@ class PAT:
 
 
 class Level:
-    def __init__(self,Pat,presetName,level,levelList):
+    def __init__(self,Pat,timestamp,patientName,presetName,level,levelList):
         self.Pat = Pat
+        self.levelList = levelList
         self.levelNum = level
         self.levels = len(levelList)
         self.config = ConfigReader.parseToDict(f"{levelList[level]}",presetName)
@@ -60,6 +76,8 @@ class Level:
         self.background = Pat.background
         self.res = Pat.res
         self.pauseFlag = True
+
+        self.logWriter = LogWriter(presetName,patientName,timestamp)
 
         self.aGroup = pygame.sprite.Group()
         self.eGroup = pygame.sprite.Group()
@@ -110,7 +128,7 @@ class Level:
 
         #record what answers were chosen
 
-        LogWriter.writeLevelQA(levelStartPause.returnQuestionText(),levelStartPause.returnAnswerText(),self.levelNum)
+        self.logWriter.writeLevelQA(levelStartPause.returnQuestionText(),levelStartPause.returnAnswerText(),self.levelList[self.levelNum])
 
         for currRound in range(self.rounds):
               
@@ -128,7 +146,7 @@ class Level:
 
             
             
-            LogWriter.writeLevelLog(round.info,self.levelNum,self.currRound)
+            self.logWriter.writeLevelLog(round.info,self.levelList[self.levelNum],self.currRound)
             self.currRound += 1
             
 

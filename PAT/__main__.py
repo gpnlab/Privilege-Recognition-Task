@@ -1,4 +1,7 @@
 from PAT import PAT
 
-pat = PAT("test")
+
+
+
+pat = PAT()
 pat.main_loop()
