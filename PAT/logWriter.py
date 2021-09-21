@@ -26,6 +26,8 @@ class LogWriter:
                 logFile.write(entry+",")
             logFile.write("\n")
 
+        logFile.close()
+
     #questions passed in as a list of strings
     #answers passed in as a list of lists (multiple answers)
 
