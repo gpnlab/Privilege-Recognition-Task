@@ -11,8 +11,8 @@ Instructions:
 2. Navigate the command line to the directory 
 3. Call `python ./PAT/`
 4. enter a number for a seed
-5. enter a name for the config directory (preset)
-6. enter the name of one of the config files in the folder
+5. enter a name for the config directory (like "test") 
+6. enter the name of one of the config files in the folder (like "config1")
 7. click on the game window then click off then back on to actually be able to play the game (bug)
 8. play the game
 9. press esc to exit the game
