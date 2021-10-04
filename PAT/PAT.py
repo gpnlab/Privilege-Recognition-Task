@@ -15,7 +15,7 @@ seed = input("Enter seed (If you want random seed, just press enter): ")
 while True:
             try:
                 if len(seed) == 0:
-                    seed = numpy.random.randint(-sys.maxsize - 1,sys.maxsize)
+                    seed = numpy.random.randint(0,sys.maxsize)
                     continue
                 else:
                     numpy.random.seed(int(seed))
