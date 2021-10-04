@@ -51,8 +51,10 @@ class PAT:
         
 
         self.patientName = input("Please enter your name: ")
-        
+        while (len(self.patientName) == 0):
+            self.patientName = input("Invalid Name. Try again: ")
         self.levels = self.mainConfig["levels"]
+        
         print(self.levels)
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
