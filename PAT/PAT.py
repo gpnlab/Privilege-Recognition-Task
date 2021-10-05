@@ -10,19 +10,16 @@ import sys
 
 #get seed globally to permeate to classes with more ease
 seed = input("Enter seed (If you want random seed, just press enter): ")
-
+if len(seed) == 0:
+    seed = numpy.random.randint(0,2**32 - 1)
 
 while True:
             try:
-                if len(seed) == 0:
-                    seed = numpy.random.randint(-sys.maxsize - 1,sys.maxsize)
-                    continue
-                else:
-                    numpy.random.seed(int(seed))
-
+                numpy.random.seed(int(seed))
             except Exception:
                 seed = input(f"Please enter a numerical seed: ")
                 continue
+                print("loop")
 
             break
 #if nothing is entered, empty string is false

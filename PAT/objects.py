@@ -168,8 +168,17 @@ class Enemy(Agent):
         xMov = self.vel * (cX - self.x) / d
         yMov = self.vel * (self.y - cY) / d
 
-        self.move(xMov,-yMov)
-    
+        #prevent half movements
+        if xMov < 0:
+            self.move(-1,0)
+        elif xMov > 0:
+            self.move(1,0)
+
+        if yMov > 0:
+            self.move(0,-1)
+        elif yMov < 0:
+            self.move(0,1)
+            
     def getRandMove(self):
         self.randX = random.uniform(-1,1)
         self.randY = math.sqrt(1 - self.randX ** 2) * random.choice([-1,1])
@@ -186,15 +195,15 @@ class Enemy(Agent):
         #1 - random direction
         #2 - stay still
         #Currently, wait 10 - 60 ticks before considering state chang
-        if time % random.randint(10,60) == 0: 
-            self.state = self.getNewState()
-            if self.state == 1: self.getRandMove() #get new random movement
+        #if time % random.randint(10,60) == 0: 
+        #    self.state = self.getNewState()
+        #    if self.state == 1: self.getRandMove() #get new random movement
 
-        if self.state == 0:
-            self.optMove()
-        elif self.state == 1:
+        #if self.state == 0:
+        self.optMove()
+        #elif self.state == 1:
             
-            self.randMove()
+        #    self.randMove()
         #state 2 do nothing
 
 
