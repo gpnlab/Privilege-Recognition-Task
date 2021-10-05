@@ -10,12 +10,14 @@ import sys
 
 #get seed globally to permeate to classes with more ease
 seed = input("Enter seed (If you want random seed, just press enter): ")
-if len(seed) == 0:
+
+if (len(seed) == 0):
     seed = numpy.random.randint(0,2**32 - 1)
 
 while True:
             try:
                 numpy.random.seed(int(seed))
+
             except Exception:
                 seed = input(f"Please enter a numerical seed: ")
                 continue
@@ -51,8 +53,10 @@ class PAT:
         
 
         self.patientName = input("Please enter your name: ")
-        
+        while (len(self.patientName) == 0):
+            self.patientName = input("Invalid Name. Try again: ")
         self.levels = self.mainConfig["levels"]
+        
         print(self.levels)
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)

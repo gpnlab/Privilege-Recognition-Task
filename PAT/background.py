@@ -9,7 +9,7 @@ class Background(pygame.sprite.Sprite):
     def __init__(self,res,image = "pacman.png"):
         pygame.sprite.Sprite.__init__(self)
         self.res = res
-        self.screen = pygame.display.set_mode(res)
+        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.surface = pygame.Surface(res)
        #self.image = self.imgLoad(image)
 
@@ -103,7 +103,7 @@ class PauseScreen:
 
 
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
-        self.startRect = (460,800,self.font.size('Start')[0] + 10,self.font.size('Start')[1] + 10)
+        self.startRect = (self.background.res[0] * 3 // 4,self.background.res[1] * 3 // 4,self.font.size('Start')[0] + 20,self.font.size('Start')[1] + 20)
         self.nextRoundRect = (460,550,self.font.size('Next Round')[0] + 10,self.font.size('Next Round')[1] + 10)
 
     #returns all question strings specified in the given config
