@@ -3,7 +3,7 @@
 Requirements:
 
 - pygame
-- python 3ß
+- python3
 
 Instructions:
 1. Download the Privilege task repo
