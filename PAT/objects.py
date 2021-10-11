@@ -101,16 +101,22 @@ class Player(Agent):
         
         #self.imgUpdate(keys)
         #when 8 directions added, this will update with corresponding sprite
+        xInd,yInd = 0,0
         
         if keys[pygame.K_w]:
-            self.move(0,-1)
+            yInd = -1
         elif keys[pygame.K_s]:
-            self.move(0,1)
+            yInd = 1
             
         if keys[pygame.K_a]:
-            self.move(-1,0)  
+            xInd = -1 
         elif keys[pygame.K_d]:
-            self.move(1,0)
+            xInd = 1
+
+        if yInd != 0 and xInd != 0:
+            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        else:
+            self.move(xInd,yInd)
 
 
 #TODO: improve AI
@@ -164,20 +170,27 @@ class Enemy(Agent):
             (cX,cY) = (0,0)
         d = self.dist((cX,cY),(self.x,self.y))
 
-        #normalize
+        #normalize - this is a relic of ai surpemacy
         xMov = self.vel * (cX - self.x) / d
         yMov = self.vel * (self.y - cY) / d
 
+        #indicators for which direction
+        xInd,yInd = 0,0
         #prevent half movements
         if xMov < 0:
-            self.move(-1,0)
+            xInd = -1
         elif xMov > 0:
-            self.move(1,0)
+            xInd = 1
 
         if yMov > 0:
-            self.move(0,-1)
+            yInd = -1
         elif yMov < 0:
-            self.move(0,1)
+            yInd = 1
+        
+        if yInd != 0 and xInd != 0:
+            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        else:
+            self.move(xInd,yInd)
             
     def getRandMove(self):
         self.randX = random.uniform(-1,1)
