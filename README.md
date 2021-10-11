@@ -5,6 +5,10 @@ Requirements:
 - pygame
 - python3
 
+## Updating the game
+1. Navigate the command line to the github directory
+2. Call 'git pull'
+
 Instructions:
 1. Download the Privilege task repo
 2. Navigate the command line to the directory PAT
