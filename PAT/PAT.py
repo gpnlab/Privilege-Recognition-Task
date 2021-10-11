@@ -21,7 +21,6 @@ while True:
             except Exception:
                 seed = input(f"Please enter a numerical seed: ")
                 continue
-                print("loop")
 
             break
 #if nothing is entered, empty string is false
@@ -213,7 +212,8 @@ class Level:
         collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
 
         #allows us to access and update selected agent coin count
-        for (agent,_) in collectFlag.items(): 
+        #everytime anyone collects a coin, update objective
+        for (agent,_) in collectFlag.items():
             print(f"{agent.name} has collected a coin!")
             #when more players are added, this will be done via group.items (see level.py of Social Heroes)
             agent.coins += 1
@@ -314,7 +314,7 @@ class Round:
         self.eGroup = pygame.sprite.Group()
         self.cGroup = pygame.sprite.Group()
 
-        self.initGroups()
+        
 
         #Pass background and player into HUD
         self.HUD = HUD(self.background, self.aGroup) 
@@ -350,6 +350,7 @@ class Round:
             dy =  meanCoor[1] - self.enemy3.y 
             meanCoor = ((meanCoor[0] - config["enemy3Bias"] * dx),(meanCoor[1] - config["enemy3Bias"] * dy))
 
+        self.initGroups()
 
         for i in range(int(config["numberOfCoins"])):
             spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 5),numpy.random.normal(meanCoor[1],self.res[1] / 5)
@@ -358,7 +359,10 @@ class Round:
                 spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
             
             coin = Coin(self.cGroup,self.background,spawnCoord)
-            
+        
+        for e in self.eGroup:
+            e.setObj()
+        
 
     
     def initGroups(self):
@@ -401,6 +405,10 @@ class Round:
         #allows us to access and update selected agent coin count
         for (agent,_) in collectFlag.items(): 
             print(f"{agent.name} has collected a coin!")
+
+            for e in self.eGroup:
+                e.setObj()
+
             #when more players are added, this will be done via group.items (see level.py of Social Heroes)
             agent.coins += 1
             self.coinsLeft -= 1

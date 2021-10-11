@@ -101,16 +101,22 @@ class Player(Agent):
         
         #self.imgUpdate(keys)
         #when 8 directions added, this will update with corresponding sprite
+        xInd,yInd = 0,0
         
-        if keys[pygame.K_w]:
-            self.move(0,-1)
-        elif keys[pygame.K_s]:
-            self.move(0,1)
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
+            yInd = -1
+        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            yInd = 1
             
-        if keys[pygame.K_a]:
-            self.move(-1,0)  
-        elif keys[pygame.K_d]:
-            self.move(1,0)
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            xInd = -1 
+        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            xInd = 1
+
+        if yInd != 0 and xInd != 0:
+            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        else:
+            self.move(xInd,yInd)
 
 
 #TODO: improve AI
@@ -133,14 +139,23 @@ class Enemy(Agent):
         #probability matrix for transfering
         self.pMatrix = [[8,1,1],[7,1,2],[7,1,2]]
 
+        #keep current objective (coin coord)
+        self.coinObj = (0,0)
+        self.coinObj = self.setObj()
+
     def dist(self,c1,c2):
         (x1,y1),(x2,y2) = c1,c2
         return math.sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
+    def getRandCoinCoord(self):
+        if len(self.coinGroup) == 0: return (0,0)
 
+        randCoin = self.coinGroup.sprites()[random.randint(0,len(self.coinGroup) - 1)]
+
+        return (randCoin.x,randCoin.y)
     #loop through everything in coin group
     def getNearestCoinCoord(self):
-        if len(self.coinGroup) == 0: return
+        if len(self.coinGroup) == 0: return (0,0)
 
         #default "max" distance
         bestDist = self.bg.res[0]
@@ -154,30 +169,50 @@ class Enemy(Agent):
 
         return (bestCoin.x,bestCoin.y)
 
+    #should be ran whenever coin is obtained
+    #for now, have it be 50/50 whether ai chooses opt or random coin
+    def setObj(self):
+        if (random.randint(1,10) > 5):
+            self.coinObj = self.getNearestCoinCoord()
+        else:
+            self.coinObj = self.getRandCoinCoord()
+            print(f"set objective to {self.coinObj}")
+
+        
+        
+
 
     #optimal movement toward nearest coin
     #will have to normalize vector to the velocity of the enemy (yay linear algebra)
     def optMove(self):
-        try:
-            (cX,cY) = self.getNearestCoinCoord()
-        except:
-            (cX,cY) = (0,0)
+        #try:
+        #    (cX,cY) = self.getNearestCoinCoord()
+        #except:
+        #    (cX,cY) = (0,0)
+        (cX,cY) = self.coinObj
         d = self.dist((cX,cY),(self.x,self.y))
 
-        #normalize
+        #normalize - this is a relic of ai surpemacy
         xMov = self.vel * (cX - self.x) / d
         yMov = self.vel * (self.y - cY) / d
 
+        #indicators for which direction
+        xInd,yInd = 0,0
         #prevent half movements
         if xMov < 0:
-            self.move(-1,0)
+            xInd = -1
         elif xMov > 0:
-            self.move(1,0)
+            xInd = 1
 
         if yMov > 0:
-            self.move(0,-1)
+            yInd = -1
         elif yMov < 0:
-            self.move(0,1)
+            yInd = 1
+        
+        if yInd != 0 and xInd != 0:
+            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        else:
+            self.move(xInd,yInd)
             
     def getRandMove(self):
         self.randX = random.uniform(-1,1)
