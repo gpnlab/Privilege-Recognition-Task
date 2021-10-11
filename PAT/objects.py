@@ -103,14 +103,14 @@ class Player(Agent):
         #when 8 directions added, this will update with corresponding sprite
         xInd,yInd = 0,0
         
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             yInd = -1
-        elif keys[pygame.K_s]:
+        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
             yInd = 1
             
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             xInd = -1 
-        elif keys[pygame.K_d]:
+        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             xInd = 1
 
         if yInd != 0 and xInd != 0:
@@ -139,14 +139,23 @@ class Enemy(Agent):
         #probability matrix for transfering
         self.pMatrix = [[8,1,1],[7,1,2],[7,1,2]]
 
+        #keep current objective (coin coord)
+        self.coinObj = (0,0)
+        self.coinObj = self.setObj()
+
     def dist(self,c1,c2):
         (x1,y1),(x2,y2) = c1,c2
         return math.sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
+    def getRandCoinCoord(self):
+        if len(self.coinGroup) == 0: return (0,0)
 
+        randCoin = self.coinGroup.sprites()[random.randint(0,len(self.coinGroup) - 1)]
+
+        return (randCoin.x,randCoin.y)
     #loop through everything in coin group
     def getNearestCoinCoord(self):
-        if len(self.coinGroup) == 0: return
+        if len(self.coinGroup) == 0: return (0,0)
 
         #default "max" distance
         bestDist = self.bg.res[0]
@@ -160,14 +169,27 @@ class Enemy(Agent):
 
         return (bestCoin.x,bestCoin.y)
 
+    #should be ran whenever coin is obtained
+    #for now, have it be 50/50 whether ai chooses opt or random coin
+    def setObj(self):
+        if (random.randint(1,10) > 5):
+            self.coinObj = self.getNearestCoinCoord()
+        else:
+            self.coinObj = self.getRandCoinCoord()
+            print(f"set objective to {self.coinObj}")
+
+        
+        
+
 
     #optimal movement toward nearest coin
     #will have to normalize vector to the velocity of the enemy (yay linear algebra)
     def optMove(self):
-        try:
-            (cX,cY) = self.getNearestCoinCoord()
-        except:
-            (cX,cY) = (0,0)
+        #try:
+        #    (cX,cY) = self.getNearestCoinCoord()
+        #except:
+        #    (cX,cY) = (0,0)
+        (cX,cY) = self.coinObj
         d = self.dist((cX,cY),(self.x,self.y))
 
         #normalize - this is a relic of ai surpemacy
