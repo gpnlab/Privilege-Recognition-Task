@@ -103,9 +103,12 @@ class PauseScreen:
 
 
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
-        self.startRect = (self.background.res[0] * 3 // 4,self.background.res[1] * 3 // 4,self.font.size('Start')[0] + 20,self.font.size('Start')[1] + 20)
+        self.startRect = (self.background.res[0] * 3 // 4,self.background.res[1] * 9 // 10,self.font.size('Start')[0] + 20,self.font.size('Start')[1] + 20)
         self.nextRoundRect = (460,550,self.font.size('Next Round')[0] + 10,self.font.size('Next Round')[1] + 10)
 
+        self.startText = self.font.render('Start',True,(0,0,0))
+        self.nextText = self.font.render('Next Round',True,(0,0,0))
+        self.endLevelText = self.font.render('End Level',True,(0,0,0))
     #returns all question strings specified in the given config
     def returnQuestionText(self):
         retList = []
@@ -174,11 +177,16 @@ class PauseScreen:
         yOff = 0
         for q in self.config["questions"]:
             qRendered = self.font.render(f"{yOff + 1}. {q['question']}",True,(0,0,0))
-            qRenderedRect = (0,yOff * qRendered.get_height() * 3,self.font.size(f"{yOff + 1}. {q['question']}")[0],self.font.size(f"{yOff + 1}. {q['question']}")[1])
+            
+            xC = self.background.res[0] // 4
+            yC = yOff * qRendered.get_height() * 6
+            xH = self.font.size(f"{yOff + 1}. {q['question']}")[0]
+            yH = self.font.size(f"{yOff + 1}. {q['question']}")[1]
+            qRenderedRect = (xC,yC,xH,yH)
             qType = q["type"]
             self.qTextList.append((qRendered,qRenderedRect,qType))
             answers = []
-            xOff = 0
+            xOff = self.background.res[0] // 4
 
 
             #each question is a dictionary of question, question type, and answers
@@ -191,7 +199,7 @@ class PauseScreen:
             if qType < 2:
                 for a in q["answers"]:
                     aRendered = self.font.render(a,True,(0,0,0))
-                    aRenderedRect = (xOff, yOff * qRendered.get_height() * 3 + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
+                    aRenderedRect = (xOff, yC + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
                     answers.append((a,aRendered,aRenderedRect,False))
                     xOff += aRendered.get_width() + 20
             
@@ -205,7 +213,7 @@ class PauseScreen:
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
                 #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
-                answers.append(((x+20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(x+20,500 + 10 - qRendered.get_height()),currVal,currValRender,False))
+                answers.append(((self.background.res[0] // 4 + 20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 20,self.background.res[0] // 4 + 520),currVal,currValRender,False))
                 #generate a ball
 
             
@@ -234,11 +242,11 @@ class PauseScreen:
 
             
         
-        startText = self.font.render('Start',True,(0,0,0))
+        
 
         #create a rectangle below the text
-        pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
-        self.background.screen.blit(startText,self.startRect)
+        #pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
+        self.background.screen.blit(self.startText,self.startRect)
 
     def blitAnswers(self,qTup,ansList):
         (q,qRect,qType) = qTup
@@ -261,14 +269,15 @@ class PauseScreen:
         (q,qRect,qType) = qTup
         (x,y,lenX,lenY) = qRect
 
+        x = self.background.res[0] // 4
+
         (center,radius,(lowLim,highLim),currVal,currValRender,Chosen) = aa
         (cX,cY) = center
 
         #segment the bar into 11 spaces
-        incr = (highLim + 10 - lowLim) / 10
+        incr = (highLim - lowLim) / 10
 
         offset = 0
-
 
         for i in range(11): 
 
@@ -276,17 +285,19 @@ class PauseScreen:
             nRendered = self.font.render(f"{i}",True,(0,0,0))
             
             #blit number and bar here
-            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 10 + self.font.size(f'i')[0],y + q.get_height() * 2 - 10,1,10))
-            self.background.screen.blit(nRendered,(x + offset + 10,y + q.get_height() * 2,500,500))
+            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 10 + self.font.size(f'{i}')[0],y + q.get_height() * 2 - 10,1,10))
+            #NOTE: uncomment if debug currVal
+            #self.background.screen.blit(currValRender,(x + offset + 20,y + q.get_height() * 2 + 30,500,500))
+            self.background.screen.blit(nRendered,(x + offset + 20,y + q.get_height() * 2,500,500))
 
             offset += incr
             
 
         #draw a progress bar + the circle to where the current position is
         #TODO: relative the rects
-        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),500,lenY),1)
-        pygame.draw.rect(self.background.screen,(0,150,0),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
-        pygame.draw.circle(self.background.screen,(0,200,0),center,radius)
+        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),520,lenY),1)
+        pygame.draw.rect(self.background.screen,(0,53,148),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
+        pygame.draw.circle(self.background.screen,(255,184,28),center,radius)
         #self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
     
     
@@ -295,15 +306,14 @@ class PauseScreen:
 
         #draw a smol rectangle to display stats
         #TODO: relativize the size
-        pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
+        #pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
 
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
 
         
-        startText = self.font.render('Next Round',True,(0,0,0))
         pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
-        self.background.screen.blit(startText,self.nextRoundRect)
+        self.background.screen.blit(self.nextText,self.nextRoundRect)
 
     
     def blitFinalStats(self,cList):
@@ -318,19 +328,21 @@ class PauseScreen:
         #    currText = self.font.render(f"{agent.name} total coins: {agent.coins}",True,(0,0,0))
         #    self.background.screen.blit(currText,(0,yOff,self.background.res[0],self.background.res[1]))
         #    yOff += 100
-        
-        pTxt = self.font.render(f"Player total coins: {cList[0]}",True,(0,0,0))
-        e1Txt = self.font.render(f"Enemy1 total coins: {cList[1]}",True,(0,0,0))
-        e2Txt = self.font.render(f"Enemy2 total coins: {cList[2]}",True,(0,0,0))
-        e3Txt = self.font.render(f"Enemy3 total coins: {cList[3]}",True,(0,0,0))
 
-        self.background.screen.blit(pTxt,(0,100,self.background.res[0],self.background.res[1]))
-        self.background.screen.blit(e1Txt,(0,200,self.background.res[0],self.background.res[1]))
-        self.background.screen.blit(e2Txt,(0,300,self.background.res[0],self.background.res[1]))
-        self.background.screen.blit(e3Txt,(0,400,self.background.res[0],self.background.res[1]))
 
-        startText = self.font.render('End Level',True,(0,0,0))
-        self.background.screen.blit(startText,self.startRect)
+
+        #NOTE: currently choosing to not display how many coins each player had obtained
+        #pTxt = self.font.render(f"Player total coins: {cList[0]}",True,(0,0,0))
+        #e1Txt = self.font.render(f"Enemy1 total coins: {cList[1]}",True,(0,0,0))
+        #e2Txt = self.font.render(f"Enemy2 total coins: {cList[2]}",True,(0,0,0))
+        #e3Txt = self.font.render(f"Enemy3 total coins: {cList[3]}",True,(0,0,0))
+
+        #self.background.screen.blit(pTxt,(0,100,self.background.res[0],self.background.res[1]))
+        #self.background.screen.blit(e1Txt,(0,200,self.background.res[0],self.background.res[1]))
+        #self.background.screen.blit(e2Txt,(0,300,self.background.res[0],self.background.res[1]))
+        #self.background.screen.blit(e3Txt,(0,400,self.background.res[0],self.background.res[1]))
+
+        self.background.screen.blit(self.endLevelText,self.startRect)
 
     def updateLoop(self,x=[]):
         #self.autoScrollTimeUpdate()
@@ -347,9 +359,11 @@ class PauseScreen:
     def startInteraction(self):
 
         for event in pygame.event.get():
+            self.hoverMenuText(pygame.mouse.get_pos())
             
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.menuInteraction(pygame.mouse.get_pos())
+                
 
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
@@ -377,7 +391,26 @@ class PauseScreen:
         else:
             self.blitFinalStats(x)
 
+    def hoverMenuText(self,mousePos):
+        x,y = mousePos
 
+        #starting game
+        inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
+        inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
+        if (inX and inY):
+            self.startText = self.font.render('Start',True,(0,255,0))
+            self.endLevelText = self.font.render('End Level',True,(0,255,0))
+        else: 
+            self.startText = self.font.render('Start',True,(0,0,0))
+            self.endLevelText = self.font.render('End Level',True,(0,0,0))
+
+        #next round
+        inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
+        inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
+        if (inX and inY):
+            self.nextText = self.font.render('Next Round',True,(0,255,0))
+        else:
+            self.nextText = self.font.render('Next Round',True,(0,0,0))
 
     #defines all the menu interactions given mousepos
     def menuInteraction(self,mousePos):
@@ -387,19 +420,26 @@ class PauseScreen:
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
         if (inX and inY):
+            #TODO: if in startrect, highlight button
             
             #check if all answered
             #if self.allAnswered():
             #    self.paused = False
             self.paused = False
-
-
+            self.startText = self.font.render('Start',True,(0,255,0))
+            self.endLevelText = self.font.render('End Level',True,(0,255,0))
+        else: 
+            self.startText = self.font.render('Start',True,(0,0,0))
+            self.endLevelText = self.font.render('End Level',True,(0,0,0))
 
         #next round
         inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
         inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
         if (inX and inY):
             self.paused = False
+            self.nextText = self.font.render('Next Round',True,(0,255,0))
+        else:
+            self.nextText = self.font.render('Next Round',True,(0,0,0))
 
         #answering questions - aTextList is indexed by the question number, list list of answers
         currInd1 = 0
@@ -466,8 +506,8 @@ class PauseScreen:
 
                     #set new center according to where mouse is in the circle
                     #make sure it does not go out of bounds
-                    if x <= aLim[0]:
-                        newPos = aLim[0]
+                    if x <= aLim[0] + aRadius:
+                        newPos = aLim[0] + aRadius
                     elif x >= aLim[1]:
                         newPos = aLim[1]
                     else:
@@ -475,10 +515,9 @@ class PauseScreen:
                     
                     #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
                     #slider min/max
-                    sMin = aLim[0]
-                    sMax = aLim[1] 
-                    currVal = (newPos + 10 - sMin) * 10 / sMax
-
+                    sMin = aLim[0] + aRadius
+                    sMax = aLim[1]
+                    currVal = (newPos - sMin) * 10 / (sMax - sMin)
                     #rounding lol
                     if currVal - int(currVal) > .7:
                         currVal = math.ceil(currVal)
@@ -488,7 +527,7 @@ class PauseScreen:
 
                     #use integer value as new center by recalculating with currVal
                     #calculated with the eqn used for currVal above
-                    newCenter = ((currVal * sMax / 10) - 10 + sMin,aCenter[1])
+                    newCenter = ((currVal * (sMax- sMin) / 10) + sMin,aCenter[1])
 
                     self.aTextList[currInd1][0] = (newCenter,aRadius,aLim,currVal,currValRender,True)
             currInd1 += 1

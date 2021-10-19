@@ -174,7 +174,7 @@ class Level:
             self.e3Coins += round.enemy3.coins
 
             
-            
+            print(f"writing log for level {self.levelList[self.levelNum]}, round {self.currRound}")
             self.logWriter.writeLevelLog(round.info,self.levelList[self.levelNum],self.currRound)
             self.currRound += 1
             
