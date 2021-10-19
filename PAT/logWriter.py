@@ -28,7 +28,7 @@ class LogWriter:
         if not path.exists(url):
             os.makedirs(url)
 
-        url += f"/{levelName}-round{roundNum}.csv"
+        url += f"/level{levelName}-round{roundNum}.csv"
         
         logFile = open(url,"w+")
         
