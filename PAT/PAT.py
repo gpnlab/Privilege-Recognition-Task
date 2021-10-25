@@ -20,6 +20,8 @@ while True:
 
             except Exception:
                 seed = input(f"Please enter a numerical seed: ")
+                if (len(seed) == 0):
+                    seed = numpy.random.randint(0,2**32 - 1)
                 continue
 
             break
@@ -41,7 +43,7 @@ class PAT:
             try:
                 
                 #RES is fullScreen
-                self.mainConfig = ConfigReader.parseToDict("mainConfig",self.presetName)
+                self.mainConfig = ConfigReader.parseToDict("main",self.presetName)
                 
             except Exception:
                 self.presetName = input(f"Preset {self.presetName} does not exist. Try a different name: ")
@@ -108,27 +110,29 @@ class Level:
 
         self.logWriter.writeSeed()
         
-        self.aGroup = pygame.sprite.Group()
-        self.eGroup = pygame.sprite.Group()
-        self.cGroup = pygame.sprite.Group()
+        #not a questions block
+        if "questions" not in self.config:
+            self.aGroup = pygame.sprite.Group()
+            self.eGroup = pygame.sprite.Group()
+            self.cGroup = pygame.sprite.Group()
 
-        self.initGroups()
-        #keep track of total coins
-        self.pCoins = 0
-        self.e1Coins = 0
-        self.e2Coins = 0
-        self.e3Coins = 0
-        #self.coinsLeft = config["numberOfCoins"]
-        #self.inProgress = True
-        
-        
-        self.rounds = int(self.config["rounds"])
-        self.currRound = 0
-        #self.time = 0
+            self.initGroups()
+            #keep track of total coins
+            self.pCoins = 0
+            self.e1Coins = 0
+            self.e2Coins = 0
+            self.e3Coins = 0
+            #self.coinsLeft = config["numberOfCoins"]
+            #self.inProgress = True
+            
+            
+            self.rounds = int(self.config["rounds"])
+            self.currRound = 0
+            #self.time = 0
         
 
         
-        self.info = [["tick","coins left","player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
+            self.info = [["tick","coins left","player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
 
     
 
@@ -150,49 +154,46 @@ class Level:
 
     def main_loop(self):
 
-        #blit questions here
-        levelStartPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config)
-        while levelStartPause.paused:
-            levelStartPause.updateLoop()
+        #blit questions here if a question block
+        if "questions" in self.config:
+            levelStartPause = PauseScreen(self.levelNum,self.levels,0,0,self.background,self.config)
+            while levelStartPause.paused:
+                levelStartPause.updateLoop()
+            #record what answers were chosen
+            self.logWriter.writeLevelQA(levelStartPause.returnQuestionText(),levelStartPause.returnAnswerText(),self.levelList[self.levelNum])
 
-        #record what answers were chosen
-
-        self.logWriter.writeLevelQA(levelStartPause.returnQuestionText(),levelStartPause.returnAnswerText(),self.levelList[self.levelNum])
-
-        for currRound in range(self.rounds):
+        else:
+            for currRound in range(self.rounds):
               
 
-            round = Round(self.Pat,self.levelNum,currRound,self.config)
+                round = Round(self.Pat,self.levelNum,currRound,self.config)
 
             
-            while round.inProgress:
-                round.main_loop()
+                while round.inProgress:
+                    round.main_loop()
             
-            self.pCoins += round.player.coins
-            self.e1Coins += round.enemy1.coins
-            self.e2Coins += round.enemy2.coins
-            self.e3Coins += round.enemy3.coins
+                self.pCoins += round.player.coins
+                self.e1Coins += round.enemy1.coins
+                self.e2Coins += round.enemy2.coins
+                self.e3Coins += round.enemy3.coins
 
             
-            print(f"writing log for level {self.levelList[self.levelNum]}, round {self.currRound}")
-            self.logWriter.writeLevelLog(round.info,self.levelList[self.levelNum],self.currRound)
-            self.currRound += 1
+                print(f"writing log for level {self.levelList[self.levelNum]}, round {self.currRound}")
+                self.logWriter.writeLevelLog(round.info,self.levelList[self.levelNum],self.currRound)
+                self.currRound += 1
             
 
 
-            #have pause screen display round stats
-            pauseScreen = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,round.config,round.aGroup,1)
+            
+                pauseScreen = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,round.config,round.aGroup,1)
 
-            while pauseScreen.paused:
-                #TODO: only have a "box" display, so it doesn't block the entire screen
-                pauseScreen.updateLoop() 
+                while pauseScreen.paused:
+                    #TODO: only have a "box" display, so it doesn't block the entire screen
+                    pauseScreen.updateLoop() 
 
             round.reset()
         
-        finalPause = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,self.config,[],3)
-
-        while finalPause.paused:
-            finalPause.updateLoop([self.pCoins,self.e1Coins,self.e2Coins,self.e3Coins])
+        
             
         #keys = pygame.key.get_pressed()
 
@@ -318,6 +319,7 @@ class Round:
 
         #Pass background and player into HUD
         self.HUD = HUD(self.background, self.aGroup) 
+        self.initGroups()
 
         #set mean acoording to biases:
         meanCoor = (self.res[0] / 2, self.res[1] / 2)
@@ -350,7 +352,7 @@ class Round:
             dy =  meanCoor[1] - self.enemy3.y 
             meanCoor = ((meanCoor[0] - config["enemy3Bias"] * dx),(meanCoor[1] - config["enemy3Bias"] * dy))
 
-        self.initGroups()
+        
 
         for i in range(int(config["numberOfCoins"])):
             spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 5),numpy.random.normal(meanCoor[1],self.res[1] / 5)
