@@ -141,7 +141,7 @@ class Enemy(Agent):
 
         #keep current objective (coin coord)
         self.coinObj = (0,0)
-        self.coinObj = self.setObj()
+        self.setObj()
 
     def dist(self,c1,c2):
         (x1,y1),(x2,y2) = c1,c2
@@ -172,12 +172,24 @@ class Enemy(Agent):
     #should be ran whenever coin is obtained
     #for now, have it be 50/50 whether ai chooses opt or random coin
     def setObj(self):
-        if (random.randint(1,10) > 5):
+        #check if coin is still in group, if yes, maybe don't change obj
+        inFlag = False
+        try:
+            x,y = self.coinObj
+        except:
+            x,y = (0,0)
+        #for coin in self.coinGroup:
+        #    if (x == coin.x and y == coin.y):
+        #        inFlag = True
+                
+        
+        if (random.randint(0,1) == 0):
             self.coinObj = self.getNearestCoinCoord()
-        else:
+        elif (random.randint(0,1) == 0):
             self.coinObj = self.getRandCoinCoord()
             print(f"set objective to {self.coinObj}")
 
+        #.25 percent chance we stay with current
         
         
 
