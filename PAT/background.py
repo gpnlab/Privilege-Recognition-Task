@@ -83,7 +83,8 @@ class PauseScreen:
         #a list of tuples: (font render, rect)
         self.aTextList = []
 
-        self.renderQuestions()
+        if "questions" in self.config:  
+            self.renderQuestions()
 
 
         self.black = (0,0,0)
@@ -306,13 +307,13 @@ class PauseScreen:
 
         #draw a smol rectangle to display stats
         #TODO: relativize the size
-        #pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
+        pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
 
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
 
         
-        pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
+        #pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
         self.background.screen.blit(self.nextText,self.nextRoundRect)
 
     
@@ -420,8 +421,6 @@ class PauseScreen:
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
         if (inX and inY):
-            #TODO: if in startrect, highlight button
-            
             #check if all answered
             #if self.allAnswered():
             #    self.paused = False
