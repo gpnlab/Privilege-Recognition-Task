@@ -1,0 +1,46 @@
+{
+	"Question0": {
+		"name": "To what extent do you feel guilty right now?",
+		"answer": [
+	},
+	"Question1": {
+		"name": "Happy?",
+		"answer": [
+	},
+	"Question2": {
+		"name": "Confident?",
+		"answer": [
+	},
+	"Question3": {
+		"name": "Stressed?",
+		"answer": [
+	},
+	"Question4": {
+		"name": "Excited?",
+		"answer": [
+	},
+	"Question5": {
+		"name": "Frustrated?",
+		"answer": [
+	},
+	"Question6": {
+		"name": "Proud?",
+		"answer": [
+	},
+	"Question7": {
+		"name": "Please select the player you think got the MOST coins",
+		"answer": [
+	},
+	"Question8": {
+		"name": "Overall, how fair was this game?",
+		"answer": [
+	},
+	"Question9": {
+		"name": "How much did you enjoy playing this game?",
+		"answer": [
+	},
+	"Question10": {
+		"name": "How likely are you to recommend this game to a friend?",
+		"answer": [
+	}
+}
