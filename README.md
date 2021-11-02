@@ -1,15 +1,28 @@
 # Privilege-Recognition-Task
+
+## Game Directions
+1. Answer the questionaire with the mouse and submit when done
+2. Use arrow keys or WASD to move (you are player 1)
+3. Collect as many coins as possible
+
+
 ## How to run
 Requirements:
 
 - pygame
 - python3
 
-## Updating the game
-1. Navigate the command line to the github directory
-2. Call 'git pull'
+## Option 1: Downloading the exe
+1. Download the executable from either the mac or windows folder
+2. Run it and follow the directions
 
-Instructions:
+### Updating the Game
+1. Redownload it from the repo
+
+
+
+## Option 2: Cloning the repo
+### Instructions:
 1. Download the Privilege task repo
 2. Navigate the command line to the directory PAT
 3. Call `python3 ../PAT/`
@@ -19,20 +32,12 @@ Instructions:
 8. play the game
 9. press esc to exit the game
 
-## 09/20 Week Tasks:
+### Updating the game
+1. Navigate the command line to the github directory
+2. Call 'git pull'
 
-1. Improve the ai to be more 'human'
 
-    a. Lit. review
-  
-  
-    b. Implementation
-  
-  
-2. Fix the EXE pathing when writing logs
-
-## Completed:
-
+## Features:
 - 1 player vs 3 AI
 - Multiple Rounds
 - Record every input from the player (time-stamped by by game tick)
@@ -44,4 +49,6 @@ Instructions:
 - Gradient Setting for bias
 - Single choice questions
 - Multiple choice questions
+- slider questions
 - JSON configuration file
+- Modular ordering of configurations
