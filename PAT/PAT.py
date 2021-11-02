@@ -4,7 +4,7 @@ from configReader import ConfigReader
 from logWriter import LogWriter
 from background import *
 from objects import *
-from datetime import datetime
+from datetime import date, datetime,time
 import sys
 
 
@@ -12,7 +12,7 @@ import sys
 seed = input("Enter seed (If you want random seed, just press enter): ")
 
 if (len(seed) == 0):
-    seed = numpy.random.randint(0,2**32 - 1)
+    seed = numpy.random.randint(0,sys.maxsize - 1)
 
 while True:
             try:
@@ -21,15 +21,14 @@ while True:
             except Exception:
                 seed = input(f"Please enter a numerical seed: ")
                 if (len(seed) == 0):
-                    seed = numpy.random.randint(0,2**32 - 1)
+                    seed = numpy.random.randint(0,sys.maxsize - 1)
                 continue
 
             break
 #if nothing is entered, empty string is false
 
 
-
-
+print("hello")
 
 class PAT:
     def __init__(self):
@@ -63,7 +62,7 @@ class PAT:
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
         self.clock = pygame.time.Clock()
 
-        self.time = datetime.now()
+        self.time = datetime.now().strftime("%H.%M.%S")
         
         #self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
