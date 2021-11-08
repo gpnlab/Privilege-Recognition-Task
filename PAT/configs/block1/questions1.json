@@ -1,12 +1,8 @@
 {"questions" : [
-    {
-        "question" : "Question set 1: hello! :)",
-        "type" : 2
-        
-    },
+
     {
         "question" : "To what extent do you feel happy right now?",
-        "type" : 1,
+        "type" : 2,
         "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Extremely"] 
     },
 

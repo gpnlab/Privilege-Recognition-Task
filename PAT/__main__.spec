@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['__main__.py'],
-             pathex=['/Users/justinzhang/Privilege-Recognition-Task/PAT'],
+             pathex=[],
              binaries=[],
              datas=[('images/objects/coin.png','images/objects'),('images/objects/p1.png','images/objects'),('images/objects/p2.png','images/objects'),('images/objects/p3.png','images/objects'),('images/objects/p4.png','images/objects'),('images/background/pacman.png','images/background'),('fonts/ARIAL.TTF','fonts'),('configs/block1/main.json','configs/block1'),('configs/block1/neutral.json','configs/block1'),('configs/block1/questions1.json','configs/block1'),('configs/block1/questions2.json','configs/block1'),('configs/block1/goodSpeed.json','configs/block1'),('configs/block1/goodCoin.json','configs/block1'),('configs/block1/goodAll.json','configs/block1'),('configs/block1/badSpeed.json','configs/block1'),('configs/block1/badAll.json','configs/block1'),('configs/block1/badCoin.json','configs/block1')],
              hiddenimports=[],
