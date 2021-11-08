@@ -12,7 +12,7 @@ import sys
 seed = input("Enter seed (If you want random seed, just press enter): ")
 
 if (len(seed) == 0):
-    seed = numpy.random.randint(0,sys.maxsize - 1)
+    seed = numpy.random.randint(0,100)
 
 while True:
             try:
@@ -26,9 +26,7 @@ while True:
 
             break
 #if nothing is entered, empty string is false
-
-
-print("hello")
+print("enter block1 for the preset name")
 
 class PAT:
     def __init__(self):
@@ -62,7 +60,10 @@ class PAT:
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
         self.clock = pygame.time.Clock()
 
-        self.time = datetime.now().strftime("%H.%M.%S")
+        
+    
+
+        self.time = datetime.now().strftime("%H_%M_%S")
         
         #self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)

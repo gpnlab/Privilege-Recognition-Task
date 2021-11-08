@@ -10,8 +10,10 @@ class LogWriter:
         self.timeStamp = timeStamp
         self.seed = seed
 
+    def getPath(self):
+        return os.path.dirname(os.sys.executable)
     def writeSeed(self):
-        url = path.join(path.dirname(path.abspath(__file__)),f"logs/{self.name}/{self.presetName}.{self.timeStamp}")
+        url = path.join(self.getPath(),f"logs/{self.name}/{self.presetName}-{self.timeStamp}")
         if not path.exists(url):
             os.makedirs(url)
         
@@ -23,7 +25,7 @@ class LogWriter:
     #pass log as a list of a list of strings (every sub list is a single tick)
 
     def writeLevelLog(self,log,levelName,roundNum = 0):
-        url = path.join(path.dirname(path.abspath(__file__)),f"logs/{self.name}/{self.presetName}.{self.timeStamp}/data")
+        url = path.join(self.getPath(),f"logs/{self.name}/{self.presetName}-{self.timeStamp}/data")
         
         if not path.exists(url):
             os.makedirs(url)
@@ -43,7 +45,7 @@ class LogWriter:
     #answers passed in as a list of lists (multiple answers)
 
     def writeLevelQA(self,Q,A,levelName):
-        url = path.join(path.dirname(path.abspath(__file__)),f"logs/{self.name}/{self.presetName}.{self.timeStamp}/answers")
+        url = path.join(self.getPath(),f"logs/{self.name}/{self.presetName}-{self.timeStamp}/answers")
         
         if not path.exists(url):
             os.makedirs(url)
