@@ -63,6 +63,54 @@ class HUD:
         timerRect.topright = (self.background.res[0],0)
         self.background.screen.blit(timerTxt,timerRect)
 
+class StartScreen:
+    def __init__(self,background):
+        self.name = ""
+        self.finished = False
+        self.background = background
+        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.1)
+        self.font = pygame.font.SysFont('arial',self.size)
+        
+        self.enterText = self.font.render("Please enter your name",True,(0,0,0),(255,255,255))
+        self.nameText = self.font.render(self.name,True,(0,0,0),(100,0,200))
+        self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
+        self.nameRect = (50 + self.background.res[0] // 5,50 + self.background.res[1] // 5,self.font.size(self.name)[0],self.font.size(self.name)[1])
+    
+
+    def updateName(self):
+        self.nameRect = (50 + self.background.res[0] // 5,50 + self.background.res[1] // 5,self.font.size(self.name)[0],self.font.size(self.name)[1])
+        self.nameText = self.font.render(self.name,True,(0,0,0),(10,80,200))
+
+    def mainLoop(self):
+        self.drawAll()
+        self.startInteraction()
+        pygame.display.flip()
+        pygame.display.update()
+        
+    def drawAll(self):
+        self.background.screen.fill((255,255,255))
+
+        self.background.screen.blit(self.enterText,self.menuRect)
+        self.background.screen.blit(self.nameText,self.nameRect)
+
+    def startInteraction(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: 
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
+                pygame.quit()
+                exit()
+            
+            elif event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_RETURN]:
+                    self.finished = True
+                elif keys[pygame.K_BACKSPACE]:
+                    self.name =  self.name[:-1]
+                elif len(self.name) < 20:
+                    self.name += event.unicode
+        self.updateName()
 
 class PauseScreen:
     def __init__(self,level,levels,round,rounds,background,config,agents = [],levelStart = 0):

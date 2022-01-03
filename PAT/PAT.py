@@ -8,32 +8,16 @@ from datetime import date, datetime,time
 import sys
 
 
-#get seed globally to permeate to classes with more ease
-seed = input("Enter seed (If you want random seed, just press enter): ")
-
-if (len(seed) == 0):
-    seed = numpy.random.randint(0,100)
-
-while True:
-            try:
-                numpy.random.seed(int(seed))
-
-            except Exception:
-                seed = input(f"Please enter a numerical seed: ")
-                if (len(seed) == 0):
-                    seed = numpy.random.randint(0,sys.maxsize - 1)
-                continue
-
-            break
-#if nothing is entered, empty string is false
-print("enter block1 for the preset name")
+seed = 0
 
 class PAT:
     def __init__(self):
         pygame.init()
+        
+        numpy.random.seed(seed)
 
         
-        self.presetName = input("Please enter the preset name: ")
+        self.presetName = "block1"
 
         #levels is a list of level names, which will be individual jsons in the respective preset directory
         while True:
@@ -481,6 +465,3 @@ class Round:
         pygame.sprite.Group.empty(self.aGroup)
         pygame.sprite.Group.empty(self.eGroup)
         pygame.sprite.Group.empty(self.cGroup)
-
-
-
