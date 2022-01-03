@@ -34,9 +34,6 @@ class PAT:
 
         
 
-        self.patientName = input("Please enter your name: ")
-        while (len(self.patientName) == 0):
-            self.patientName = input("Invalid Name. Try again: ")
         self.levels = self.mainConfig["levels"]
         
         print(self.levels)
@@ -51,7 +48,12 @@ class PAT:
         
         #self.font = pygame.font.SysFont('arial',20)
         self.background = Background(self.res)
-        
+
+        self.start = StartScreen(self.background)
+
+        while not self.start.finished:
+            self.start.mainLoop()
+        self.patientName = self.start.name
 
     def main_loop(self):
 
