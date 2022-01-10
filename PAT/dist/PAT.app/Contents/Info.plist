@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>PAT</string>
+	<key>CFBundleExecutable</key>
+	<string>__main__</string>
+	<key>CFBundleIconFile</key>
+	<string>pac-man.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.GPN.PAT</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>PAT</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>1.0.0</string>
+	<key>LSBackgroundOnly</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<string>True</string>
+	<key>NSRequiresAquaSystemAppearance</key>
+	<string>No</string>
+</dict>
+</plist>
