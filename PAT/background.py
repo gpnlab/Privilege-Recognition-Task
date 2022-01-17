@@ -51,11 +51,12 @@ class HUD:
         self.timer = 0
 
     def drawHUD(self):
-        i = 0
-        for agent in self.agents:
-            coinTxt = self.fontHUD.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
-            self.background.screen.blit(coinTxt,(0,self.size * i))
-            i += 1
+        #UNCOMMENT IF WANT TO DISPLAY SCORES
+        #i = 0
+        #for agent in self.agents:
+        #    coinTxt = self.fontHUD.render(f"{agent.name} coins: {agent.coins}",True,(0,0,0))
+        #    self.background.screen.blit(coinTxt,(0,self.size * i))
+        #    i += 1
 
         #Timer
         timerTxt = self.fontHUD.render(f"Time: {(self.timer // 60)}" ,True,(0,0,0))
