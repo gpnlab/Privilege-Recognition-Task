@@ -45,7 +45,7 @@ class HUD:
         self.timer = 0
     
     def updateTimer(self):
-        self.timer = pygame.time.get_ticks()
+        self.timer += 1
 
     def resetTimer(self):
         self.timer = 0
@@ -58,7 +58,7 @@ class HUD:
             i += 1
 
         #Timer
-        timerTxt = self.fontHUD.render(f"Time: {self.timer // 1000}" ,True,(0,0,0))
+        timerTxt = self.fontHUD.render(f"Time: {(self.timer // 60)}" ,True,(0,0,0))
         timerRect = timerTxt.get_rect()
         timerRect.topright = (self.background.res[0],0)
         self.background.screen.blit(timerTxt,timerRect)
@@ -68,19 +68,23 @@ class StartScreen:
         self.name = ""
         self.finished = False
         self.background = background
-        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.1)
+        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.05)
         self.font = pygame.font.SysFont('arial',self.size)
         
-        self.enterText = self.font.render("Please enter your name",True,(0,0,0),(255,255,255))
+        self.enterText = self.font.render("Please enter your name and press enter",True,(0,0,0),(255,255,255))
         self.nameText = self.font.render(self.name,True,(0,0,0),(100,0,200))
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
-        self.nameRect = (50 + self.background.res[0] // 5,50 + self.background.res[1] // 5,self.font.size(self.name)[0],self.font.size(self.name)[1])
+
+        #TODO: for now, adding another rect for the rectangle so that it is slightly bigger than text
+        self.nameRect1 = (40 + self.background.res[0] // 5,40 + self.background.res[1] // 5,self.background.res[0] // 2,self.font.size("1")[1] + 20)
+        self.nameRect = (50 + self.background.res[0] // 5,50 + self.background.res[1] // 5,self.background.res[0] // 2,self.font.size("1")[1])
+        
     
 
     def updateName(self):
-        self.nameRect = (50 + self.background.res[0] // 5,50 + self.background.res[1] // 5,self.font.size(self.name)[0],self.font.size(self.name)[1])
-        self.nameText = self.font.render(self.name,True,(0,0,0),(10,80,200))
-
+        #self.nameRect = (50 + self.background.res[0] // 5,50 + self.background.res[1] // 5,self.font.size(self.name)[0],self.font.size(self.name)[1])
+        self.nameText = self.font.render(self.name,True,(0,0,0),(255,255,255))
+        
     def mainLoop(self):
         self.drawAll()
         self.startInteraction()
@@ -91,6 +95,7 @@ class StartScreen:
         self.background.screen.fill((255,255,255))
 
         self.background.screen.blit(self.enterText,self.menuRect)
+        pygame.draw.rect(self.background.screen,(0,0,0),self.nameRect1,1)
         self.background.screen.blit(self.nameText,self.nameRect)
 
     def startInteraction(self):
