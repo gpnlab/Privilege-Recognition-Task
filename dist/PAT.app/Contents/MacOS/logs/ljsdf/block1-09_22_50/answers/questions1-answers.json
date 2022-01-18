@@ -1,0 +1,26 @@
+{
+	"Question0": {
+		"name": "To what extent do you feel happy right now?",
+		"answer": ["0"]
+	},
+	"Question1": {
+		"name": "Confident?",
+		"answer": ["0"]
+	},
+	"Question2": {
+		"name": "Stressed?",
+		"answer": ["0"]
+	},
+	"Question3": {
+		"name": "Excited?",
+		"answer": ["0"]
+	},
+	"Question4": {
+		"name": "Frustrated?",
+		"answer": ["0"]
+	},
+	"Question5": {
+		"name": "Proud?",
+		"answer": ["0"]
+	}
+}

@@ -1,0 +1,3 @@
+([('__main__',
+   '/Users/justinzhang/Privilege-Recognition-Task/PAT/dist/__main__',
+   'EXECUTABLE')],)
