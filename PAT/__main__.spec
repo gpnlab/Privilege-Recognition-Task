@@ -37,4 +37,18 @@ exe = EXE(pyz,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
-          entitlements_file=None )
+          entitlements_file=None)
+
+app = BUNDLE(exe,
+    name='PAT.app',
+    icon='pac-man.icns',
+    bundle_identifier='com.GPN.PAT',
+    info_plist={
+      'CFBundleName': 'PAT',
+      'CFBundleDisplayName': 'PAT',
+      'CFBundleVersion': '1.0.0',
+      'CFBundleShortVersionString': '1.0.0',
+      'NSRequiresAquaSystemAppearance': 'No',
+      'NSHighResolutionCapable': 'True',
+    },
+)
