@@ -2,7 +2,11 @@
 
 ## Downloading the application
 
-### Option 1: Cloning the repo (M1 MAC)
+### FOR FIRST TIME SETUP (MAC)
+Download XCode from the following link: https://apps.apple.com/us/app/xcode/id497799835?mt=12
+This should install git
+
+### Option 1: Cloning the repo (MAC)
 #### Instructions:
 1. press 'cmd' + 'space'
 2. Type terminal and enter
@@ -12,7 +16,7 @@
 
 
 
-### Option 2: Downloading the exe (ONLY FOR NON-M1 MACS)
+### Option 2: Downloading the exe (ONLY FOR NONMACS)
 1. Download the executable from the release window 
 2. Run it and follow the directions
 
