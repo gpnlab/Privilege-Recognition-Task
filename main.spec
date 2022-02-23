@@ -46,7 +46,7 @@ app = BUNDLE(exe,
     info_plist={
       'CFBundleName': 'PAT',
       'CFBundleDisplayName': 'PAT',
-      'CFBundleVersion': '1.0.0',
+      'CFBundleVersion': '1.0.1',
       'CFBundleShortVersionString': '1.0.0',
       'NSRequiresAquaSystemAppearance': 'No',
       'NSHighResolutionCapable': 'True',
