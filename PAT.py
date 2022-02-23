@@ -166,7 +166,7 @@ class Round:
         self.config = config
 
     
-        self.info = [["tick","coins left","player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
+        self.info = dict()
         
         self.aGroup = pygame.sprite.Group()
         self.eGroup = pygame.sprite.Group()
@@ -303,19 +303,33 @@ class Round:
 
         keysPressedStr = "" 
 
-        if keys[pygame.K_w]:
-            keysPressedStr += "w"
-        elif keys[pygame.K_s]:
-            keysPressedStr += "s"
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
+            keysPressedStr += "up "
+        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            keysPressedStr += "down "
             
-        if keys[pygame.K_a]:
-            keysPressedStr += "a"
-        elif keys[pygame.K_d]:
-            keysPressedStr += "d"
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            keysPressedStr += "left "
+        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            keysPressedStr += "right "
 
         #TODO: This hurts
-        self.info.append([str(self.time),str(self.coinsLeft),keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
-        
+        # self.info.append([str(self.time),str(self.coinsLeft),keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
+        # self.info = [["player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
+        info = dict() 
+        info["tick"] = str(self.time)
+        info["coins left"] = str(self.coinsLeft)
+        info["player coins"] = str(self.player.coins)
+        info["keys pressed"] = keysPressedStr
+        info["e1 coins"] = str(self.enemy1.coins)
+        info["e2 coins"] = str(self.enemy2.coins)
+        info["e3 coins"] = str(self.enemy3.coins)
+        info["player position"] = str((self.player.x,self.player.y))       
+        info["enemy1 position"] = str((self.enemy1.x,self.enemy1.y))
+        info["enemy2 position"] = str((self.enemy2.x,self.enemy2.y))
+        info["enemy3 position"] = str((self.enemy3.x,self.enemy3.y))
+
+        self.info[str(self.time)] = info    
     def reset(self):
         pygame.sprite.Group.empty(self.aGroup)
         pygame.sprite.Group.empty(self.eGroup)

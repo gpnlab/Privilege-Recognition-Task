@@ -1,6 +1,7 @@
 import os
 from os import path
 from datetime import datetime
+import json
 
 class LogWriter:
 
@@ -30,14 +31,19 @@ class LogWriter:
         if not path.exists(url):
             os.makedirs(url)
 
-        url += f"/level{levelName}-round{roundNum}.csv"
+        url += f"/level{levelName}-round{roundNum}.json"
         
         logFile = open(url,"w+")
         
-        for line in log:
-            for entry in line:
-                logFile.write(entry+",")
-            logFile.write("\n")
+        parsed = json.dumps(log, indent = 5)
+
+        print(parsed)
+        logFile.write(parsed)
+
+        # for line in log:
+        #     for entry in line:
+        #         logFile.write(entry+",")
+        #     logFile.write("\n")
 
         logFile.close()
 
