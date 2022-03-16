@@ -25,6 +25,7 @@ class PAT:
         
 
         self.levels = self.mainConfig["levels"]
+        self.info = dict()
         
         print(self.levels)
         self.displayInfo = pygame.display.Info()
@@ -43,10 +44,26 @@ class PAT:
             self.start.mainLoop()
         self.patientName = self.start.name
 
+        self.logWriter = LogWriter(self.presetName,self.patientName,self.time,seed)
+
     def main_loop(self):
+        #manually keep track of which level since questions count as levels when they should not
+        levelnum = 1 
+
         for currLevel in range(len(self.levels)):
             level = Level(self,self.time,self.patientName,self.presetName,currLevel,self.levels)
             level.main_loop()
+
+            if "questions" in level.config:
+                self.info[f"level {levelnum} questions"] = level.info
+            else:
+                self.info[f"level {levelnum} log"] = level.info
+                levelnum += 1
+
+            
+
+        self.logWriter.writeLog(self.info)
+        
         final = FinalScreen(self.background)
         final.mainLoop()
 
@@ -71,6 +88,9 @@ class Level:
         self.logWriter = LogWriter(presetName,patientName,timestamp,seed)
 
         self.logWriter.writeSeed()
+
+        self.info = dict()
+        #will only be set if it is a 'questions' level
         
         #not a questions block
         if "questions" not in self.config:
@@ -89,7 +109,6 @@ class Level:
             self.currRound = 0
         
         
-            self.info = [["tick","coins left","player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
 
     
     def initGroups(self):
@@ -103,6 +122,9 @@ class Level:
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
         self.eGroup.add(self.enemy3)
+    
+    def returnInfo(self):
+        return self.info
 
     def main_loop(self):
 
@@ -112,8 +134,17 @@ class Level:
             while levelStartPause.paused:
                 levelStartPause.updateLoop()
             #record what answers were chosen
-            self.logWriter.writeLevelQA(levelStartPause.returnQuestionText(),levelStartPause.returnAnswerText(),self.levelList[self.levelNum])
+            
+            answersDict = dict()
+            answersDict["level"] = self.levelNum
+            questions = levelStartPause.returnQuestionText()
+            answers = levelStartPause.returnAnswerText()
 
+            for i in range(len(questions)):
+                answersDict[questions[i]] = answers[i]
+
+            #self.logWriter.writeLevelQA(answersDict)
+            self.info = answersDict
         else:
             for currRound in range(self.rounds):
                 round = Round(self.Pat,self.levelNum,currRound,self.config)
@@ -126,8 +157,8 @@ class Level:
                 self.e3Coins += round.enemy3.coins
 
             
-                print(f"writing log for level {self.levelList[self.levelNum]}, round {self.currRound}")
-                self.logWriter.writeLevelLog(round.info,self.levelList[self.levelNum],self.currRound)
+                #save round info
+                self.info[f"level {self.levelNum} round {self.currRound}"] = round.info
                 self.currRound += 1
             
 
@@ -167,6 +198,8 @@ class Round:
 
     
         self.info = dict()
+        self.info["level"] = levelNum
+        self.info["round"] = roundNum
         
         self.aGroup = pygame.sprite.Group()
         self.eGroup = pygame.sprite.Group()
@@ -175,7 +208,7 @@ class Round:
         #Pass background and player into HUD
         self.HUD = HUD(self.background, self.aGroup) 
         self.initGroups()
-
+ 
         #set mean acoording to biases:
         meanCoor = (self.res[0] / 2, self.res[1] / 2)
         
@@ -313,9 +346,6 @@ class Round:
         elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             keysPressedStr += "right "
 
-        #TODO: This hurts
-        # self.info.append([str(self.time),str(self.coinsLeft),keysPressedStr,str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.player.x,self.player.y)),str(self.player.coins),str(self.enemy1.coins),str(self.enemy2.coins),str(self.enemy3.coins),str((self.enemy1.x,self.enemy1.y)),str((self.enemy2.x,self.enemy2.y)),str((self.enemy3.x,self.enemy3.y))])
-        # self.info = [["player input", "player coins", "e1 coins", "e2 coins", "e3 coins","player pos", "e1 pos", "e2 pos", "e3 pos"]]
         info = dict() 
         info["tick"] = str(self.time)
         info["coins left"] = str(self.coinsLeft)
