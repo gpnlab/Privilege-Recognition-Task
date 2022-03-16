@@ -1,5 +1,12 @@
 # Privilege-Recognition-Task
 
+## Todo
+1. Change the structure of the config folder for the multiple blocks described by the doc
+
+2. change "favorability bias" towards opposite corner AI
+
+3. Fix basic indexing off-by-ones for log files
+
 ## Downloading the application
 
 ### FOR FIRST TIME SETUP (MAC)
