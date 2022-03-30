@@ -1,4 +1,5 @@
 import numpy
+from numpy.random import mtrand
 import pygame
 from configReader import ConfigReader
 from logWriter import LogWriter
@@ -6,6 +7,7 @@ from background import *
 from objects import *
 from datetime import date, datetime,time
 import sys
+
 
 
 seed = 0
@@ -21,11 +23,29 @@ class PAT:
 
         #levels is a list of level names, which will be individual jsons in the respective preset directory
         #RES is fullScreen
-        self.mainConfig = ConfigReader.parseToDict("main",self.presetName)
-        
+        #TODO: Fix the configs
+        self.mainConfig = ConfigReader.parseToDict("structure")
+        self.structure = self.mainConfig["structure"]
+        self.blocks = self.mainConfig["blocks"]
 
-        self.levels = self.mainConfig["levels"]
+
+        self.levels = []
+        
+        #loop through the structure and add levels
+        for blockType in self.structure: 
+            block = self.blocks[blockType]["layout"]
+            print(block)
+
+            for b in block:
+                print(b)
+                level = b[0]
+                freq = int(b[1])
+                for i in range(freq):
+                    self.levels.append(level)
+
+        
         self.info = dict()
+        
         
         print(self.levels)
         self.displayInfo = pygame.display.Info()
@@ -45,7 +65,7 @@ class PAT:
         self.patientName = self.start.name
 
         self.logWriter = LogWriter(self.presetName,self.patientName,self.time,seed)
-
+        
     def main_loop(self):
         #manually keep track of which level since questions count as levels when they should not
         levelnum = 1 
@@ -79,7 +99,7 @@ class Level:
         self.levelList = levelList
         self.levelNum = level
         self.levels = len(levelList)
-        self.config = ConfigReader.parseToDict(f"{levelList[level]}",presetName)
+        self.config = ConfigReader.parseToDict(f"{levelList[level]}","levelconfigs")
         print(self.config)
         self.background = Pat.background
         self.res = Pat.res
@@ -107,6 +127,8 @@ class Level:
             
             self.rounds = int(self.config["rounds"])
             self.currRound = 0
+
+            
         
         
 
@@ -156,11 +178,11 @@ class Level:
                 self.e2Coins += round.enemy2.coins
                 self.e3Coins += round.enemy3.coins
 
+                
             
                 #save round info
                 self.info[f"level {self.levelNum} round {self.currRound}"] = round.info
                 self.currRound += 1
-            
 
 
             
