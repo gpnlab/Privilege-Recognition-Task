@@ -79,8 +79,23 @@ class StartScreen:
         #TODO: for now, adding another rect for the rectangle so that it is slightly bigger than text
         self.nameRect1 = (40 + self.background.res[0] // 5,40 + self.background.res[1] // 5,self.background.res[0] // 2,self.font.size("1")[1] + 20)
         self.nameRect = (50 + self.background.res[0] // 5,50 + self.background.res[1] // 5,self.background.res[0] // 2,self.font.size("1")[1])
-        
-    
+
+        #Start game off with selecting config, then actually start game
+        self.configSelect = True
+        self.structRectList = []
+        self.configSelectText = self.font.render("Choose Config",True,(0,0,0),(255,255,255))
+        self.configSelectRect = (40 + self.background.res[0] // 5,40 + self.background.res[1] // 5,self.background.res[0] // 2,self.font.size("1")[1] + 20)
+
+        #just do two structs as a proof of concept, otherwise, would be in a list
+        self.struct1Text = self.font.render("Struct 0",True,(0,0,0),(255,255,255))
+        self.struct1Rect = (40 + self.background.res[0] // 5,self.background.res[1] // 3,self.background.res[0] // 2,self.font.size("1")[1] + 20) 
+
+        self.struct2Text = self.font.render("Struct 1",True,(0,0,0),(255,255,255))
+        self.struct2Rect = (40 + self.background.res[0] // 5,self.background.res[1] // 2,self.background.res[0] // 2,self.font.size("1")[1] + 20) 
+
+        self.structRectList = [self.struct1Rect,self.struct2Rect]
+        self.structNameList = [self.struct1Text,self.struct2Text]
+        self.chosenStruct = ""    
 
     def updateName(self):
         self.nameText = self.font.render(self.name,True,(0,0,0),(255,255,255))
@@ -94,9 +109,49 @@ class StartScreen:
     def drawAll(self):
         self.background.screen.fill((255,255,255))
 
-        self.background.screen.blit(self.enterText,self.menuRect)
-        pygame.draw.rect(self.background.screen,(0,0,0),self.nameRect1,1)
-        self.background.screen.blit(self.nameText,self.nameRect)
+        if self.configSelect:
+            self.hover(pygame.mouse.get_pos())
+            self.background.screen.blit(self.configSelectText,self.configSelectRect)
+            self.background.screen.blit(self.structNameList[0],self.structRectList[0])
+            self.background.screen.blit(self.structNameList[1],self.structRectList[1])
+            
+        else:
+            self.background.screen.blit(self.enterText,self.menuRect)
+            pygame.draw.rect(self.background.screen,(0,0,0),self.nameRect1,1)
+            self.background.screen.blit(self.nameText,self.nameRect)
+
+    def hover(self,mousePos):
+        x,y = mousePos
+        i = 0
+        for rect in self.structRectList:
+            xRange = range(rect[0],rect[0] + rect[2])
+            yRange = range(rect[1],rect[1] + rect[3])
+
+            inX = x in xRange
+            inY = y in yRange
+            if (inX and inY):
+                self.structNameList[i] = self.font.render(f"Struct {i}",True,(0,255,0),(255,255,255))
+            else:
+                self.structNameList[i] = self.font.render(f"Struct {i}",True,(0,0,0),(255,255,255)) 
+            i += 1
+
+
+
+    def configSelection(self,mousePos): 
+        i = 0
+        x,y = mousePos
+
+        #starting game
+        for rect in self.structRectList:
+            xRange = range(rect[0],rect[0]+rect[2])
+            yRange = range(rect[1],rect[1] + rect[3])
+
+            inX = x in xRange
+            inY = y in yRange
+            if (inX and inY):
+                self.chosenStruct = f"structure{i}"
+                self.configSelect = False
+            i += 1 
 
     def startInteraction(self):
         for event in pygame.event.get():
@@ -106,8 +161,10 @@ class StartScreen:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
                 pygame.quit()
                 exit()
-            
-            elif event.type == pygame.KEYDOWN:
+
+            elif self.configSelect and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                self.configSelection(pygame.mouse.get_pos()) 
+            elif not self.configSelect and event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_RETURN]:
                     self.finished = True

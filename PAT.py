@@ -24,30 +24,29 @@ class PAT:
         #levels is a list of level names, which will be individual jsons in the respective preset directory
         #RES is fullScreen
         #TODO: Fix the configs
-        self.mainConfig = ConfigReader.parseToDict("structure")
-        self.structure = self.mainConfig["structure"]
-        self.blocks = self.mainConfig["blocks"]
+        # self.mainConfig = ConfigReader.parseToDict("structure")
+        # self.structure = self.mainConfig["structure1"]
+        # self.blocks = self.mainConfig["blocks"]
 
 
-        self.levels = []
+        # self.levels = []
         
-        #loop through the structure and add levels
-        for blockType in self.structure: 
-            block = self.blocks[blockType]["layout"]
-            print(block)
+        # #loop through the structure and add levels
+        # for blockType in self.structure: 
+        #     block = self.blocks[blockType]["layout"]
+        #     print(block)
 
-            for b in block:
-                print(b)
-                level = b[0]
-                freq = int(b[1])
-                for i in range(freq):
-                    self.levels.append(level)
+        #     for b in block:
+        #         print(b)
+        #         level = b[0]
+        #         freq = int(b[1])
+        #         for i in range(freq):
+        #             self.levels.append(level)
 
         
         self.info = dict()
         
         
-        print(self.levels)
         self.displayInfo = pygame.display.Info()
         self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
         self.clock = pygame.time.Clock()
@@ -64,8 +63,31 @@ class PAT:
             self.start.mainLoop()
         self.patientName = self.start.name
 
+        self.parseStructure(self.start.chosenStruct)
+
+        print(self.levels)
+
         self.logWriter = LogWriter(self.presetName,self.patientName,self.time,seed)
+    
+    def parseStructure(self,structName="structure1"):
+        self.mainConfig = ConfigReader.parseToDict("structure")
+        self.structure = self.mainConfig[structName]
+        self.blocks = self.mainConfig["blocks"]
+
+        self.levels = []
         
+        #loop through the structure and add levels
+        for blockType in self.structure: 
+            block = self.blocks[blockType]["layout"]
+            print(block)
+
+            for b in block:
+                print(b)
+                level = b[0]
+                freq = int(b[1])
+                for i in range(freq):
+                    self.levels.append(level)
+
     def main_loop(self):
         #manually keep track of which level since questions count as levels when they should not
         levelnum = 1 

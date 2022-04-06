@@ -6,7 +6,6 @@ import json
 class LogWriter:
 
     def __init__(self,presetName = "default",name = "NONAME", timeStamp = "NOTIME",seed = 0):
-        self.presetName = presetName
         self.name = name
         self.timeStamp = timeStamp
         self.seed = seed
