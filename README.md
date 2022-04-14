@@ -7,6 +7,11 @@
 
 3. Fix basic indexing off-by-ones for log files
 
+4. Change to the partipant id
+
+5. The data structuring
+
+6. Start menu (participant look away) -> choose config (what we already have)
 ## Downloading the application
 
 ### FOR FIRST TIME SETUP (MAC)

@@ -97,9 +97,10 @@ class PAT:
             level.main_loop()
 
             if "questions" in level.config:
-                self.info[f"level {levelnum} questions"] = level.info
+                #questions will occur after, so -1 is "safe"
+                self.info[f"questions {levelnum - 1}"] = level.info
             else:
-                self.info[f"level {levelnum} log"] = level.info
+                self.info[f"level {levelnum}"] = level.info
                 levelnum += 1
 
             
