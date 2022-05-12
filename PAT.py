@@ -1,7 +1,7 @@
 import numpy
 from numpy.random import mtrand
 import pygame
-from configReader import ConfigReader
+from configReader import ConfigReader, ConfigContainer
 from logWriter import LogWriter
 from background import *
 from objects import *
@@ -93,6 +93,7 @@ class PAT:
         levelnum = 1 
 
         for currLevel in range(len(self.levels)):
+            print()
             level = Level(self,self.time,self.patientName,self.presetName,currLevel,self.levels)
             level.main_loop()
 
@@ -104,8 +105,8 @@ class PAT:
                 levelnum += 1
 
             
-
-        self.logWriter.writeLog(self.info)
+            print("writing log")
+            self.logWriter.writeLog(self.info)
         
         final = FinalScreen(self.background)
         final.mainLoop()
@@ -409,3 +410,7 @@ class Round:
         pygame.sprite.Group.empty(self.aGroup)
         pygame.sprite.Group.empty(self.eGroup)
         pygame.sprite.Group.empty(self.cGroup)
+
+if __name__ == "__main__":
+    pat = PAT()
+    pat.main_loop()
