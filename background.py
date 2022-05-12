@@ -320,8 +320,10 @@ class PauseScreen:
                 currVal = 0
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
+                
+                #add each slider to list of things to be rendered 
                 #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
-                answers.append(((self.background.res[0] // 4 + 20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 20,self.background.res[0] // 4 + 520),currVal,currValRender,False))
+                answers.append(((self.background.res[0] // 4 + 26,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 15,self.background.res[0] // 4 + 511),currVal,currValRender,False))
                 #generate a ball
 
             
@@ -386,16 +388,20 @@ class PauseScreen:
         offset = 0
 
         for i in range(11): 
-
+            
+            #for some reason 10 is 5 pixels off probably due to rounding
+            if i == 10:
+                offset -= 5
             #render number beforehand
             nRendered = self.font.render(f"{i}",True,(0,0,0))
             
             #blit number and bar here
-            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 10 + self.font.size(f'{i}')[0],y + q.get_height() * 2 - 10,1,10))
+            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 20 + self.font.size(f'{i}')[0]//2,y + q.get_height() * 2 - 10,1,10))
             #NOTE: uncomment if debug currVal
             #self.background.screen.blit(currValRender,(x + offset + 20,y + q.get_height() * 2 + 30,500,500))
-            self.background.screen.blit(nRendered,(x + offset + 20,y + q.get_height() * 2,500,500))
-
+            
+            self.background.screen.blit(nRendered,(x + offset + 21,y + q.get_height() * 2,500,500))
+            
             offset += incr
             
 
@@ -559,8 +565,7 @@ class PauseScreen:
         x,y = mousePos
 
         #answering questions - aTextList is indexed by the question number, list list of answers
-        currInd1 = 0
-        for aList in self.aTextList:     
+        for currInd1, aList in enumerate(self.aTextList):     
             (q,qRect,qType) = self.qTextList[currInd1]
             #Slider: move depending on mouse distance from center
             if qType == 2:
@@ -583,13 +588,13 @@ class PauseScreen:
                     
                     #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
                     #slider min/max
-                    sMin = aLim[0] + aRadius
-                    sMax = aLim[1]
+                    sMin = aLim[0] + aRadius -1
+                    sMax = aLim[1] + aRadius 
                     currVal = (newPos - sMin) * 10 / (sMax - sMin)
                     #rounding lol
-                    if currVal - int(currVal) > .7:
+                    if currVal - int(currVal) >= .5:
                         currVal = math.ceil(currVal)
-                    elif currVal - int(currVal) < .3:
+                    elif currVal - int(currVal) < .5:
                         currVal = int(currVal)
                     currValRender = self.font.render(f"{currVal}",True,(0,0,0))
 
@@ -598,7 +603,7 @@ class PauseScreen:
                     newCenter = ((currVal * (sMax- sMin) / 10) + sMin,aCenter[1])
 
                     self.aTextList[currInd1][0] = (newCenter,aRadius,aLim,currVal,currValRender,True)
-            currInd1 += 1
+            
         
 
 class FinalScreen:
