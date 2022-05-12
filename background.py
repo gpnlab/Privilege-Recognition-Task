@@ -320,6 +320,8 @@ class PauseScreen:
                 currVal = 0
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
+                
+                #add each slider to list of things to be rendered 
                 #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
                 answers.append(((self.background.res[0] // 4 + 20,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 20,self.background.res[0] // 4 + 520),currVal,currValRender,False))
                 #generate a ball
@@ -559,8 +561,7 @@ class PauseScreen:
         x,y = mousePos
 
         #answering questions - aTextList is indexed by the question number, list list of answers
-        currInd1 = 0
-        for aList in self.aTextList:     
+        for currInd1, aList in enumerate(self.aTextList):     
             (q,qRect,qType) = self.qTextList[currInd1]
             #Slider: move depending on mouse distance from center
             if qType == 2:
@@ -598,7 +599,7 @@ class PauseScreen:
                     newCenter = ((currVal * (sMax- sMin) / 10) + sMin,aCenter[1])
 
                     self.aTextList[currInd1][0] = (newCenter,aRadius,aLim,currVal,currValRender,True)
-            currInd1 += 1
+            
         
 
 class FinalScreen:
