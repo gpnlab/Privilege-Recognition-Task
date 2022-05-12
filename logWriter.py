@@ -25,17 +25,18 @@ class LogWriter:
     #pass log as a list of a list of strings (every sub list is a single tick)
     def writeLog(self,log):
         url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
-       
+        print("writing to: " + url)
         if not path.exists(url):
             os.makedirs(url)
         url += "/data.json"  
         #assumed that file will be created via qa write so we can append      
-        logFile = open(url,"a")
+        logFile = open(url,"w")
         
         parsed = json.dumps(log, indent = 5)
         logFile.write(parsed)
         logFile.close()
 
+    # UNUSED
     def writeLevelLog(self,log,levelName,roundNum = 0):
         url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
         
@@ -60,7 +61,7 @@ class LogWriter:
 
     #questions passed in as a list of strings
     #answers passed in as a list of lists (multiple answers)
-
+    # UNUSED
     def writeLevelQA(self,qDict):
         url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
         

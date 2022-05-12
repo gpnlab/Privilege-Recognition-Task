@@ -12,11 +12,7 @@ class ConfigReader:
         else:
             asset_url = EXE.resource_path(f"configs/levelconfigs/{filename}.json") 
 
-        with open(asset_url,"r+") as config:
-            d = json.load(config)
-        print(f"loaded config {filename}")
-
-        config.close()
+        d = ConfigContainer(asset_url)
         
         return d
 
@@ -33,6 +29,7 @@ class ConfigReader:
         for q in self.config["questions"]:
             retList.append(q["question"])
         return retList
+    
 
 # copied from my files need to make package at sometime
 class ConfigContainer(dict):
@@ -63,7 +60,7 @@ class ConfigContainer(dict):
 
     def __init__(self, json_filename: str = None, *args, **kwargs):
         super(ConfigContainer, self).__init__(*args, **kwargs)
-
+        
         if json_filename is not None:
             self.set_json(json_filename)
             self.read_json()
