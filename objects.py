@@ -97,7 +97,7 @@ class Player(Agent):
     def __init__(self,background,group,coord,velocity,imgName = "placeholder.png", seed = 0):
         super().__init__("Player 1",background,group,coord,velocity,imgName,seed)
 
-    def getInput(self,keys):
+    def getInput(self,keys,time_passed):
         
         #self.imgUpdate(keys)
         #when 8 directions added, this will update with corresponding sprite
@@ -237,7 +237,7 @@ class Enemy(Agent):
     def getNewState(self):
         return random.choices([0,1,2],self.pMatrix[self.state])[0]
 
-    def randomWalk(self,time):
+    def randomWalk(self):
         #0 - optimal path towards closest coin
         #1 - random direction
         #2 - stay still
