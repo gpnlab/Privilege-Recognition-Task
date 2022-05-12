@@ -93,8 +93,8 @@ class PAT:
         levelnum = 1 
 
         for currLevel in range(len(self.levels)):
-            print()
-            level = Level(self,self.time,self.patientName,self.presetName,currLevel,self.levels)
+            print(self.levels)
+            level = Level(self,self.time,self.patientName,self.presetName,levelnum,self.levels)
             level.main_loop()
 
             if "questions" in level.config:
@@ -238,11 +238,15 @@ class Round:
         self.inProgress = True
         self.background = Pat.background
         self.res = Pat.res
-        self.time = 0
+        
 
         self.config = config
 
-    
+        # ticks in milliseconds
+        self.prev_time = pygame.time.get_ticks() 
+        self.time = 0
+        #add time prev and time passed param
+        #add calculation/update before player input and pass time 
         self.info = dict()
         self.info["level"] = levelNum
         self.info["round"] = roundNum
@@ -315,16 +319,18 @@ class Round:
     def main_loop(self):
             
         keys = pygame.key.get_pressed()
-
+        self._update_time()
         self._handle_input(keys)
         self._process_game_logic(keys)
         self._draw()
 
+    def _update_time(self):
+        self.time_passed = pygame.time.get_ticks() - self.prev_time
+        self.prev_time = pygame.time.get_ticks()
         
-
     def _handle_input(self,keys):
         #player moves with WASD
-        self.player.getInput(keys)
+        self.player.getInput(keys,self.time_passed)
 
     def _process_game_logic(self,keys):
         
@@ -345,7 +351,7 @@ class Round:
         
         for e in self.eGroup:
             if self.coinsLeft > 0:
-                e.randomWalk(self.time)
+                e.randomWalk()
         
         #TODO: flag whenever all coins are gone to end "level"
 
@@ -360,9 +366,11 @@ class Round:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
                 pygame.quit()
                 exit()
-        self.time += 1
+                
+        #TODO fix time stuff 
+        self.time += self.time_passed
         #Clock updates
-        self.HUD.updateTimer()
+        self.HUD.updateTimer(self.time_passed)
         self.updateInfo(keys)
 
     def _draw(self):

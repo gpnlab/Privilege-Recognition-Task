@@ -44,8 +44,8 @@ class HUD:
         self.fontHUD = pygame.font.SysFont('arial', self.size)
         self.timer = 0
     
-    def updateTimer(self):
-        self.timer += 1
+    def updateTimer(self,time_passed):
+        self.timer += time_passed
 
     def resetTimer(self):
         self.timer = 0
@@ -59,7 +59,7 @@ class HUD:
         #    i += 1
 
         #Timer
-        timerTxt = self.fontHUD.render(f"Time: {(self.timer // 60)}" ,True,(0,0,0))
+        timerTxt = self.fontHUD.render(f"Time: {(self.timer // 1000)}" ,True,(0,0,0))
         timerRect = timerTxt.get_rect()
         timerRect.topright = (self.background.res[0],0)
         self.background.screen.blit(timerTxt,timerRect)
