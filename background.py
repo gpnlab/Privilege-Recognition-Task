@@ -588,9 +588,9 @@ class PauseScreen:
                     sMax = aLim[1]
                     currVal = (newPos - sMin) * 10 / (sMax - sMin)
                     #rounding lol
-                    if currVal - int(currVal) > .7:
+                    if currVal - int(currVal) >= .5:
                         currVal = math.ceil(currVal)
-                    elif currVal - int(currVal) < .3:
+                    elif currVal - int(currVal) < .5:
                         currVal = int(currVal)
                     currValRender = self.font.render(f"{currVal}",True,(0,0,0))
 
