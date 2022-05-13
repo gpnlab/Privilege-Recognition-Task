@@ -9,7 +9,8 @@ class GameObject(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
 
         random.seed(seed)
-
+        self.prev_time = pygame.time.get_ticks()
+        
         self.group = group 
         self.group.add(self)
         #screen tells us where to draw to
@@ -18,7 +19,7 @@ class GameObject(pygame.sprite.Sprite):
 
 
         self.x,self.y = coord
-        self.vel = velocity
+        self.vel = velocity # assume pixels per second
 
         #should we have acceleration?
         self.acc = acceleration
@@ -60,18 +61,26 @@ class GameObject(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x - self.xDim/2,self.y - self.yDim/2,
                                 self.xDim,self.yDim)
 
+    def update_velocity(self):
+        self.time_passed = pygame.time.get_ticks()- self.prev_time
+        self.prev_time = pygame.time.get_ticks()
+        
+        # to correct for different framerates
+        self.correct_vel = self.vel * self.time_passed / 3
+
+
     #direction is horizontal, then veritical
     def move(self,horizontal = 0, vertical = 0):
         
-        
-        self.x += horizontal * self.vel
-        self.y += vertical * self.vel
+        self.update_velocity()
+        self.x += horizontal * self.correct_vel
+        self.y += vertical * self.correct_vel
 
         #check oob
         if (self.x < 0 + self.xDim // 2 or self.x > self.bg.res[0] - self.xDim // 2):
-            self.x -= horizontal * self.vel
+            self.x -= horizontal * self.correct_vel
         if (self.y < 0 + self.yDim // 2 or self.y > self.bg.res[1] - self.yDim // 2):
-            self.y -= vertical * self.vel
+            self.y -= vertical * self.correct_vel
 
 
         self.setRect()
