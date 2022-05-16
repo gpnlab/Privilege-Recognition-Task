@@ -6,6 +6,18 @@ class ConfigReader:
 
     #requires a json formated as in the default directory
     def parseToDict(filename,dirName = "default"):
+        """
+        It takes a file name and a directory name, and returns a dictionary of the file's
+        contents
+        
+        Args:
+          filename: the name of the file you want to parse
+          dirName: The directory the file is in. If it's in the default directory, leave it
+        blank. Defaults to default
+        
+        Returns:
+          A dictionary of dictionaries.
+        """
 
         if dirName == "default":
             asset_url = EXE.resource_path(f"configs/{filename}.json")
@@ -18,6 +30,13 @@ class ConfigReader:
 
     @staticmethod
     def returnQuestionText(self):
+        """
+        It takes a list of dictionaries, and returns a list of the values of the "question"
+        key in each dictionary
+        
+        Returns:
+          A list of strings.
+        """
         retList = []
         for q in self.config["questions"]:
             retList.append(q["question"])
@@ -25,6 +44,13 @@ class ConfigReader:
     
     @staticmethod
     def returnQuestionText(self):
+        """
+        It takes a list of dictionaries, and returns a list of the values of the "question"
+        key in each dictionary
+        
+        Returns:
+          A list of strings.
+        """
         retList = []
         for q in self.config["questions"]:
             retList.append(q["question"])
