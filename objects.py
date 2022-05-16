@@ -6,6 +6,24 @@ from exe import EXE
 
 class GameObject(pygame.sprite.Sprite):
     def __init__(self,background,group,coord,imgName,velocity = .5,acceleration = 0,resize = (40,40),seed = 0):
+        """
+        This function creates a sprite object that can be drawn to the screen. The sprite 
+        object has a position, velocity, acceleration, image, and group.  
+
+        The sprite object can be removed from the screen and the group of sprites and deleted
+        and the memory freed. 
+        
+        Args:
+          background: the background object that the sprite is on
+          group: the sprite group that the object belongs to
+          coord: the starting coordinates of the sprite
+          imgName: the name of the image file
+          velocity: how fast the object moves
+          acceleration: how much the velocity changes per second. Defaults to 0
+          resize: a tuple of the new dimensions of the image
+          seed: random seed for the random number generator. Defaults to 0
+        """
+        
         pygame.sprite.Sprite.__init__(self)
 
         random.seed(seed)
@@ -19,7 +37,7 @@ class GameObject(pygame.sprite.Sprite):
 
 
         self.x,self.y = coord
-        self.vel = velocity # assume pixels per second
+        self.vel = velocity # not sure what the units are
 
         #should we have acceleration?
         self.acc = acceleration
@@ -41,6 +59,16 @@ class GameObject(pygame.sprite.Sprite):
     #default size will be 80x80
     @staticmethod
     def imgLoad(img,resizeDim = (80,80)):
+        """
+        It takes an image file name, and returns a pygame image object
+        
+        Args:
+          img: the name of the image file
+          resizeDim: The dimensions of the image.
+        
+        Returns:
+          The image is being returned.
+        """
 
         asset_url = EXE.resource_path(f"images/objects/{img}")
         
@@ -58,10 +86,21 @@ class GameObject(pygame.sprite.Sprite):
     
 
     def setRect(self):
+        """
+        The function takes the x and y coordinates of the center of the rectangle and the x
+        and y dimensions of the rectangle and returns a pygame.Rect object with the x and y
+        coordinates of the top left corner of the rectangle and the x and y dimensions of the
+        rectangle
+        """
         self.rect = pygame.Rect(self.x - self.xDim/2,self.y - self.yDim/2,
                                 self.xDim,self.yDim)
 
     def update_velocity(self):
+        """
+        The function updates the velocity of the object by multiplying the velocity by the
+        time passed since the last frame, and dividing it by 3
+        """
+        
         self.time_passed = pygame.time.get_ticks()- self.prev_time
         self.prev_time = pygame.time.get_ticks()
         
@@ -71,6 +110,15 @@ class GameObject(pygame.sprite.Sprite):
 
     #direction is horizontal, then veritical
     def move(self,horizontal = 0, vertical = 0):
+        """
+        It moves the player in the direction of the input, and checks if the player is out of
+        bounds. If the player is out of bounds, it moves the player back to the previous
+        position
+        
+        Args:
+          horizontal: -1, 0, or 1. Defaults to 0
+          vertical: -1, 0, 1. Defaults to 0
+        """
         
         self.update_velocity()
         self.x += horizontal * self.correct_vel
@@ -86,6 +134,10 @@ class GameObject(pygame.sprite.Sprite):
         self.setRect()
     
     def draw(self):
+        """
+        The function draw() takes the image of the player and draws it on the screen at the x
+        and y coordinates of the player
+        """
         self.screen.blit(self.image,(self.x,self.y))
 
 
@@ -97,6 +149,20 @@ class Agent(GameObject):
         return
     
     def __init__(self,name,background,group,coord,velocity,imgName = "placeholder.png",seed = 0):
+        """
+        This function is the constructor for the Player class. It takes in a name, background,
+        group, coord, velocity, imgName, and seed. It then calls the super constructor for the
+        Player class, and sets the name, and coins to the values passed in
+        
+        Args:
+          name: The name of the player
+          background: The background image
+          group: The group that the sprite will be added to.
+          coord: (x,y)
+          velocity: a tuple of the form (x,y)
+          imgName: The name of the image file. Defaults to placeholder.png
+          seed: the seed for the random number generator. Defaults to 0
+        """
         super().__init__(background,group,coord,imgName,velocity,seed)
         self.name = name
         self.coins = 0
@@ -104,9 +170,30 @@ class Agent(GameObject):
     
 class Player(Agent):
     def __init__(self,background,group,coord,velocity,imgName = "placeholder.png", seed = 0):
+        """
+        This function is the constructor for the Player class. It takes in a background,
+        group, coordinate, velocity, image name, and seed. It then calls the constructor
+        for the Agent class above
+        
+        Args:
+          background: The background image
+          group: The group that the sprite will be added to.
+          coord: (x,y)
+          velocity: a tuple of the form (x,y)
+          imgName: The name of the image file to be used for the sprite. Defaults to
+        placeholder.png
+          seed: The seed for the random number generator. Defaults to 0
+        """
         super().__init__("Player 1",background,group,coord,velocity,imgName,seed)
 
     def getInput(self,keys,time_passed):
+        """
+        If the player is pressing a key, the player moves in that direction
+        
+        Args:
+          keys: the list of keys that are currently being pressed
+          time_passed: the time passed since the last frame
+        """
         
         #self.imgUpdate(keys)
         #when 8 directions added, this will update with corresponding sprite
@@ -135,6 +222,21 @@ class Player(Agent):
 class Enemy(Agent):
     #need to pass in coin group for AI to find nearest coin
     def __init__(self,name,background,group,cGroup,coord,velocity,imgName = "placeholder.png",seed=0):
+        """
+        The constructor for the class, which sets the state of the object to 0, and sets the
+        probability matrix for the state transitions
+        
+        Args:
+          name: name of the object
+          background: the background image
+          group: the group of all the sprites
+          cGroup: the coin group
+          coord: the current position of the player
+          velocity: the speed of the enemy
+          imgName: the name of the image file for the sprite. Defaults to placeholder.png
+          seed: random seed for the random number generator. Defaults to 0
+        """
+        
         super().__init__(name,background,group,coord,velocity,imgName,seed)
         self.coinGroup = cGroup
         
@@ -153,17 +255,42 @@ class Enemy(Agent):
         self.setObj()
 
     def dist(self,c1,c2):
+        """
+        It calculates the distance between two points.
+        
+        Args:
+          c1: The first coordinate
+          c2: (x,y) coordinates of the center of the circle
+        
+        Returns:
+          The distance between two points.
+        """
+        # we should make this numpy
         (x1,y1),(x2,y2) = c1,c2
         return math.sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
     def getRandCoinCoord(self):
+        """
+        It returns the coordinates of a random coin in the coinGroup
+        
+        Returns:
+          The x and y coordinates of the random coin.
+        """
+        #loop through everything in coin group
         if len(self.coinGroup) == 0: return (0,0)
 
         randCoin = self.coinGroup.sprites()[random.randint(0,len(self.coinGroup) - 1)]
 
         return (randCoin.x,randCoin.y)
-    #loop through everything in coin group
+    
+    
     def getNearestCoinCoord(self):
+        """
+        It returns the coordinates of the nearest coin to the ai
+        
+        Returns:
+          The x and y coordinates of the nearest coin.
+        """
         if len(self.coinGroup) == 0: return (0,0)
 
         #default "max" distance
@@ -180,7 +307,11 @@ class Enemy(Agent):
 
     #should be ran whenever coin is obtained
     #for now, have it be 50/50 whether ai chooses opt or random coin
+    # What is this function for? - Linghai
     def setObj(self):
+        """
+        If the coin is still in the group, don't change the objective
+        """
         #check if coin is still in group, if yes, maybe don't change obj
         inFlag = False
         try:
@@ -206,6 +337,9 @@ class Enemy(Agent):
     #optimal movement toward nearest coin
     #will have to normalize vector to the velocity of the enemy (yay linear algebra)
     def optMove(self):
+        """
+        The function takes the coordinates of the nearest coin and moves the ai towards it
+        """
         #try:
         #    (cX,cY) = self.getNearestCoinCoord()
         #except:
@@ -236,17 +370,32 @@ class Enemy(Agent):
             self.move(xInd,yInd)
             
     def getRandMove(self):
+        """
+        It generates a random point on the unit circle as a direction for the ai
+        """
         self.randX = random.uniform(-1,1)
         self.randY = math.sqrt(1 - self.randX ** 2) * random.choice([-1,1])
     
     def randMove(self):
+        """
+        It returns a randomized and normalized movement
+        """
         #return a randomized and normalized movement
         self.move(self.randX,self.randY)
 
     def getNewState(self):
+        """
+        It returns a random number from the set {0,1,2} with probabilities given by the row of
+        the transition matrix corresponding to the current state
+        
+        Returns:
+          a random number from the list [0,1,2] with the probabilities given by the row of the
+        pMatrix corresponding to the current state.
+        """
         return random.choices([0,1,2],self.pMatrix[self.state])[0]
 
     def randomWalk(self):
+        # Unused
         #0 - optimal path towards closest coin
         #1 - random direction
         #2 - stay still
@@ -257,10 +406,7 @@ class Enemy(Agent):
 
         #if self.state == 0:
         self.optMove()
-        #elif self.state == 1:
-            
-        #    self.randMove()
-        #state 2 do nothing
+
 
 
 

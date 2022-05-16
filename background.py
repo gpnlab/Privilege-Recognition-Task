@@ -7,15 +7,32 @@ from pygame.constants import QUIT
 
 class Background(pygame.sprite.Sprite):
     def __init__(self,res,image = "pacman.png"):
+        """
+        It creates a surface object with the resolution of the screen, and then sets the
+        caption of the window to "Privilege Recognition Task"
+        
+        Args:
+          res: the resolution of the screen
+          image: The image to load. Defaults to pacman.png
+        """
         pygame.sprite.Sprite.__init__(self)
         self.res = res
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.surface = pygame.Surface(res)
-       #self.image = self.imgLoad(image)
+        #self.image = self.imgLoad(image)
 
         pygame.display.set_caption("Privilege Recognition Task")
 
     def imgLoad(self,img):
+        """
+        It takes a string, and returns a pygame image object
+        
+        Args:
+          img: The name of the image to load.
+        
+        Returns:
+          The image is being returned.
+        """
 
         print(f"loading {img}")
 
@@ -27,6 +44,9 @@ class Background(pygame.sprite.Sprite):
         return backImg
     
     def draw(self):
+        """
+        It fills the screen with white
+        """
         #fills a black screen
         self.screen.fill((255,255,255))
     
@@ -35,8 +55,17 @@ class Background(pygame.sprite.Sprite):
 
 class HUD:
     def __init__(self, background, agents):
+        """
+        The function is a constructor that initializes the class HUD. It sets the background,
+        agents, font, font size, and timer
+        
+        Args:
+          background: The background image
+          agents: a list of agents
+        """
         self.background = background
         self.agents = agents
+        #just the font size
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
         
         fontPath = path.join("fonts","arial.TTF")
@@ -45,12 +74,25 @@ class HUD:
         self.timer = 0
     
     def updateTimer(self,time_passed):
+        """
+        The function updateTimer() takes in a parameter called time_passed, and adds to 
+        the current amount of time passed
+        
+        Args:
+          time_passed: The amount of time that has passed since the last time the function was
+        called.
+        """
         self.timer += time_passed
 
     def resetTimer(self):
+        """Sets the time passed to 0
+        """
         self.timer = 0
 
     def drawHUD(self):
+        """
+        It draws the timer on the screen
+        """
         #UNCOMMENT IF WANT TO DISPLAY SCORES
         #i = 0
         #for agent in self.agents:
@@ -66,6 +108,14 @@ class HUD:
 
 class StartScreen:
     def __init__(self,background):
+        """
+        The function takes the name the user has entered and saves it to a file. This 
+        function also initiallizes the screen to select the experiment structure.
+        
+        Args:
+          background: the background of the game
+        """
+        
         self.name = ""
         self.finished = False
         self.background = background
@@ -98,6 +148,9 @@ class StartScreen:
         self.chosenStruct = ""    
 
     def updateName(self):
+        """
+        It takes the name of the player and renders it to the screen
+        """
         self.nameText = self.font.render(self.name,True,(0,0,0),(255,255,255))
         
     def mainLoop(self):
@@ -107,6 +160,9 @@ class StartScreen:
         pygame.display.update()
         
     def drawAll(self):
+        """
+        It draws the menu screen.
+        """
         self.background.screen.fill((255,255,255))
 
         if self.configSelect:
@@ -121,6 +177,13 @@ class StartScreen:
             self.background.screen.blit(self.nameText,self.nameRect)
 
     def hover(self,mousePos):
+        """
+        It takes the mouse position and checks if it's in the range of the rectangles. If it
+        is, it changes the color of the text to green
+        
+        Args:
+          mousePos: The position of the mouse
+        """
         x,y = mousePos
         i = 0
         for rect in self.structRectList:
@@ -138,6 +201,14 @@ class StartScreen:
 
 
     def configSelection(self,mousePos): 
+        """
+        The function takes in a mouse position and checks if the mouse is in the range of any
+        of the rectangles in the list. If it is, it sets the chosenStruct variable to the name
+        of the structure
+        
+        Args:
+          mousePos: the position of the mouse
+        """
         i = 0
         x,y = mousePos
 
@@ -154,6 +225,9 @@ class StartScreen:
             i += 1 
 
     def startInteraction(self):
+        """
+        It's a function handles the input logic for this game
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 pygame.quit()
@@ -176,7 +250,22 @@ class StartScreen:
 
 class PauseScreen:
     def __init__(self,level,levels,round,rounds,background,config,agents = [],levelStart = 0):
-        self.level,self.round = level,round
+        """
+        It's a function that initializes the round start screen or the question screen
+        
+        Args:
+          level: the current level
+          levels: the number of levels in the game
+          round: the current round
+          rounds: the number of rounds in the game
+          background: a pygame.Surface object
+          config: a dictionary of the config file
+          agents: a list of agents
+          levelStart: the time at which the level started. Defaults to 0
+        """
+        
+        self.level = level
+        self.round = round
         self.levelStart = levelStart
         self.levels = levels
         self.rounds = rounds
@@ -217,15 +306,28 @@ class PauseScreen:
         self.startText = self.font.render('Start',True,(0,0,0))
         self.nextText = self.font.render('Next Round',True,(0,0,0))
         self.endLevelText = self.font.render('End Level',True,(0,0,0))
-    #returns all question strings specified in the given config
+        
     def returnQuestionText(self):
+        """
+        It takes a list of dictionaries, and returns a list of the values of the "question"
+        key in each dictionary
+        
+        Returns:
+          returns all question strings specified in the given config
+        """
         retList = []
         for q in self.config["questions"]:
             retList.append(q["question"])
         return retList
 
-    #returns all answer strings specified in the given config
     def returnAnswerText(self):
+        """
+        Parses values in the aTextList and qTextList arrays
+        
+        Returns:
+          returns all answer strings specified in the given config
+        """
+        
         retList = []
         currIndex = 0
         for aList in self.aTextList:
@@ -248,14 +350,14 @@ class PauseScreen:
         
         return retList
 
-    #check that all questions given have been answered
     def allAnswered(self):
+        """
+        check that all questions given have been answered
+        """
         currIndex = 0
         for aList in self.aTextList:
 
             qType = self.qTextList[currIndex][2]
-
-            
 
             chosenForAny = False
             for aa in aList:
@@ -282,6 +384,11 @@ class PauseScreen:
 
 
     def renderQuestions(self):
+        """
+        It renders the questions and answers to the screen. The logic for slider and text 
+        response answers are different
+        """
+        
         yOff = 0
         for q in self.config["questions"]:
             qRendered = self.font.render(f"{yOff + 1}. {q['question']}",True,(0,0,0))
@@ -310,9 +417,7 @@ class PauseScreen:
                     aRenderedRect = (xOff, yC + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
                     answers.append((a,aRendered,aRenderedRect,False))
                     xOff += aRendered.get_width() + 20
-            
-                
-            
+                    
             elif qType == 2:
                 (x,y,lenX,lenY) = qRenderedRect
                 #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
@@ -326,12 +431,14 @@ class PauseScreen:
                 answers.append(((self.background.res[0] // 4 + 26,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 15,self.background.res[0] // 4 + 511),currVal,currValRender,False))
                 #generate a ball
 
-            
             self.aTextList.append(answers)
             yOff += 1
     
 
     def blitQuestions(self):
+        """
+        It loops through a list of questions and answers and blits them to the screen.
+        """
         self.background.screen.fill((255,255,255))
 
         yOff = 0
@@ -348,16 +455,20 @@ class PauseScreen:
             self.blitAnswers(qTuple,ansList)
             
             yOff += 1
-
             
-        
-        
-
         #create a rectangle below the text
         #pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
         self.background.screen.blit(self.startText,self.startRect)
 
     def blitAnswers(self,qTup,ansList):
+        """
+        It takes a question tuple and a list of answers and decides how to blit them
+        
+        Args:
+          qTup: (question, questionRect, questionType)
+          ansList: a list of tuples, each tuple containing the answer text, the answer rect,
+        and the answer type (0,1,2)
+        """
         (q,qRect,qType) = qTup
 
         for aa in ansList:
@@ -368,12 +479,26 @@ class PauseScreen:
 
 
     def blitButtonAnswer(self,aa):
+        """
+        It draws a rectangle around the answer and then blits the answer onto the screen
+        
+        Args:
+          aa: a tuple containing the following:
+        """
         (_,ansRender,ansRect,_) = aa
         pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
         self.background.screen.blit(ansRender,ansRect)
 
 
     def blitSliderAnswer(self,qTup,aa):
+        """
+        It draws a slider bar with a circle on it that can be moved by the user
+        
+        Args:
+          qTup: (q,qRect,qType)
+          aa: (center,radius,(lowLim,highLim),currVal,currValRender,Chosen)
+        """
+        
         (q,qRect,qType) = qTup
         (x,y,lenX,lenY) = qRect
 
@@ -404,7 +529,6 @@ class PauseScreen:
             
             offset += incr
             
-
         #draw a progress bar + the circle to where the current position is
         pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),520,lenY),1)
         pygame.draw.rect(self.background.screen,(0,53,148),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
@@ -414,6 +538,9 @@ class PauseScreen:
     
     #this is for after round is over
     def blitSumStats(self):
+        """
+        It draws a rectangle and then draws the summary statistics on top of it
+        """
 
         #draw a smol rectangle to display stats
         #TODO: relativize the size
@@ -422,12 +549,18 @@ class PauseScreen:
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
 
-        
         #pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
         self.background.screen.blit(self.nextText,self.nextRoundRect)
 
     
     def blitFinalStats(self,cList):
+        """
+        Displays the final stats of the game
+        
+        Args:
+          cList: list of all the characters in the game
+        """
+        
         self.background.screen.fill((255,255,255))
         levelTxt = self.font.render(f"Level {self.level + 1} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(0,0,self.background.res[0],self.background.res[1]))
@@ -446,6 +579,12 @@ class PauseScreen:
 
     #custom designed for start menu
     def startInteraction(self):
+        """
+        It checks for mouse events and keyboard events. If the mouse is clicked, it checks if
+        the mouse is hovering over a menu item. If it is, it calls the menuInteraction
+        function. If the mouse is clicked and held, it calls the sliderInteraction function.
+        If the escape key is pressed, it quits the program
+        """
 
         for event in pygame.event.get():
             self.hoverMenuText(pygame.mouse.get_pos())
@@ -464,6 +603,12 @@ class PauseScreen:
     
 
     def drawAll(self,x):
+        """
+        Chooses different blit functions depending on levelStart variable
+        
+        Args:
+          x: the number of questions answered correctly
+        """
         if self.levelStart == 0:
             self.blitQuestions()
         elif self.levelStart == 1:
@@ -473,6 +618,13 @@ class PauseScreen:
             self.blitFinalStats(x)
 
     def hoverMenuText(self,mousePos):
+        """
+        It's a function that changes the color of the text in the menu depending on whether
+        the mouse is hovering over it or not
+        
+        Args:
+          mousePos: (x,y)
+        """
         x,y = mousePos
 
         #starting game
@@ -495,6 +647,14 @@ class PauseScreen:
 
     #defines all the menu interactions given mousepos
     def menuInteraction(self,mousePos):
+        """
+        The function takes in a mouse position, and checks if the mouse is hovering over any
+        of the buttons on the screen. If it is, it changes the color of the button to green.
+        If it is not, it changes the color of the button to black
+        
+        Args:
+          mousePos: the position of the mouse
+        """
         x,y = mousePos
 
         #starting game
@@ -522,7 +682,6 @@ class PauseScreen:
         currInd1 = 0
         for aList in self.aTextList:
             
-
             (q,qRect,qType) = self.qTextList[currInd1]
 
             if qType < 2:
@@ -546,7 +705,6 @@ class PauseScreen:
                                 self.aTextList[currInd1][aListIndex] = (aTxt,newR,aRect,False)
                                 aListIndex += 1
                         
-
                     #choose the answer
                 
                         if newChoice: 
@@ -556,12 +714,19 @@ class PauseScreen:
 
                         nAnsRender = self.font.render(ansTxt,True,newCol)
 
-
                         self.aTextList[currInd1][currInd2] = (ansTxt,nAnsRender,ansRect,newChoice)
                     currInd2 += 1
             currInd1 += 1
 
     def sliderInteraction(self,mousePos):
+        """
+        The function takes in the mouse position and checks if the mouse is within the
+        slider's bounds. If it is, it calculates the new slider position and updates the
+        slider's center position
+        
+        Args:
+          mousePos: (x,y) tuple of mouse position
+        """
         x,y = mousePos
 
         #answering questions - aTextList is indexed by the question number, list list of answers
@@ -608,6 +773,12 @@ class PauseScreen:
 
 class FinalScreen:
     def __init__(self, background):
+        """
+        Initializes the end screen for the game
+        
+        Args:
+          background: The background object that the text will be drawn on.
+        """
         self.background = background
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.04)
         
@@ -620,12 +791,15 @@ class FinalScreen:
 
 
     def draw(self):
+        """
+        The function draws the background of the screen white, then draws the text in the
+        middle of the screen
+        """
         self.background.screen.fill((255,255,255))
 
         self.background.screen.blit(self.txt,(self.size // 2, self.size // 2))
     
     def mainLoop(self):
-        
         while True:
             events = pygame.event.get()
 
