@@ -60,11 +60,10 @@ class PAT:
     
     def parseStructure(self,structName="structure1"):
         """
-        It takes a structure name, and then loops through the structure, adding levels to a
-        list
+        It takes a structure name, parses the structure file, and then adds levels to a list.
         
-        :param structName: the name of the structure to parse, defaults to structure1
-        (optional)
+        Args:
+          structName: the name of the structure to parse. Defaults to structure1
         """
         
         self.mainConfig = ConfigReader.parseToDict("structure")
@@ -127,15 +126,16 @@ class PAT:
 class Level:
     def __init__(self,Pat,timestamp,patientName,presetName,level,levelList):
         """
-        It initializes the level, and it's groups, and it's config, and it's logwriter, and
-        it's info, and it's coins, and it's rounds, and it's current round.
+        It initializes the level, and if it's not a questions level, it initializes the
+        groups, coins, and rounds.
         
-        :param Pat: the PAT object used to initialize this level. This is passed to the round object
-        :param timestamp: the time the game was started
-        :param patientName: the name of the patient
-        :param presetName: the name of the preset file
-        :param level: the current level number
-        :param levelList: a list of the levels in the game
+        Args:
+          Pat: the patient object
+          timestamp: the time the game was started
+          patientName: the name of the patient
+          presetName: the name of the preset file
+          level: the current level
+          levelList: a list of the levels in the game
         """
         
         self.Pat = Pat
@@ -260,6 +260,10 @@ class Level:
  
         
     def reset(self):
+        """
+        It clears the sprite groups
+        """
+        
         pygame.sprite.Group.empty(self.aGroup)
         pygame.sprite.Group.empty(self.eGroup)
         pygame.sprite.Group.empty(self.cGroup)
@@ -269,13 +273,15 @@ class Level:
 class Round:
     def __init__(self,Pat,levelNum,roundNum,config):
         """
-        It initializes the game, and sets the positions of the coins, enemies, and player.
+        It initializes the game
         
-        :param Pat: the main game class
-        :param levelNum: the level number
-        :param roundNum: the round number
-        :param config: a dictionary of parameters for the level
+        Args:
+          Pat: the main game class
+          levelNum: the level number
+          roundNum: the current round number
+          config: a dictionary of parameters for the level
         """
+
         print(f"starting level {levelNum}, round {roundNum}")
         self.coinsLeft = config["numberOfCoins"]
         self.inProgress = True
@@ -379,11 +385,13 @@ class Round:
         
     def _handle_input(self,keys):
         """
-        The player object gets the input from the keyboard and moves the player object
-        accordingly
+        The player object is passed the keys that are pressed and the time passed since the
+        last frame
         
-        :param keys: a list of keys that are currently pressed
+        Args:
+          keys: a list of keys that are currently being pressed
         """
+        
         #player moves with WASD
         self.player.getInput(keys,self.time_passed)
 
@@ -392,7 +400,8 @@ class Round:
         The function is called every frame and it checks for collisions between the agents and
         the coins, updates the agents' coin count, and updates the timer
         
-        :param keys: a list of keys that are currently being pressed
+        Args:
+          keys: a list of keys that are currently being pressed
         """
         
         events = pygame.event.get()
@@ -452,9 +461,12 @@ class Round:
 
     def updateInfo(self,keys):
         """
-        It updates the information of the game for writing to the log file.
+        This function updates the info dictionary with the current time, the number of coins
+        left, the number of coins each player has, the keys pressed, and the position of each
+        player.
         
-        :param keys: the keys pressed by the player
+        Args:
+          keys: the keys that are pressed
         """
 
         keysPressedStr = "" 
