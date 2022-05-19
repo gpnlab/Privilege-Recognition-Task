@@ -138,13 +138,18 @@ class StartScreen:
 
         #just do two structs as a proof of concept, otherwise, would be in a list
         self.struct1Text = self.font.render("Struct 0",True,(0,0,0),(255,255,255))
-        self.struct1Rect = (40 + self.background.res[0] // 5,self.background.res[1] // 3,self.background.res[0] // 2,self.font.size("1")[1] + 20) 
+        self.struct1Rect = () 
 
         self.struct2Text = self.font.render("Struct 1",True,(0,0,0),(255,255,255))
         self.struct2Rect = (40 + self.background.res[0] // 5,self.background.res[1] // 2,self.background.res[0] // 2,self.font.size("1")[1] + 20) 
 
-        self.structRectList = [self.struct1Rect,self.struct2Rect]
-        self.structNameList = [self.struct1Text,self.struct2Text]
+        self.structRectList = []
+        self.structNameList = []
+
+        for i in range(9):
+            self.structRectList.append((40 + self.background.res[0] // 5,self.background.res[1] // 3 + 50 * i,self.background.res[0] // 2,self.font.size("1")[1] + 20))
+            self.structNameList.append(self.font.render(f"Struct {i}",True,(0,0,0),(255,255,255)))
+
         self.chosenStruct = ""    
 
     def updateName(self):
@@ -168,8 +173,9 @@ class StartScreen:
         if self.configSelect:
             self.hover(pygame.mouse.get_pos())
             self.background.screen.blit(self.configSelectText,self.configSelectRect)
-            self.background.screen.blit(self.structNameList[0],self.structRectList[0])
-            self.background.screen.blit(self.structNameList[1],self.structRectList[1])
+
+            for i in range(len(self.structRectList)):
+                self.background.screen.blit(self.structNameList[i],self.structRectList[i])
             
         else:
             self.background.screen.blit(self.enterText,self.menuRect)

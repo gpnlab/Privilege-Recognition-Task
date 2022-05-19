@@ -96,8 +96,8 @@ class PAT:
         levelnum = 1 
 
         for currLevel in range(len(self.levels)):
-            print(self.levels)
-            level = Level(self,self.time,self.patientName,self.presetName,levelnum,self.levels)
+            print(f"The current level is {currLevel}")
+            level = Level(self,self.time,self.participantID,self.presetName,levelnum,self.levels)
             level.main_loop()
 
             if "questions" in level.config:
@@ -108,9 +108,9 @@ class PAT:
                 levelnum += 1
 
             
-            print("writing log")
-            self.logWriter.writeLog(self.info)
-        
+        print("writing log")
+        self.logWriter.writeLog(self.info)
+
         final = FinalScreen(self.background)
         final.mainLoop()
 
@@ -155,6 +155,8 @@ class Level:
         self.info = dict()
         #will only be set if it is a 'questions' level
         
+        if "questions" in self.config:
+            print("foooofsdjofjdsofjoij")
         #not a questions block
         if "questions" not in self.config:
             self.aGroup = pygame.sprite.Group()
