@@ -71,11 +71,12 @@ class PAT:
         self.blocks = self.mainConfig["blocks"]
 
         self.levels = []
+
         
+        print("looping through block type")
         #loop through the structure and add levels
         for blockType in self.structure: 
             block = self.blocks[blockType]["layout"]
-            print(block)
 
             for b in block:
                 print(b)
@@ -97,7 +98,7 @@ class PAT:
 
         for currLevel in range(len(self.levels)):
             print(f"The current level is {currLevel}")
-            level = Level(self,self.time,self.participantID,self.presetName,levelnum,self.levels)
+            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels)
             level.main_loop()
 
             if "questions" in level.config:
