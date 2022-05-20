@@ -41,7 +41,6 @@ class PAT:
         self.time = datetime.now().strftime("%H_%M_%S")
         
         self.background = Background(self.res)
-
         self.countdownList = [Background(self.res,image="3.png",isBackground=True),Background(self.res,image="2.png",isBackground=True),Background(self.res,image="1.png",isBackground=True),Background(self.res,image="start.png",isBackground=True)]
 
 
@@ -60,6 +59,11 @@ class PAT:
         
         # initiallize logwriter class to track participant responses and inputs
         self.logWriter = LogWriter(self.presetName,self.participantID,self.time,seed)
+
+        instructions = InstrScreen(self.res)
+
+        while not instructions.proceed:
+            instructions.mainLoop()
     
     def parseStructure(self,structName="structure1"):
         """

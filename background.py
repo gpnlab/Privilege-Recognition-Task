@@ -14,6 +14,7 @@ class Background(pygame.sprite.Sprite):
         Args:
           res: the resolution of the screen
           image: The image to load. Defaults to pacman.png
+          isBackground: True if background image (in the background subdirectory)
         """
         pygame.sprite.Sprite.__init__(self)
         self.res = res
@@ -806,7 +807,72 @@ class PauseScreen:
 
                     self.aTextList[currInd1][0] = (newCenter,aRadius,aLim,currVal,currValRender,True)
             
+class InstrScreen:
+    def __init__(self,res):
+        self.background = Background(res,image="instructions.png",isBackground=True)
+        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.02)
+        self.font = pygame.font.SysFont('arial',self.size)
+        self.proceed = False        
+
         
+        self.startRect = (1100,710,self.font.size('Start')[0]+10,self.font.size('Start')[1] + 10)
+        self.startText = self.font.render('Start',True,(0,0,0))
+
+    def mainLoop(self):
+        self.draw()
+        self.interaction()
+        pygame.display.flip()
+        pygame.display.update()
+        
+    
+    def draw(self):
+        self.background.draw()
+        pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
+        self.background.screen.blit(self.startText,self.startRect)
+
+    def interaction(self):
+        """
+        It checks for mouse events and keyboard events. If the mouse is clicked, it checks if
+        the mouse is hovering over the start button then proceeds
+
+        The start button should be at coord (1100, 710)
+        """
+        for event in pygame.event.get():
+            print(pygame.mouse.get_pos())
+            self.hoverText(pygame.mouse.get_pos())
+            
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                self.menuInteraction(pygame.mouse.get_pos())
+                
+
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
+                pygame.quit()
+                exit()
+
+    
+    def hoverText(self,pos):
+        x,y = pos 
+
+        inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
+        inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
+
+        if inX and inY:
+            self.startText = self.font.render('Start',True,(0,200,0)) 
+        else:
+            self.startText = self.font.render('Start',True,(0,0,0))
+    def menuInteraction(self,pos):
+        x,y = pos 
+
+        inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
+        inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
+
+        if inX and inY:
+            self.proceed = True 
+
+    
+
+
 
 class FinalScreen:
     def __init__(self, background):
