@@ -24,9 +24,9 @@ class Background(pygame.sprite.Sprite):
             
 
             if isBackground:
-                self.image = self.imgLoad(image)
-            else:
                 self.image = self.bgImgLoad(image)
+            else:
+                self.image = self.imgLoad(image)
         else:
             self.image = None
 

@@ -42,6 +42,9 @@ class PAT:
         
         self.background = Background(self.res)
 
+        self.countdownList = [Background(self.res,image="3.png",isBackground=True),Background(self.res,image="2.png",isBackground=True),Background(self.res,image="1.png",isBackground=True),Background(self.res,image="start.png",isBackground=True)]
+
+
         # startscreen is responsible for letting the player select which configuration
         # the code is defined in the background.py file
         self.start = StartScreen(self.background)
@@ -98,7 +101,7 @@ class PAT:
 
         for currLevel in range(len(self.levels)):
             print(f"The current level is {currLevel}")
-            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels)
+            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownList)
             level.main_loop()
 
             if "questions" in level.config:
@@ -125,7 +128,7 @@ class PAT:
         finalTxt = "Game Complete! Press esc on your keyboard to exit."
 
 class Level:
-    def __init__(self,Pat,timestamp,patientName,presetName,level,levelList):
+    def __init__(self,Pat,timestamp,patientName,presetName,level,levelList,countdownList):
         """
         It initializes the level, and if it's not a questions level, it initializes the
         groups, coins, and rounds.
@@ -149,10 +152,9 @@ class Level:
         self.res = Pat.res
         self.pauseFlag = True
 
-        self.three = Background(self.res,image="3.png")
-        self.two = Background(self.res,image="2.png")
-        self.one = Background(self.res,image="1.png")
-        self.start = Background(self.res,image="start.png")
+        self.countdownList = countdownList
+
+        
 
         self.logWriter = LogWriter(presetName,patientName,timestamp,seed)
 
@@ -269,30 +271,14 @@ class Level:
         """
         Blits a countdown screen. Duration is roughly 3 seconds
         """
+        for curr in self.countdownList:
+            for _ in range(50):
+                curr.draw()
+                pygame.display.flip()
+                pygame.display.update()
+                pygame.event.get()
 
-        for _ in range(50):
-            self.three.draw()
-            pygame.display.flip()
-            pygame.display.update()
-            pygame.event.get()
-        
-        for _ in range(50):
-            self.two.draw()
-            pygame.display.flip()
-            pygame.display.update()
-            pygame.event.get()
-        
-        for _ in range(50):
-            self.one.draw()
-            pygame.display.flip()
-            pygame.display.update()
-            pygame.event.get()
 
-        for _ in range(50):
-            self.start.draw()
-            pygame.display.flip()
-            pygame.display.update()
-            pygame.event.get()
  
         
     def reset(self):
