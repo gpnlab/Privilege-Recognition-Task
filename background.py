@@ -6,7 +6,7 @@ from configReader import *
 from pygame.constants import QUIT
 
 class Background(pygame.sprite.Sprite):
-    def __init__(self,res,image = "pacman.png"):
+    def __init__(self,res,image = "NA",isBackground=False):
         """
         It creates a surface object with the resolution of the screen, and then sets the
         caption of the window to "Privilege Recognition Task"
@@ -19,7 +19,16 @@ class Background(pygame.sprite.Sprite):
         self.res = res
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.surface = pygame.Surface(res)
-        #self.image = self.imgLoad(image)
+        
+        if image != "NA":
+            
+
+            if isBackground:
+                self.image = self.imgLoad(image)
+            else:
+                self.image = self.bgImgLoad(image)
+        else:
+            self.image = None
 
         pygame.display.set_caption("Privilege Recognition Task")
 
@@ -36,7 +45,29 @@ class Background(pygame.sprite.Sprite):
 
         print(f"loading {img}")
 
+
         asset_url = EXE.resource_path(f"images/objects/{img}")
+        
+        backImg = pygame.image.load(asset_url).convert_alpha()
+        backImg = pygame.transform.scale(backImg,self.res)
+
+        return backImg
+
+    def bgImgLoad(self,img):
+        """
+        It takes a string, and returns a pygame image object
+        
+        Args:
+          img: The name of the image to load.
+        
+        Returns:
+          The image is being returned.
+        """
+
+        print(f"loading {img}")
+
+
+        asset_url = EXE.resource_path(f"images/background/{img}")
         
         backImg = pygame.image.load(asset_url).convert_alpha()
         backImg = pygame.transform.scale(backImg,self.res)
@@ -50,8 +81,8 @@ class Background(pygame.sprite.Sprite):
         #fills a black screen
         self.screen.fill((255,255,255))
     
-        #not a fan of this dark background :P
-        #self.screen.blit(self.image,(0,0))
+        if self.image:
+            self.screen.blit(self.image,(0,0))
 
 class HUD:
     def __init__(self, background, agents):
@@ -138,13 +169,18 @@ class StartScreen:
 
         #just do two structs as a proof of concept, otherwise, would be in a list
         self.struct1Text = self.font.render("Struct 0",True,(0,0,0),(255,255,255))
-        self.struct1Rect = (40 + self.background.res[0] // 5,self.background.res[1] // 3,self.background.res[0] // 2,self.font.size("1")[1] + 20) 
+        self.struct1Rect = () 
 
         self.struct2Text = self.font.render("Struct 1",True,(0,0,0),(255,255,255))
         self.struct2Rect = (40 + self.background.res[0] // 5,self.background.res[1] // 2,self.background.res[0] // 2,self.font.size("1")[1] + 20) 
 
-        self.structRectList = [self.struct1Rect,self.struct2Rect]
-        self.structNameList = [self.struct1Text,self.struct2Text]
+        self.structRectList = []
+        self.structNameList = []
+
+        for i in range(9):
+            self.structRectList.append((40 + self.background.res[0] // 5,self.background.res[1] // 3 + 60 * i,self.background.res[0] // 2,self.font.size("1")[1]))
+            self.structNameList.append(self.font.render(f"Struct {i}",True,(0,0,0),(255,255,255)))
+
         self.chosenStruct = ""    
 
     def updateName(self):
@@ -168,8 +204,9 @@ class StartScreen:
         if self.configSelect:
             self.hover(pygame.mouse.get_pos())
             self.background.screen.blit(self.configSelectText,self.configSelectRect)
-            self.background.screen.blit(self.structNameList[0],self.structRectList[0])
-            self.background.screen.blit(self.structNameList[1],self.structRectList[1])
+
+            for i in range(len(self.structRectList)):
+                self.background.screen.blit(self.structNameList[i],self.structRectList[i])
             
         else:
             self.background.screen.blit(self.enterText,self.menuRect)

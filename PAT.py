@@ -71,11 +71,12 @@ class PAT:
         self.blocks = self.mainConfig["blocks"]
 
         self.levels = []
+
         
+        print("looping through block type")
         #loop through the structure and add levels
         for blockType in self.structure: 
             block = self.blocks[blockType]["layout"]
-            print(block)
 
             for b in block:
                 print(b)
@@ -96,8 +97,8 @@ class PAT:
         levelnum = 1 
 
         for currLevel in range(len(self.levels)):
-            print(self.levels)
-            level = Level(self,self.time,self.patientName,self.presetName,levelnum,self.levels)
+            print(f"The current level is {currLevel}")
+            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels)
             level.main_loop()
 
             if "questions" in level.config:
@@ -108,9 +109,9 @@ class PAT:
                 levelnum += 1
 
             
-            print("writing log")
-            self.logWriter.writeLog(self.info)
-        
+        print("writing log")
+        self.logWriter.writeLog(self.info)
+
         final = FinalScreen(self.background)
         final.mainLoop()
 
@@ -148,6 +149,11 @@ class Level:
         self.res = Pat.res
         self.pauseFlag = True
 
+        self.three = Background(self.res,image="3.png")
+        self.two = Background(self.res,image="2.png")
+        self.one = Background(self.res,image="1.png")
+        self.start = Background(self.res,image="start.png")
+
         self.logWriter = LogWriter(presetName,patientName,timestamp,seed)
 
         self.logWriter.writeSeed()
@@ -155,6 +161,7 @@ class Level:
         self.info = dict()
         #will only be set if it is a 'questions' level
         
+
         #not a questions block
         if "questions" not in self.config:
             self.aGroup = pygame.sprite.Group()
@@ -229,6 +236,9 @@ class Level:
         else:
             for currRound in range(self.rounds):
                 round = Round(self.Pat,self.levelNum,currRound,self.config)
+                
+                self.countdown()
+
                 while round.inProgress:
                     round.main_loop()
             
@@ -250,13 +260,39 @@ class Level:
                 while pauseScreen.paused:
                     pauseScreen.updateLoop() 
 
-            round.reset()
+                round.reset()
         
     
 
 
+    def countdown(self):
+        """
+        Blits a countdown screen. Duration is roughly 3 seconds
+        """
 
+        for _ in range(50):
+            self.three.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
+        
+        for _ in range(50):
+            self.two.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
+        
+        for _ in range(50):
+            self.one.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
 
+        for _ in range(50):
+            self.start.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
  
         
     def reset(self):
