@@ -149,6 +149,11 @@ class Level:
         self.res = Pat.res
         self.pauseFlag = True
 
+        self.three = Background(self.res,image="3.png")
+        self.two = Background(self.res,image="2.png")
+        self.one = Background(self.res,image="1.png")
+        self.start = Background(self.res,image="start.png")
+
         self.logWriter = LogWriter(presetName,patientName,timestamp,seed)
 
         self.logWriter.writeSeed()
@@ -156,8 +161,7 @@ class Level:
         self.info = dict()
         #will only be set if it is a 'questions' level
         
-        if "questions" in self.config:
-            print("foooofsdjofjdsofjoij")
+
         #not a questions block
         if "questions" not in self.config:
             self.aGroup = pygame.sprite.Group()
@@ -232,6 +236,9 @@ class Level:
         else:
             for currRound in range(self.rounds):
                 round = Round(self.Pat,self.levelNum,currRound,self.config)
+                
+                self.countdown()
+
                 while round.inProgress:
                     round.main_loop()
             
@@ -253,13 +260,39 @@ class Level:
                 while pauseScreen.paused:
                     pauseScreen.updateLoop() 
 
-            round.reset()
+                round.reset()
         
     
 
 
+    def countdown(self):
+        """
+        Blits a countdown screen. Duration is roughly 3 seconds
+        """
 
+        for _ in range(50):
+            self.three.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
+        
+        for _ in range(50):
+            self.two.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
+        
+        for _ in range(50):
+            self.one.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
 
+        for _ in range(50):
+            self.start.draw()
+            pygame.display.flip()
+            pygame.display.update()
+            pygame.event.get()
  
         
     def reset(self):
