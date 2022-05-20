@@ -2,7 +2,7 @@ import pygame
 import math
 from os import path
 from configReader import *
-
+from sys import exit
 from pygame.constants import QUIT
 
 class Background(pygame.sprite.Sprite):
@@ -154,7 +154,7 @@ class StartScreen:
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.05)
         self.font = pygame.font.SysFont('arial',self.size)
         
-        self.enterText = self.font.render("Please enter your name and press enter",True,(0,0,0),(255,255,255))
+        self.enterText = self.font.render("Please enter your participant ID and press enter",True,(0,0,0),(255,255,255))
         self.nameText = self.font.render(self.name,True,(0,0,0),(100,0,200))
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
 
@@ -826,6 +826,9 @@ class InstrScreen:
         
     
     def draw(self):
+        '''
+        draws the instructions as a background and a button to start
+        '''
         self.background.draw()
         pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
         self.background.screen.blit(self.startText,self.startRect)
@@ -852,6 +855,14 @@ class InstrScreen:
 
     
     def hoverText(self,pos):
+        """
+        It's a function that changes the color of the text in the menu depending on whether
+        the mouse is hovering over it or not
+        
+        Args:
+          mousePos: (x,y)
+        """
+
         x,y = pos 
 
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
@@ -861,7 +872,16 @@ class InstrScreen:
             self.startText = self.font.render('Start',True,(0,200,0)) 
         else:
             self.startText = self.font.render('Start',True,(0,0,0))
+
     def menuInteraction(self,pos):
+        """"
+        The function takes in a mouse position, and checks if the mouse is hovering over any
+        of the buttons on the screen. If it is, it proceeds with the game
+        
+        Args:
+          mousePos: the position of the mouse
+        """
+
         x,y = pos 
 
         inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
