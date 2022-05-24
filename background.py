@@ -313,7 +313,11 @@ class PauseScreen:
         self.config = config
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.02)
         self.font = pygame.font.SysFont('arial',self.size)
-
+        
+        #this is for the one text box answer in the game
+        self.name = ""
+        self.nameText = self.font.render(self.name,True,(0,0,0),(100,0,200))
+        
         #keep all question and answer texts here
         self.qTextList = []
 
@@ -378,49 +382,26 @@ class PauseScreen:
                     (ansTxt,ansRender,ansRect,choice) = aa
                     if choice:
                         currAnsList.append(ansTxt)
-                else:
+                elif qType == 2:
                     (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
                     #if choice:
                     currAnsList.append(f"{currVal}")
+                elif qType == 3:
+                    currAnsList.append(f"{self.name}")
+                
             retList.append(currAnsList)
 
             currIndex += 1
         
         return retList
-
-    def allAnswered(self):
+    
+    # this implementation of the text box only works if there is only 1 text answer
+    def updateName(self):
         """
-        check that all questions given have been answered
+        It takes the name of the player and renders it to the screen
         """
-        currIndex = 0
-        for aList in self.aTextList:
-
-            qType = self.qTextList[currIndex][2]
-
-            chosenForAny = False
-            for aa in aList:
-
-                #these are button type answers, just need at least one chosen
-                if qType < 2:
-                    (ansTxt,ansRender,ansRect,choice) = aa
-                    if choice:
-                        chosenForAny = True
-
-                #slider type questions: as long as slider has been 'clicked', chosen == true
-                elif qType == 2:
-                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
-                    if not choice:
-                        return False
-                    chosenForAny = True
-
-            if not chosenForAny:
-                return False
-
-            currIndex += 1
+        self.nameText = self.font.render(self.name,True,(0,0,0),(255,255,255))
         
-        return True
-
-
     def renderQuestions(self):
         """
         It renders the questions and answers to the screen. The logic for slider and text 
@@ -469,6 +450,15 @@ class PauseScreen:
                 answers.append(((self.background.res[0] // 4 + 26,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 15,self.background.res[0] // 4 + 511),currVal,currValRender,False))
                 #generate a ball
 
+            elif qType == 3:
+                self.nameRect = (xOff + 12,yC + qRendered.get_height()+30,520,yH + 18+20)
+                aRendered = self.font.render(self.name,True,(0,0,0))
+                aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,xH +8,yH + 8)
+                answers.append(("",aRendered,aRenderedRect,False))
+                xOff += aRendered.get_width() + 20
+                
+                pass
+            
             self.aTextList.append(answers)
             yOff += 1
     
@@ -514,6 +504,8 @@ class PauseScreen:
                 self.blitButtonAnswer(aa)
             elif qType == 2:
                 self.blitSliderAnswer(qTup,aa)
+            elif qType == 3:
+                self.blitTextAnswer(qTup,aa)
 
 
     def blitButtonAnswer(self,aa):
@@ -570,10 +562,18 @@ class PauseScreen:
             
         #draw a progress bar + the circle to where the current position is
         pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),520,lenY),1,2)
-        pygame.draw.rect(self.background.screen,(0,53,148),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
+        pygame.draw.rect(self.background.screen,(0,53,148),(x + 10,y + q.get_height(),cX - (x + 10),lenY),0,2)
         pygame.draw.circle(self.background.screen,(255,184,28),center,radius)
         #self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
     
+    def blitTextAnswer(self,qTup,aa):
+        (q,qRect,qType) = qTup
+        (x,y,lenX,lenY) = qRect
+
+        x = self.background.res[0] // 4
+
+        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height()+25,520,lenY+10),1,2)
+        self.background.screen.blit(self.nameText,self.nameRect)
     
     #this is for after round is over
     def blitSumStats(self):
@@ -583,7 +583,7 @@ class PauseScreen:
 
         #draw a smol rectangle to display stats
         #TODO: relativize the size
-        pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
+        pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0,3)
 
         levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
@@ -629,9 +629,16 @@ class PauseScreen:
             self.hoverMenuText(pygame.mouse.get_pos())
             
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                self.menuInteraction(pygame.mouse.get_pos())
-                
-
+                self.menuInteraction(pygame.mouse.get_pos())                
+            
+            if event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_RETURN]:
+                    self.finished = True
+                elif keys[pygame.K_BACKSPACE]:
+                    self.name =  self.name[:-1]
+                elif len(self.name) < 20:
+                    self.name += event.unicode
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
                 pygame.quit()
@@ -640,7 +647,8 @@ class PauseScreen:
         if pygame.mouse.get_pressed()[0] == True: 
             self.sliderInteraction(pygame.mouse.get_pos())
     
-
+        self.updateName()
+        
     def drawAll(self,x):
         """
         Chooses different blit functions depending on levelStart variable
