@@ -3,13 +3,15 @@
     {
         "question" : "How much would you like to keep playing this game?",
         "type" : 2,
-        "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Very much"] 
+        "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Very much"],
+        "start" : 5 
     },
 
     {
-        "question" : "How well are you playing this game right now??",
+        "question" : "How well are you playing this game right now?",
         "type" : 2,
-        "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Very much"] 
+        "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Very much"], 
+        "start" : 5 
     },
     {
         "question" : "Who was the best player this round? (select one)",

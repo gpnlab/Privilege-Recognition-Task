@@ -430,6 +430,7 @@ class PauseScreen:
             #0: single answer
             #1: multiple answer
             #2: slider
+            #3: text box ONLY 1 ALLOWED PER SCREEN currently
             if qType < 2:
                 for a in q["answers"]:
                     aRendered = self.font.render(a,True,(0,0,0))
@@ -440,14 +441,20 @@ class PauseScreen:
             elif qType == 2:
                 (x,y,lenX,lenY) = qRenderedRect
                 #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
-
+                
                 currVal = 0
+                if "start" in q.keys():
+                    currVal = q["start"]
+                
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
                 
                 #add each slider to list of things to be rendered 
                 #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
-                answers.append(((self.background.res[0] // 4 + 26,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 15,self.background.res[0] // 4 + 511),currVal,currValRender,False))
+                lowLim = self.background.res[0] // 4 + 15
+                highLim = self.background.res[0] // 4 + 511
+                incr = (highLim - lowLim) / 10
+                answers.append(((self.background.res[0] // 4 + 26 + incr*currVal,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 15,self.background.res[0] // 4 + 511),currVal,currValRender,False))
                 #generate a ball
 
             elif qType == 3:
@@ -784,10 +791,12 @@ class PauseScreen:
                 (aCenter,aRadius,aLim,val,valRender,choice) = aList[0]
 
                 #allow the mouse to be a little further out
-                inX = aCenter[0] - aRadius * 4 < x and x < aCenter[0] + aRadius * 4
                 inY = aCenter[1] - aRadius * 4 < y and y < aCenter[1] + aRadius * 4
+                # unused to allow clicking on numbers to select
+                inX = aCenter[0] - aRadius * 4 < x and x < aCenter[0] + aRadius * 4
+                
 
-                if inX and inY:
+                if inY:
 
                     #set new center according to where mouse is in the circle
                     #make sure it does not go out of bounds
