@@ -211,7 +211,7 @@ class StartScreen:
             
         else:
             self.background.screen.blit(self.enterText,self.menuRect)
-            pygame.draw.rect(self.background.screen,(0,0,0),self.nameRect1,1)
+            pygame.draw.rect(self.background.screen,(0,0,0),self.nameRect1,2,2)
             self.background.screen.blit(self.nameText,self.nameRect)
 
     def hover(self,mousePos):
@@ -452,7 +452,7 @@ class PauseScreen:
             if qType < 2:
                 for a in q["answers"]:
                     aRendered = self.font.render(a,True,(0,0,0))
-                    aRenderedRect = (xOff, yC + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
+                    aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,self.font.size(a)[0] +8,self.font.size(a)[1] + 8,)
                     answers.append((a,aRendered,aRenderedRect,False))
                     xOff += aRendered.get_width() + 20
                     
@@ -524,8 +524,9 @@ class PauseScreen:
           aa: a tuple containing the following:
         """
         (_,ansRender,ansRect,_) = aa
-        pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-        self.background.screen.blit(ansRender,ansRect)
+        pygame.draw.rect(self.background.screen,(0,0,0),ansRect,2,3)
+        recenter_rect = (ansRect[0]+4, ansRect[1]+4, ansRect[2], ansRect[3])
+        self.background.screen.blit(ansRender,recenter_rect)
 
 
     def blitSliderAnswer(self,qTup,aa):
@@ -559,7 +560,7 @@ class PauseScreen:
             nRendered = self.font.render(f"{i}",True,(0,0,0))
             
             #blit number and bar here
-            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 20 + self.font.size(f'{i}')[0]//2,y + q.get_height() * 2 - 10,1,10))
+            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 20 + self.font.size(f'{i}')[0]//2,y + q.get_height() * 2 - 10,1,10),1,2)
             #NOTE: uncomment if debug currVal
             #self.background.screen.blit(currValRender,(x + offset + 20,y + q.get_height() * 2 + 30,500,500))
             
@@ -568,7 +569,7 @@ class PauseScreen:
             offset += incr
             
         #draw a progress bar + the circle to where the current position is
-        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),520,lenY),1)
+        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),520,lenY),1,2)
         pygame.draw.rect(self.background.screen,(0,53,148),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
         pygame.draw.circle(self.background.screen,(255,184,28),center,radius)
         #self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))

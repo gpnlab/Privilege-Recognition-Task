@@ -2,37 +2,42 @@
     "block1" :
     {
         "description" : "coin: neutral -> negative",
-        "layout" : [["neutral",2],["questions",1],["badCoin",4],["questions",1]]
+        "layout" : [["neutral",2],["questions",1],["badCoin",4],["questions",1],["after_block_questions",1]]
     },
     "block2" :
     {
         "description" : "coin: neutral -> positive",
-        "layout" : [["neutral",2],["questions",1],["goodCoin",4],["questions",1]]
+        "layout" : [["neutral",2],["questions",1],["goodCoin",4],["questions",1],["after_block_questions",1]]
     },
     "block3" :
     {
         "description" : "speed: neutral -> negative",
-        "layout" : [["neutral",2],["questions",1],["badSpeed",4],["questions",1]]
+        "layout" : [["neutral",2],["questions",1],["badSpeed",4],["questions",1],["after_block_questions",1]]
     },
     "block4" :
     {
         "description" : "speed: neutral -> positive",
-        "layout" : [["neutral",2],["questions",1],["goodSpeed",4],["questions",1]]
+        "layout" : [["neutral",2],["questions",1],["goodSpeed",4],["questions",1],["after_block_questions",1]]
+    },
+    "end" :
+    {
+        "description": "End of game questions",
+        "layout" : [["end_game_questions",1]]
     },
     "test" :
     {
         "description" : "test",
-        "layout" : [["test",1],["questions",1]]
+        "layout" : [["after_block_questions",1]]
     }
 },
 
-    "structure0" : ["block1","block2","block3","block4"],
-    "structure1" : ["block2","block1","block4","block3"],
-    "structure2" : ["block3","block4","block1","block2"],
-    "structure3" : ["block4","block3","block2","block1"],
-    "structure4" : ["block1","block2","block4","block3"], 
-    "structure5" : ["block2","block1","block3","block4"],
-    "structure6" : ["block3","block4","block2","block1"],
-    "structure7" : ["block4","block3","block1","block2"],
-    "structure8" : ["test","test"]
+    "structure0" : ["block1","block2","block3","block4","end"],
+    "structure1" : ["block2","block1","block4","block3","end"],
+    "structure2" : ["block3","block4","block1","block2","end"],
+    "structure3" : ["block4","block3","block2","block1","end"],
+    "structure4" : ["block1","block2","block4","block3","end"], 
+    "structure5" : ["block2","block1","block3","block4","end"],
+    "structure6" : ["block3","block4","block2","block1","end"],
+    "structure7" : ["block4","block3","block1","block2","end"],
+    "structure8" : ["test","end"]
 }
