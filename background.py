@@ -451,9 +451,9 @@ class PauseScreen:
                 #generate a ball
 
             elif qType == 3:
-                self.nameRect = (xOff + 12,yC + qRendered.get_height()+30,520,yH + 18+20)
+                self.nameRect = (xOff + 12,yC + qRendered.get_height()+30)
                 aRendered = self.font.render(self.name,True,(0,0,0))
-                aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,xH +8,yH + 8)
+                aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,xH +80,yH + 80)
                 answers.append(("",aRendered,aRenderedRect,False))
                 xOff += aRendered.get_width() + 20
                 
