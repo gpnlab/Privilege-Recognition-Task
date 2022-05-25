@@ -89,7 +89,7 @@ class PAT:
             else:
                 rounds = int(config["rounds"]) 
 
-                print(f"level {level} has {rounds} rounds")
+                #print(f"level {level} has {rounds} rounds")
                 res += rounds
 
         return res
@@ -134,7 +134,7 @@ class PAT:
         roundsCompleted = 0
 
         for currLevel in range(len(self.levels)):
-            print(f"The current level is {self.levels[currLevel]}")
+            #print(f"The current level is {self.levels[currLevel]}")
             level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownList,roundsCompleted,self.totalRounds)
             level.main_loop()
 
@@ -147,7 +147,7 @@ class PAT:
             roundsCompleted = level.prevRoundsCompleted
 
             
-        print("writing log")
+        #print("writing log")
         self.logWriter.writeLog(self.info)
 
         final = FinalScreen(self.background)
@@ -182,7 +182,7 @@ class Level:
         self.levelNum = level
         self.levels = len(levelList)
         self.config = ConfigReader.parseToDict(f"{levelList[level]}","levelconfigs")
-        print(self.config)
+        #print(self.config)
         self.background = Pat.background
         self.res = Pat.res
         self.pauseFlag = True
@@ -275,7 +275,7 @@ class Level:
             for currRound in range(self.rounds):
                 round = Round(self.Pat,self.levelNum,currRound,self.config,self.totalRounds)
                 
-                self.countdown()
+                self.countdown(round.aGroup,round.cGroup)
 
                 while round.inProgress:
                     round.main_loop()
@@ -305,13 +305,15 @@ class Level:
     
 
 
-    def countdown(self):
+    def countdown(self,agents,coins):
         """
-        Blits a countdown screen. Duration is roughly 3 seconds
+        Blits a countdown screen. Duration is roughly 3 seconds (on my end)
         """
         for curr in self.countdownList:
             for _ in range(50):
                 curr.draw()
+                agents.draw(self.background.screen)
+                coins.draw(self.background.screen)
                 pygame.display.flip()
                 pygame.display.update()
                 pygame.event.get()
@@ -342,11 +344,13 @@ class Round:
           config: a dictionary of parameters for the level
         """
 
-        print(f"starting level {levelNum}, round {roundNum}")
+        #print(f"starting level {levelNum}, round {roundNum}")
         self.coinsLeft = config["numberOfCoins"]
         self.inProgress = True
         self.background = Pat.background
         self.res = Pat.res
+
+
 
         
 
@@ -406,26 +410,26 @@ class Round:
                 spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
             
             coin = Coin(self.cGroup,self.background,spawnCoord)
-            print(spawnCoord)
+            #print(spawnCoord)
         
         
         for e in self.eGroup:
             e.coinObj = e.getNearestCoinCoord(self.cGroup)
-            print(f"initial objective set to {e.coinObj}")
+            #print(f"initial objective set to {e.coinObj}")
 
         
 
     
     def initGroups(self):
         #why is this here twice?
-        self.player = Player(self.background,self.aGroup,(self.res[0] // 4, self.res[1] // 4), self.config["playerVel"], "p1.png",seed)
+        self.player = Player(self.background,self.aGroup,(self.res[0] // 8, self.res[1] // 8), self.config["playerVel"], "p1.png",seed)
         
         #TODO: change the temporary spawn points of enemies, and change sprite
-        self.enemy1 = Enemy("player 2",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,self.res[1] // 4),self.config["enemy1Vel"],"p2.png",seed)
+        self.enemy1 = Enemy("player 2",self.background,self.aGroup,self.cGroup,(7 * self.res[0] // 8,self.res[1] // 8),self.config["enemy1Vel"],"p2.png",seed)
 
-        self.enemy2 = Enemy("player 3",self.background,self.aGroup,self.cGroup,(self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy2Vel"],"p3.png",seed)
+        self.enemy2 = Enemy("player 3",self.background,self.aGroup,self.cGroup,(self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy2Vel"],"p3.png",seed)
         
-        self.enemy3 = Enemy("player 4",self.background,self.aGroup,self.cGroup,(3 * self.res[0] // 4,3 * self.res[1] // 4),self.config["enemy3Vel"],"p4.png",seed)
+        self.enemy3 = Enemy("player 4",self.background,self.aGroup,self.cGroup,(7 * self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy3Vel"],"p4.png",seed)
 
         self.eGroup.add(self.enemy1)
         self.eGroup.add(self.enemy2)
@@ -462,6 +466,7 @@ class Round:
         self.player.getInput(keys,self.time_passed)
 
     def _process_game_logic(self,keys):
+        print(self.time)
         """
         The function is called every frame and it checks for collisions between the agents and
         the coins, updates the agents' coin count, and updates the timer
@@ -481,7 +486,7 @@ class Round:
             self.coinsLeft -= 1
 
         if len(collectFlag) > 0:
-            print("setting new objectives")
+            #print("setting new objectives")
             #reupdate the coin objectives
             for e in self.eGroup:
                 e.setObj(self.cGroup) 
@@ -489,12 +494,9 @@ class Round:
         
         
 
-        
         for e in self.eGroup:
-            if self.coinsLeft > 0:
+            if self.coinsLeft > 0 and self.time > 10:
                 e.randomWalk()
-        
-        #TODO: flag whenever all coins are gone to end "level"
 
         if self.coinsLeft <= 0 or len(self.cGroup) == 0:
             print("finished level")
@@ -513,6 +515,8 @@ class Round:
         #Clock updates
         self.HUD.updateTimer(self.time_passed)
         self.updateInfo(keys)
+
+
 
     def _draw(self):
         """

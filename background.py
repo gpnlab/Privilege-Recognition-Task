@@ -828,14 +828,21 @@ class PauseScreen:
             
 class InstrScreen:
     def __init__(self,res):
-        self.background = Background(res,image="instructions.png",isBackground=True)
-        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.02)
+        self.desc = Background(res,image="desc.png",isBackground=True)
+        self.instr = Background(res,image="instructions.png",isBackground=True)
+        self.size = int(min(self.desc.res[0],self.desc.res[1]) * 0.02)
         self.font = pygame.font.SysFont('arial',self.size)
+        
+        #can go to the next set of instructions
+        self.nextInstr = False
+
+        #can go past the instructions screen
         self.proceed = False        
 
         
         self.startRect = (1100,710,self.font.size('Start')[0]+10,self.font.size('Start')[1] + 10)
         self.startText = self.font.render('Start',True,(0,0,0))
+        self.nextText = self.font.render('Next',True,(0,0,0))
 
     def mainLoop(self):
         self.draw()
@@ -848,9 +855,14 @@ class InstrScreen:
         '''
         draws the instructions as a background and a button to start
         '''
-        self.background.draw()
-        pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
-        self.background.screen.blit(self.startText,self.startRect)
+        if not self.nextInstr:
+            self.desc.draw()
+            pygame.draw.rect(self.desc.screen,(150,150,150),self.startRect)
+            self.desc.screen.blit(self.nextText,self.startRect)
+        else:
+            self.instr.draw()
+            pygame.draw.rect(self.instr.screen,(150,150,150),self.startRect)
+            self.instr.screen.blit(self.startText,self.startRect)
 
     def interaction(self):
         """
@@ -887,9 +899,11 @@ class InstrScreen:
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
 
         if inX and inY:
-            self.startText = self.font.render('Start',True,(0,200,0)) 
+            self.startText = self.font.render('Start',True,(0,200,0))
+            self.nextText = self.font.render('Next',True,(0,200,0))
         else:
             self.startText = self.font.render('Start',True,(0,0,0))
+            self.nextText = self.font.render('Next',True,(0,0,0))
 
     def menuInteraction(self,pos):
         """"
@@ -906,7 +920,10 @@ class InstrScreen:
         inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
 
         if inX and inY:
-            self.proceed = True 
+            if not self.nextInstr:
+                self.nextInstr = True
+            else:
+                self.proceed = True 
 
     
 
