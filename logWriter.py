@@ -51,7 +51,7 @@ class LogWriter:
           log: the log object
         """
         url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
-        print("writing to: " + url)
+        print("log writing to: " + url)
         if not path.exists(url):
             os.makedirs(url)
         url += "/data.json"  
@@ -107,7 +107,6 @@ class LogWriter:
         logFile = open(url,"w+")
 
         parsed = json.dumps(qDict, indent = 5)
-        print(parsed)
         logFile.write(parsed)
 
         logFile.close()

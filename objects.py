@@ -238,7 +238,6 @@ class Enemy(Agent):
         """
         
         super().__init__(name,background,group,coord,velocity,imgName,seed)
-        self.coinGroup = cGroup
         
         #3 states:
         #0 - optimal path towards closest coin
@@ -252,7 +251,7 @@ class Enemy(Agent):
 
         #keep current objective (coin coord)
         self.coinObj = (0,0)
-        self.setObj()
+
 
     def dist(self,c1,c2):
         """
@@ -269,7 +268,7 @@ class Enemy(Agent):
         (x1,y1),(x2,y2) = c1,c2
         return math.sqrt ((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
-    def getRandCoinCoord(self):
+    def getRandCoinCoord(self,cGroup):
         """
         It returns the coordinates of a random coin in the coinGroup
         
@@ -277,26 +276,26 @@ class Enemy(Agent):
           The x and y coordinates of the random coin.
         """
         #loop through everything in coin group
-        if len(self.coinGroup) == 0: return (0,0)
+        if len(cGroup) == 0: return (0,0)
 
-        randCoin = self.coinGroup.sprites()[random.randint(0,len(self.coinGroup) - 1)]
+        randCoin = cGroup.sprites()[random.randint(0,len(cGroup) - 1)]
 
         return (randCoin.x,randCoin.y)
     
     
-    def getNearestCoinCoord(self):
+    def getNearestCoinCoord(self,cGroup):
         """
         It returns the coordinates of the nearest coin to the ai
         
         Returns:
           The x and y coordinates of the nearest coin.
         """
-        if len(self.coinGroup) == 0: return (0,0)
+        if len(cGroup) == 0: return (0,0)
 
         #default "max" distance
         bestDist = self.bg.res[0]
 
-        for coin in self.coinGroup:
+        for coin in cGroup:
             currDist = self.dist((self.x,self.y),(coin.x,coin.y))
 
             if currDist < bestDist:
@@ -305,10 +304,11 @@ class Enemy(Agent):
 
         return (bestCoin.x,bestCoin.y)
 
+
     #should be ran whenever coin is obtained
     #for now, have it be 50/50 whether ai chooses opt or random coin
     # What is this function for? - Linghai
-    def setObj(self):
+    def setObj(self,cGroup):
         """
         If the coin is still in the group, don't change the objective
         """
@@ -324,18 +324,15 @@ class Enemy(Agent):
                 
         
         if (random.randint(0,1) == 0):
-            self.coinObj = self.getNearestCoinCoord()
+            print("choosing opt")
+            self.coinObj = self.getNearestCoinCoord(cGroup)
         elif (random.randint(0,1) == 0):
-            self.coinObj = self.getRandCoinCoord()
-            print(f"set objective to {self.coinObj}")
-
-        #.25 percent chance we stay with current
-        
-        
+            print("choosing rand")
+            self.coinObj = self.getRandCoinCoord(cGroup)
+            #print(f"set objective to {self.coinObj}")
 
 
     #optimal movement toward nearest coin
-    #will have to normalize vector to the velocity of the enemy (yay linear algebra)
     def optMove(self):
         """
         The function takes the coordinates of the nearest coin and moves the ai towards it

@@ -80,17 +80,18 @@ class PAT:
         self.levels = []
 
         
-        print("looping through block type")
         #loop through the structure and add levels
         for blockType in self.structure: 
             block = self.blocks[blockType]["layout"]
 
             for b in block:
-                print(b)
                 level = b[0]
                 freq = int(b[1])
                 for i in range(freq):
                     self.levels.append(level)
+
+        print("these are all the levels")
+        print(self.levels)
 
     def main_loop(self):
         """
@@ -104,7 +105,7 @@ class PAT:
         levelnum = 1 
 
         for currLevel in range(len(self.levels)):
-            print(f"The current level is {currLevel}")
+            print(f"The current level is {self.levels[currLevel]}")
             level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownList)
             level.main_loop()
 
@@ -364,15 +365,19 @@ class Round:
 
 
         for i in range(int(config["numberOfCoins"])):
-            spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 5),numpy.random.normal(meanCoor[1],self.res[1] / 5)
+            spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 8),numpy.random.normal(meanCoor[1],self.res[1] / 8)
             
             while spawnCoord[0] < 100 or spawnCoord[0] > self.res[0] - 100 or spawnCoord[1] < 100 or spawnCoord[1] > self.res[1] - 100:
                 spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
             
             coin = Coin(self.cGroup,self.background,spawnCoord)
+            print(spawnCoord)
+        
         
         for e in self.eGroup:
-            e.setObj()
+            e.coinObj = e.getNearestCoinCoord(self.cGroup)
+            print(f"initial objective set to {e.coinObj}")
+
         
 
     
@@ -437,10 +442,15 @@ class Round:
 
         #allows us to access and update selected agent coin count
         for (agent,_) in collectFlag.items(): 
-            for e in self.eGroup:
-                e.setObj()
             agent.coins += 1
             self.coinsLeft -= 1
+
+        if len(collectFlag) > 0:
+            print("setting new objectives")
+            #reupdate the coin objectives
+            for e in self.eGroup:
+                e.setObj(self.cGroup) 
+
         
         
 

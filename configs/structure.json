@@ -21,7 +21,7 @@
     },
     "test" :
     {
-        "description" : "test",
+        "description" : "tests bias",
         "layout" : [["test",1],["questions",1]]
     }
 },

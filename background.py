@@ -584,7 +584,7 @@ class PauseScreen:
         #TODO: relativize the size
         pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
 
-        levelTxt = self.font.render(f"Level {self.level + 1} Round {self.round}/{self.rounds} finished!",True,(0,0,0))
+        levelTxt = self.font.render(f"Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
 
         #pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
@@ -841,7 +841,6 @@ class InstrScreen:
         The start button should be at coord (1100, 710)
         """
         for event in pygame.event.get():
-            print(pygame.mouse.get_pos())
             self.hoverText(pygame.mouse.get_pos())
             
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
