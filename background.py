@@ -211,7 +211,7 @@ class StartScreen:
             
         else:
             self.background.screen.blit(self.enterText,self.menuRect)
-            pygame.draw.rect(self.background.screen,(0,0,0),self.nameRect1,1)
+            pygame.draw.rect(self.background.screen,(0,0,0),self.nameRect1,2,2)
             self.background.screen.blit(self.nameText,self.nameRect)
 
     def hover(self,mousePos):
@@ -313,7 +313,11 @@ class PauseScreen:
         self.config = config
         self.size = int(min(self.background.res[0],self.background.res[1]) * 0.02)
         self.font = pygame.font.SysFont('arial',self.size)
-
+        
+        #this is for the one text box answer in the game
+        self.name = ""
+        self.nameText = self.font.render(self.name,True,(0,0,0),(100,0,200))
+        
         #keep all question and answer texts here
         self.qTextList = []
 
@@ -378,49 +382,26 @@ class PauseScreen:
                     (ansTxt,ansRender,ansRect,choice) = aa
                     if choice:
                         currAnsList.append(ansTxt)
-                else:
+                elif qType == 2:
                     (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
                     #if choice:
                     currAnsList.append(f"{currVal}")
+                elif qType == 3:
+                    currAnsList.append(f"{self.name}")
+                
             retList.append(currAnsList)
 
             currIndex += 1
         
         return retList
-
-    def allAnswered(self):
+    
+    # this implementation of the text box only works if there is only 1 text answer
+    def updateName(self):
         """
-        check that all questions given have been answered
+        It takes the name of the player and renders it to the screen
         """
-        currIndex = 0
-        for aList in self.aTextList:
-
-            qType = self.qTextList[currIndex][2]
-
-            chosenForAny = False
-            for aa in aList:
-
-                #these are button type answers, just need at least one chosen
-                if qType < 2:
-                    (ansTxt,ansRender,ansRect,choice) = aa
-                    if choice:
-                        chosenForAny = True
-
-                #slider type questions: as long as slider has been 'clicked', chosen == true
-                elif qType == 2:
-                    (center,radius,(lowLim,highLim),currVal,currValRender,choice) = aa
-                    if not choice:
-                        return False
-                    chosenForAny = True
-
-            if not chosenForAny:
-                return False
-
-            currIndex += 1
+        self.nameText = self.font.render(self.name,True,(0,0,0),(255,255,255))
         
-        return True
-
-
     def renderQuestions(self):
         """
         It renders the questions and answers to the screen. The logic for slider and text 
@@ -449,26 +430,42 @@ class PauseScreen:
             #0: single answer
             #1: multiple answer
             #2: slider
+            #3: text box ONLY 1 ALLOWED PER SCREEN currently
             if qType < 2:
                 for a in q["answers"]:
                     aRendered = self.font.render(a,True,(0,0,0))
-                    aRenderedRect = (xOff, yC + qRendered.get_height() ,self.font.size(a)[0],self.font.size(a)[1])
+                    aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,self.font.size(a)[0] +8,self.font.size(a)[1] + 8,)
                     answers.append((a,aRendered,aRenderedRect,False))
                     xOff += aRendered.get_width() + 20
                     
             elif qType == 2:
                 (x,y,lenX,lenY) = qRenderedRect
                 #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
-
+                
                 currVal = 0
+                if "start" in q.keys():
+                    currVal = q["start"]
+                
                 currValRender = self.font.render(f"0",True,(0,0,0))
                 #ball should start at the start of the slider
                 
                 #add each slider to list of things to be rendered 
                 #stored as the center coord,radius,(lowLim,highLim),currVal,currValRender,Chosen
-                answers.append(((self.background.res[0] // 4 + 26,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 15,self.background.res[0] // 4 + 511),currVal,currValRender,False))
+                lowLim = self.background.res[0] // 4 + 15
+                highLim = self.background.res[0] // 4 + 511
+                incr = (highLim - lowLim) / 10
+                answers.append(((self.background.res[0] // 4 + 26 + incr*currVal,y + qRendered.get_height() * 1.5),qRendered.get_height() / 2,(self.background.res[0] // 4 + 15,self.background.res[0] // 4 + 511),currVal,currValRender,False))
                 #generate a ball
 
+            elif qType == 3:
+                self.nameRect = (xOff + 12,yC + qRendered.get_height()+30)
+                aRendered = self.font.render(self.name,True,(0,0,0))
+                aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,xH +80,yH + 80)
+                answers.append(("",aRendered,aRenderedRect,False))
+                xOff += aRendered.get_width() + 20
+                
+                pass
+            
             self.aTextList.append(answers)
             yOff += 1
     
@@ -514,6 +511,8 @@ class PauseScreen:
                 self.blitButtonAnswer(aa)
             elif qType == 2:
                 self.blitSliderAnswer(qTup,aa)
+            elif qType == 3:
+                self.blitTextAnswer(qTup,aa)
 
 
     def blitButtonAnswer(self,aa):
@@ -524,8 +523,9 @@ class PauseScreen:
           aa: a tuple containing the following:
         """
         (_,ansRender,ansRect,_) = aa
-        pygame.draw.rect(self.background.screen,(0,0,0),ansRect,1)
-        self.background.screen.blit(ansRender,ansRect)
+        pygame.draw.rect(self.background.screen,(0,0,0),ansRect,2,3)
+        recenter_rect = (ansRect[0]+4, ansRect[1]+4, ansRect[2], ansRect[3])
+        self.background.screen.blit(ansRender,recenter_rect)
 
 
     def blitSliderAnswer(self,qTup,aa):
@@ -559,7 +559,7 @@ class PauseScreen:
             nRendered = self.font.render(f"{i}",True,(0,0,0))
             
             #blit number and bar here
-            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 20 + self.font.size(f'{i}')[0]//2,y + q.get_height() * 2 - 10,1,10))
+            pygame.draw.rect(self.background.screen,(0,0,0),(x + offset + 20 + self.font.size(f'{i}')[0]//2,y + q.get_height() * 2 - 10,1,10),1,2)
             #NOTE: uncomment if debug currVal
             #self.background.screen.blit(currValRender,(x + offset + 20,y + q.get_height() * 2 + 30,500,500))
             
@@ -568,11 +568,19 @@ class PauseScreen:
             offset += incr
             
         #draw a progress bar + the circle to where the current position is
-        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),520,lenY),1)
-        pygame.draw.rect(self.background.screen,(0,53,148),(x + 10,y + q.get_height(),cX - (x + 10),lenY))
+        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height(),520,lenY),1,2)
+        pygame.draw.rect(self.background.screen,(0,53,148),(x + 10,y + q.get_height(),cX - (x + 10),lenY),0,2)
         pygame.draw.circle(self.background.screen,(255,184,28),center,radius)
         #self.background.screen.blit(currValRender,(cX + radius,cY + radius,self.background.res[0],self.background.res[1]))
     
+    def blitTextAnswer(self,qTup,aa):
+        (q,qRect,qType) = qTup
+        (x,y,lenX,lenY) = qRect
+
+        x = self.background.res[0] // 4
+
+        pygame.draw.rect(self.background.screen,(0,0,0),(x + 10,y + q.get_height()+25,520,lenY+10),1,2)
+        self.background.screen.blit(self.nameText,self.nameRect)
     
     #this is for after round is over
     def blitSumStats(self):
@@ -582,7 +590,7 @@ class PauseScreen:
 
         #draw a smol rectangle to display stats
         #TODO: relativize the size
-        pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0)
+        pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0,3)
 
         levelTxt = self.font.render(f"Round {self.round}/{self.rounds} finished!",True,(0,0,0))
         self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
@@ -628,9 +636,16 @@ class PauseScreen:
             self.hoverMenuText(pygame.mouse.get_pos())
             
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                self.menuInteraction(pygame.mouse.get_pos())
-                
-
+                self.menuInteraction(pygame.mouse.get_pos())                
+            
+            if event.type == pygame.KEYDOWN:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_RETURN]:
+                    self.finished = True
+                elif keys[pygame.K_BACKSPACE]:
+                    self.name =  self.name[:-1]
+                elif len(self.name) < 20:
+                    self.name += event.unicode
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
                 pygame.quit()
@@ -639,7 +654,8 @@ class PauseScreen:
         if pygame.mouse.get_pressed()[0] == True: 
             self.sliderInteraction(pygame.mouse.get_pos())
     
-
+        self.updateName()
+        
     def drawAll(self,x):
         """
         Chooses different blit functions depending on levelStart variable
@@ -775,10 +791,12 @@ class PauseScreen:
                 (aCenter,aRadius,aLim,val,valRender,choice) = aList[0]
 
                 #allow the mouse to be a little further out
-                inX = aCenter[0] - aRadius * 4 < x and x < aCenter[0] + aRadius * 4
                 inY = aCenter[1] - aRadius * 4 < y and y < aCenter[1] + aRadius * 4
+                # unused to allow clicking on numbers to select
+                inX = aCenter[0] - aRadius * 4 < x and x < aCenter[0] + aRadius * 4
+                
 
-                if inX and inY:
+                if inY:
 
                     #set new center according to where mouse is in the circle
                     #make sure it does not go out of bounds

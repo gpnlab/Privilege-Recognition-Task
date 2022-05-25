@@ -1,0 +1,27 @@
+{"questions" : [
+
+    {
+        "question" : "Please rank the players from who got the MOST coins to who got the LEAST (You, P2, P3, P4)",
+        "type" : 3,
+        "answers" : [] 
+    },
+
+    {
+        "question" : "Overall, how fair was this game?",
+        "type" : 2,
+        "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Very fair"],
+        "start" : 5 
+    },
+    {
+        "question" : "How much did you enjoy playing this game?",
+        "type" : 2,
+        "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Very much"],
+        "start" : 5 
+    },
+    {
+        "question" : "How likely are you to recommend this game to a friend?",
+        "type" : 2,
+        "answers" : ["0: Not at all ","1","2","3","4","5","6","7","8","9","10: Very likely"],
+        "start" : 5 
+    }
+]}
