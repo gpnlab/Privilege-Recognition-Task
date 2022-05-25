@@ -200,14 +200,19 @@ class Player(Agent):
         xInd,yInd = 0,0
         
         if keys[pygame.K_w] or keys[pygame.K_UP]:
-            yInd = -1
-        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-            yInd = 1
+            yInd -= 1
+            
+        
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            yInd += 1
+        
+
             
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            xInd = -1 
-        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            xInd = 1
+            xInd -= 1 
+        
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            xInd += 1
 
         if yInd != 0 and xInd != 0:
             self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
