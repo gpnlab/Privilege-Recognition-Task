@@ -42,7 +42,7 @@ class PAT:
         
         self.background = Background(self.res)
         self.countdownList = [Background(self.res,image="3.png",isBackground=True),Background(self.res,image="2.png",isBackground=True),Background(self.res,image="1.png",isBackground=True),Background(self.res,image="start.png",isBackground=True)]
-
+        
 
         # startscreen is responsible for letting the player select which configuration
         # the code is defined in the background.py file
@@ -56,6 +56,9 @@ class PAT:
         self.parseStructure(self.start.chosenStruct)
 
         print(self.levels)
+
+        self.totalRounds = self.countTotalRounds()
+
         
         # initiallize logwriter class to track participant responses and inputs
         self.logWriter = LogWriter(self.presetName,self.participantID,self.time,seed)
@@ -64,6 +67,32 @@ class PAT:
 
         while not instructions.proceed:
             instructions.mainLoop()
+
+        
+        
+
+        
+    
+    def countTotalRounds(self):
+        """
+        returns a count of the total amount of rounds
+        """
+        res = 0
+
+        for level in self.levels:
+            config = ConfigReader.parseToDict(f"{level}","levelconfigs")
+            print(config)
+
+            #question 'levels' do not have rounds, count them as a single round
+            if 'questions' in config:
+                continue
+            else:
+                rounds = int(config["rounds"]) 
+
+                print(f"level {level} has {rounds} rounds")
+                res += rounds
+
+        return res
     
     def parseStructure(self,structName="structure1"):
         """
@@ -90,8 +119,6 @@ class PAT:
                 for i in range(freq):
                     self.levels.append(level)
 
-        print("these are all the levels")
-        print(self.levels)
 
     def main_loop(self):
         """
@@ -104,9 +131,11 @@ class PAT:
         #manually keep track of which level since questions count as levels when they should not
         levelnum = 1 
 
+        roundsCompleted = 0
+
         for currLevel in range(len(self.levels)):
             print(f"The current level is {self.levels[currLevel]}")
-            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownList)
+            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownList,roundsCompleted,self.totalRounds)
             level.main_loop()
 
             if "questions" in level.config:
@@ -115,6 +144,7 @@ class PAT:
             else:
                 self.info[f"level {levelnum}"] = level.info
                 levelnum += 1
+            roundsCompleted = level.prevRoundsCompleted
 
             
         print("writing log")
@@ -133,7 +163,7 @@ class PAT:
         finalTxt = "Game Complete! Press esc on your keyboard to exit."
 
 class Level:
-    def __init__(self,Pat,timestamp,patientName,presetName,level,levelList,countdownList):
+    def __init__(self,Pat,timestamp,patientName,presetName,level,levelList,countdownList,roundsCompleted,totalRounds):
         """
         It initializes the level, and if it's not a questions level, it initializes the
         groups, coins, and rounds.
@@ -158,7 +188,8 @@ class Level:
         self.pauseFlag = True
 
         self.countdownList = countdownList
-
+        self.prevRoundsCompleted = roundsCompleted
+        self.totalRounds = totalRounds
         
 
         self.logWriter = LogWriter(presetName,patientName,timestamp,seed)
@@ -242,7 +273,7 @@ class Level:
             self.info = answersDict
         else:
             for currRound in range(self.rounds):
-                round = Round(self.Pat,self.levelNum,currRound,self.config)
+                round = Round(self.Pat,self.levelNum,currRound,self.config,self.totalRounds)
                 
                 self.countdown()
 
@@ -255,20 +286,22 @@ class Level:
                 self.e3Coins += round.enemy3.coins
 
                 
-            
+                self.prevRoundsCompleted += 1
+                
+
+
+                #blit the round completed here 
+                pauseScreen = PauseScreen(self.levelNum,self.levels,self.prevRoundsCompleted,self.totalRounds,self.background,round.config,round.aGroup,1)
+
+
+                while pauseScreen.paused:
+                    pauseScreen.updateLoop() 
+                
                 #save round info
                 self.info[f"level {self.levelNum} round {self.currRound}"] = round.info
                 self.currRound += 1
 
-
-            
-                pauseScreen = PauseScreen(self.levelNum,self.levels,self.currRound,self.rounds,self.background,round.config,round.aGroup,1)
-
-                while pauseScreen.paused:
-                    pauseScreen.updateLoop() 
-
                 round.reset()
-        
     
 
 
@@ -298,7 +331,7 @@ class Level:
     
 
 class Round:
-    def __init__(self,Pat,levelNum,roundNum,config):
+    def __init__(self,Pat,levelNum,roundNum,config,totalRounds):
         """
         It initializes the game
         
@@ -314,9 +347,11 @@ class Round:
         self.inProgress = True
         self.background = Pat.background
         self.res = Pat.res
+
         
 
         self.config = config
+        self.totalRounds = totalRounds
 
         # ticks in milliseconds
         self.prev_time = pygame.time.get_ticks() 

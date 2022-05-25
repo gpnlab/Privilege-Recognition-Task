@@ -286,6 +286,7 @@ class StartScreen:
                     self.name += event.unicode
         self.updateName()
 
+
 class PauseScreen:
     def __init__(self,level,levels,round,rounds,background,config,agents = [],levelStart = 0):
         """
@@ -301,10 +302,10 @@ class PauseScreen:
           agents: a list of agents
           levelStart: the time at which the level started. Defaults to 0
         """
-        
         self.level = level
         self.round = round
         self.levelStart = levelStart
+
         self.levels = levels
         self.rounds = rounds
 
