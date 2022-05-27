@@ -39,15 +39,10 @@ This should install git
 3. in the terminal, enter 
 ```bash
 cd Privilege-Recognition-Task
-
 git pull
-
 pip3 install -r requirements.txt
-
 python3 -m  PyInstaller --noconfirm main.spec
-
 rsync -va dist/PAT.app ~/Desktop/PAT.ap
-
 #NOTE: If prompted '...overwrite (y/N)?' enter 'y' 
 ```
     
