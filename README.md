@@ -23,8 +23,14 @@ This should install git
 1. press 'cmd' + 'space'
 2. Type terminal and enter
 3. in the terminal, enter 'git clone https://github.com/gpnlab/Privilege-Recognition-Task'
-4. type 'cd Privilege-Recognition-Task; pip3 install -r requirements.txt; python3 -m --noconfirm PyInstaller __main__.spec; mv -f dist/PAT.app ~/Desktop'
-5. The application will be on your desktop named 'PAT'; double click to run
+4. Enter the following:
+```
+cd Privilege-Recognition-Task
+pip3 install -r requirements.txt
+python3 -m --noconfirm PyInstaller main.spec
+mv -f dist/PAT.app ~/Desktop
+```
+6. The application will be on your desktop named 'PAT'; double click to run
 
 
 
@@ -36,12 +42,12 @@ This should install git
 #### Updating the game
 1. press 'cmd' + 'space'
 2. Type terminal and enter
-3. in the terminal, enter 
+3. in the terminal, enter the following:
 ```bash
 cd Privilege-Recognition-Task
 git pull
 pip3 install -r requirements.txt
-python3 -m  PyInstaller --noconfirm main.spec
+python3 -m  PyInstaller main.spec
 rsync -va dist/PAT.app ~/Desktop/PAT.ap
 #NOTE: If prompted '...overwrite (y/N)?' enter 'y' 
 ```
