@@ -36,8 +36,13 @@ This should install git
 #### Updating the game
 1. press 'cmd' + 'space'
 2. Type terminal and enter
-3. in the terminal, enter 'cd Privilege-Recognition-Task; git pull; pip3 install -r requirements.txt; python3 -m  PyInstaller --noconfirm main.spec; rsync -va dist/PAT.app ~/Desktop/PAT.app'
-    NOTE: If prompted '...overwrite (y/N)?' enter 'y' 
+3. in the terminal, enter `cd Privilege-Recognition-Task
+git pull
+pip3 install -r requirements.txt
+python3 -m  PyInstaller --noconfirm main.spec
+rsync -va dist/PAT.app ~/Desktop/PAT.ap
+3.1 NOTE: If prompted '...overwrite (y/N)?' enter 'y' `
+    
 4. The application is now updated on your desktop
 
 
