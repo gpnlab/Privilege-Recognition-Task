@@ -49,7 +49,7 @@ cd Privilege-Recognition-Task
 git pull
 pip3 install -r requirements.txt
 python3 -m  PyInstaller main.spec
-rsync -va dist/PAT.app ~/Desktop/PAT.ap
+rsync -va dist/PAT.app ~/Desktop/PAT.app
 #NOTE: If prompted '...overwrite (y/N)?' enter 'y' 
 ```
     
