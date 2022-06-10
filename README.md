@@ -14,7 +14,27 @@
 6. Start menu (participant look away) -> choose config (what we already have)
 ## Downloading the application
 
-### FOR FIRST TIME SETUP (MAC)
+### MAC instructions
+1. Download the latest .zip release from (here)[https://github.com/gpnlab/Privilege-Recognition-Task/releases/tag/test]
+2. Drag the downloaded .app file to your desktop or application folder
+3. Double click the app icon to open it. You should get and error that looks like the image below
+
+    ![error 1](instructions1.png)
+
+4. Then you want to go to system preferences and under that go to security and privacy you should see something similar to the image below
+
+    ![security](instructions2.png)
+
+5. Click the open anyway box to open the task. If you do not see the box you need to attempt step 3 first 
+6. You should see a popup and click open like the image below
+
+    ![error 2](instructions3.png)
+
+7. After entering your participant id and selecting a config, if the game crashes after the instructions you need to drag the app out of the download folder
+
+## Build instructions
+
+### FOR FIRST TIME installation SETUP (MAC)
 Download XCode from the following link: https://apps.apple.com/us/app/xcode/id497799835?mt=12
 This should install git
 
