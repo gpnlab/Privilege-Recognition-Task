@@ -42,7 +42,7 @@ This should install git
 ```bash
 cd Privilege-Recognition-Task
 pip3 install -r requirements.txt
-python3 -m --noconfirm PyInstaller main.spec
+python3 -m PyInstaller main.spec
 mv -f dist/PAT.app ~/Desktop
 ```
 6. The application will be on your desktop named 'PAT'; double click to run
