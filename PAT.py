@@ -55,7 +55,7 @@ class PAT:
         # organize levels based on chosen configuration
         self.parseStructure(self.start.chosenStruct)
 
-        print(self.levels)
+        print("levels: ", self.levels)
 
         self.totalRounds = self.countTotalRounds()
 
@@ -81,7 +81,7 @@ class PAT:
 
         for level in self.levels:
             config = ConfigReader.parseToDict(f"{level}","levelconfigs")
-            print(config)
+            print("config: \n", config)
 
             #question 'levels' do not have rounds, count them as a single round
             if 'questions' in config:
@@ -89,7 +89,7 @@ class PAT:
             else:
                 rounds = int(config["rounds"]) 
 
-                #print(f"level {level} has {rounds} rounds")
+                print(f"level {level} has {rounds} rounds")
                 res += rounds
 
         return res
@@ -277,6 +277,8 @@ class Level:
                 
                 self.countdown(round.aGroup,round.cGroup)
 
+                round.updateAgentVelocity()
+
                 while round.inProgress:
                     round.main_loop()
             
@@ -310,13 +312,16 @@ class Level:
         Blits a countdown screen. Duration is roughly 3 seconds (on my end)
         """
         for curr in self.countdownList:
-            for _ in range(50):
+            prev_time = pygame.time.get_ticks()
+            while True:
                 curr.draw()
                 agents.draw(self.background.screen)
                 coins.draw(self.background.screen)
                 pygame.display.flip()
                 pygame.display.update()
                 pygame.event.get()
+                if pygame.time.get_ticks() - prev_time > 1000:
+                    break
 
 
  
@@ -435,6 +440,13 @@ class Round:
         self.eGroup.add(self.enemy2)
         self.eGroup.add(self.enemy3)
 
+    def updateAgentVelocity(self):
+        self.player.update_velocity()
+        self.enemy1.update_velocity()
+        self.enemy2.update_velocity()
+        self.enemy3.update_velocity()
+
+
     #main loop will check what 
     def main_loop(self):
             
@@ -466,7 +478,7 @@ class Round:
         self.player.getInput(keys,self.time_passed)
 
     def _process_game_logic(self,keys):
-        print(self.time)
+        #print(self.time)
         """
         The function is called every frame and it checks for collisions between the agents and
         the coins, updates the agents' coin count, and updates the timer

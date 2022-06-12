@@ -2,22 +2,22 @@
     "block1" :
     {
         "description" : "coin: neutral -> negative",
-        "layout" : [["neutral",2],["questions",1],["badCoin",4],["questions",1],["after_block_questions",1]]
+        "layout" : [["neutral",2],["questions",1],["badCoin",8],["questions",1],["after_block_questions",1]]
     },
     "block2" :
     {
         "description" : "coin: neutral -> positive",
-        "layout" : [["neutral",2],["questions",1],["goodCoin",4],["questions",1],["after_block_questions",1]]
+        "layout" : [["neutral",2],["questions",1],["goodCoin",8],["questions",1],["after_block_questions",1]]
     },
     "block3" :
     {
         "description" : "speed: neutral -> negative",
-        "layout" : [["neutral",2],["questions",1],["badSpeed",4],["questions",1],["after_block_questions",1]]
+        "layout" : [["neutral",2],["questions",1],["badSpeed",8],["questions",1],["after_block_questions",1]]
     },
     "block4" :
     {
         "description" : "speed: neutral -> positive",
-        "layout" : [["neutral",2],["questions",1],["goodSpeed",4],["questions",1],["after_block_questions",1]]
+        "layout" : [["neutral",2],["questions",1],["goodSpeed",8],["questions",1],["after_block_questions",1]]
     },
     "end" :
     {

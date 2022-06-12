@@ -1,5 +1,5 @@
 {
-    "rounds" : 2,
+    "rounds" : 1,
     "numberOfCoins" : 30,
     "playerVel": 1.25,
     "enemy1Vel": 1,
