@@ -312,7 +312,7 @@ class PauseScreen:
         self.agents = agents
         self.background = background
         self.config = config
-        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.02)
+        self.size = int(min(self.background.res[0],self.background.res[1]) * 0.03)
         self.font = pygame.font.SysFont('arial',self.size)
         
         #this is for the one text box answer in the game
@@ -345,6 +345,10 @@ class PauseScreen:
         self.menuRect = (50,50,self.background.res[0] - 100,self.background.res[1] - 100)
         self.startRect = (self.background.res[0] * 3 // 4,self.background.res[1] * 9 // 10,self.font.size('Start')[0] + 20,self.font.size('Start')[1] + 20)
         self.nextRoundRect = (460,550,self.font.size('Next Round')[0] + 10,self.font.size('Next Round')[1] + 10)
+
+        self.startTextRect = (self.background.res[0] * 3 // 4 + 5,self.background.res[1] * 9 // 10 + 5,self.font.size('Start')[0] + 20,self.font.size('Start')[1] + 20)
+        self.nextRoundTextRect = (465,555,self.font.size('Next Round')[0] + 10,self.font.size('Next Round')[1] + 10)
+
 
         self.startText = self.font.render('Start',True,(0,0,0))
         self.nextText = self.font.render('Next Round',True,(0,0,0))
@@ -437,7 +441,7 @@ class PauseScreen:
                     aRendered = self.font.render(a,True,(0,0,0))
                     aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,self.font.size(a)[0] +8,self.font.size(a)[1] + 8,)
                     answers.append((a,aRendered,aRenderedRect,False))
-                    xOff += aRendered.get_width() + 20
+                    xOff += aRendered.get_width(startRect) + 20
                     
             elif qType == 2:
                 (x,y,lenX,lenY) = qRenderedRect
@@ -494,7 +498,7 @@ class PauseScreen:
             
         #create a rectangle below the text
         #pygame.draw.rect(self.background.screen,(150,150,150),self.startRect)
-        self.background.screen.blit(self.startText,self.startRect)
+        self.background.screen.blit(self.startText,self.startTextRect)
 
     def blitAnswers(self,qTup,ansList):
         """
@@ -594,10 +598,9 @@ class PauseScreen:
         pygame.draw.rect(self.background.screen,(200,200,200),(250,250,800,400),0,3)
 
         levelTxt = self.font.render(f"Round {self.round}/{self.rounds} finished!",True,(0,0,0))
-        self.background.screen.blit(levelTxt,(250,250,self.background.res[0],self.background.res[1]))
+        self.background.screen.blit(levelTxt,(260,260,self.background.res[0],self.background.res[1]))
 
-        #pygame.draw.rect(self.background.screen,(150,150,150),(self.nextRoundRect[0],self.nextRoundRect[1],self.font.size('Next Round')[0],self.font.size('Next Round')[1]))
-        self.background.screen.blit(self.nextText,self.nextRoundRect)
+        self.background.screen.blit(self.nextText,self.nextRoundTextRect)
 
     
     def blitFinalStats(self,cList):
@@ -613,7 +616,7 @@ class PauseScreen:
         self.background.screen.blit(levelTxt,(0,0,self.background.res[0],self.background.res[1]))
 
         
-        self.background.screen.blit(self.endLevelText,self.startRect)
+        self.background.screen.blit(self.endLevelText,self.startTextRect)
 
     def updateLoop(self,x=[]):
         self.drawAll(x)
@@ -809,7 +812,7 @@ class PauseScreen:
                         newPos = x
                     
                     #TODO: better currPos logic, currently multiplying by 11 to round upward to 10
-                    #slider min/max
+                    #slider min/maxstartRect
                     sMin = aLim[0] + aRadius -1
                     sMax = aLim[1] + aRadius 
                     currVal = (newPos - sMin) * 10 / (sMax - sMin)
@@ -841,6 +844,7 @@ class InstrScreen:
 
         
         self.startRect = (1100,710,self.font.size('Start')[0]+10,self.font.size('Start')[1] + 10)
+        self.startTextRect = (1100 +5,710 +5,self.font.size('Start')[0]+10,self.font.size('Start')[1] + 10)
         self.startText = self.font.render('Start',True,(0,0,0))
         self.nextText = self.font.render('Next',True,(0,0,0))
 
@@ -858,11 +862,11 @@ class InstrScreen:
         if not self.nextInstr:
             self.desc.draw()
             pygame.draw.rect(self.desc.screen,(150,150,150),self.startRect)
-            self.desc.screen.blit(self.nextText,self.startRect)
+            self.desc.screen.blit(self.nextText,self.startTextRect)
         else:
             self.instr.draw()
             pygame.draw.rect(self.instr.screen,(150,150,150),self.startRect)
-            self.instr.screen.blit(self.startText,self.startRect)
+            self.instr.screen.blit(self.startText,self.startTextRect)
 
     def interaction(self):
         """

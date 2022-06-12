@@ -1,17 +1,12 @@
 # Privilege-Recognition-Task
 
 ## Todo
-1. Change the structure of the config folder for the multiple blocks described by the doc
+1. Fix slider bugs
 
-2. change "favorability bias" towards opposite corner AI
+2. Make the round number larger
 
-3. Fix basic indexing off-by-ones for log files
+3. fix movement
 
-4. Change to the partipant id
-
-5. The data structuring
-
-6. Start menu (participant look away) -> choose config (what we already have)
 ## Downloading the application
 
 ### MAC instructions
