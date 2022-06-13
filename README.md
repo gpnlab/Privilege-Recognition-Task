@@ -10,7 +10,7 @@
 ## Downloading the application
 
 ### MAC instructions
-1. Download the latest .zip release from (here)[https://github.com/gpnlab/Privilege-Recognition-Task/releases/tag/test]
+1. Download the latest .zip release from [here](https://github.com/gpnlab/Privilege-Recognition-Task/releases/tag/v0.1.0)
 2. Drag the downloaded .app file to your desktop or application folder
 3. Double click the app icon to open it. You should get and error that looks like the image below
 
