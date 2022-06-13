@@ -133,10 +133,13 @@ class HUD:
         #    i += 1
 
         #Timer
+        """ 
+        # remove timer for now 
         timerTxt = self.fontHUD.render(f"Time: {(self.timer // 1000)}" ,True,(0,0,0))
         timerRect = timerTxt.get_rect()
         timerRect.topright = (self.background.res[0],0)
         self.background.screen.blit(timerTxt,timerRect)
+        """
 
 class StartScreen:
     def __init__(self,background):
