@@ -14,7 +14,7 @@
         "start" : 5 
     },
     {
-        "question" : "Who was the best player this round? (select one)",
+        "question" : "Which player do you think collected the most coins? (select one)",
         "type" : 0,
         "answers" : ["You", "P2", "P3", "P4"] 
     }
