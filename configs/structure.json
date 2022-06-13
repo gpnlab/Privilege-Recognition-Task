@@ -38,6 +38,5 @@
     "structure4" : ["block1","block2","block4","block3","end"], 
     "structure5" : ["block2","block1","block3","block4","end"],
     "structure6" : ["block3","block4","block2","block1","end"],
-    "structure7" : ["block4","block3","block1","block2","end"],
-    "structure8" : ["test","end"]
+    "structure7" : ["block4","block3","block1","block2","end"]
 }
