@@ -11,7 +11,7 @@
 
 ### MAC instructions
 - If you are updating the game, We recommend deleting older versions.
-1. Download the latest .zip release from [here](https://github.com/gpnlab/Privilege-Recognition-Task/releases/tag/v0.1.1)
+1. Download the latest .zip release from [here](https://github.com/gpnlab/Privilege-Recognition-Task/releases/tag/v0.1.2)
 2. Drag the downloaded .app file to your desktop or application folder
 3. Double click the app icon to open it. You should get and error that looks like the image below
 
