@@ -7,7 +7,7 @@ from background import *
 from objects import *
 from datetime import date, datetime,time
 import sys
-
+from pygame import mixer
 # code is resolution dependent
 
 seed = 0
@@ -24,6 +24,8 @@ class PAT:
         """
         
         pygame.init()
+        global coin_sound
+        coin_sound = pygame.mixer.Sound("sounds/coin_sound.mp3")
         
         numpy.random.seed(seed)
 
@@ -494,6 +496,9 @@ class Round:
 
         #allows us to access and update selected agent coin count
         for (agent,_) in collectFlag.items(): 
+            print(agent)
+            if not agent in self.eGroup:
+                pygame.mixer.Sound.play(coin_sound)
             agent.coins += 1
             self.coinsLeft -= 1
 
