@@ -330,10 +330,10 @@ class Enemy(Agent):
                 
         
         if (random.randint(0,1) == 0):
-            print("choosing opt")
+            #print("choosing opt")
             self.coinObj = self.getNearestCoinCoord(cGroup)
         elif (random.randint(0,1) == 0):
-            print("choosing rand")
+            #print("choosing rand")
             self.coinObj = self.getRandCoinCoord(cGroup)
             #print(f"set objective to {self.coinObj}")
 

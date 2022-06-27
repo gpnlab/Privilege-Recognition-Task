@@ -56,7 +56,7 @@ class LogWriter:
             os.makedirs(url)
         url += "/data.json"  
         #assumed that file will be created via qa write so we can append      
-        logFile = open(url,"w")
+        logFile = open(url,"w+")
         
         parsed = json.dumps(log, indent = 5)
         logFile.write(parsed)

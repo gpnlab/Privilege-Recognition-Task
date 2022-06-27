@@ -8,6 +8,7 @@ from objects import *
 from datetime import date, datetime,time
 import sys
 from pygame import mixer
+from exe import EXE
 # code is resolution dependent
 
 seed = 0
@@ -25,7 +26,8 @@ class PAT:
         
         pygame.init()
         global coin_sound
-        coin_sound = pygame.mixer.Sound("sounds/coin_sound.mp3")
+        path = EXE.resource_path("sounds/coin_sound.mp3")
+        coin_sound = pygame.mixer.Sound(path)
         
         numpy.random.seed(seed)
 
@@ -130,7 +132,6 @@ class PAT:
         The Level class has a main_loop function that loops through the questions in the level or
         runs a game round with the corresponding manipulation.
         """
-        #manually keep track of which level since questions count as levels when they should not
         levelnum = 1 
 
         roundsCompleted = 0
@@ -143,14 +144,15 @@ class PAT:
             if "questions" in level.config:
                 #questions will occur after, so -1 is "safe"
                 self.info[f"questions {levelnum - 1}"] = level.info
+                levelnum += 1
             else:
                 self.info[f"level {levelnum}"] = level.info
                 levelnum += 1
             roundsCompleted = level.prevRoundsCompleted
 
             
-        #print("writing log")
-        self.logWriter.writeLog(self.info)
+            #print("writing log")
+            self.logWriter.writeLog(self.info)
 
         final = FinalScreen(self.background)
         final.mainLoop()
@@ -386,25 +388,25 @@ class Round:
         
 
         if config["playerBias"] > 0:
-            print("playerBias detected")
+            #print("playerBias detected")
 
             dx = meanCoor[0] - self.player.x
             dy = meanCoor[1] - self.player.y 
             meanCoor = ((meanCoor[0] - config["playerBias"] * dx),(meanCoor[1] - config["playerBias"] * dy))
 
         if config["enemy1Bias"] > 0:
-            print("e1 bias")
+            #print("e1 bias")
             dx = meanCoor[0] - self.enemy1.x
             dy = meanCoor[1] - self.enemy1.y 
             meanCoor = ((meanCoor[0] - config["enemy1Bias"] * dx),(meanCoor[1] - config["enemy1Bias"] * dy))
 
         if config["enemy2Bias"] > 0:
-            print("e2 bias")
+            #print("e2 bias")
             dx = meanCoor[0] - self.enemy2.x
             dy = meanCoor[1] - self.enemy2.y 
             meanCoor = ((meanCoor[0] - config["enemy2Bias"] * dx),(meanCoor[1] - config["enemy2Bias"] * dy))
         if config["enemy3Bias"] > 0:
-            print("e3 bias")
+            #print("e3 bias")
             dx = meanCoor[0] - self.enemy3.x
             dy =  meanCoor[1] - self.enemy3.y 
             meanCoor = ((meanCoor[0] - config["enemy3Bias"] * dx),(meanCoor[1] - config["enemy3Bias"] * dy))
@@ -496,7 +498,7 @@ class Round:
 
         #allows us to access and update selected agent coin count
         for (agent,_) in collectFlag.items(): 
-            print(agent)
+            #print(agent)
             if not agent in self.eGroup:
                 pygame.mixer.Sound.play(coin_sound)
             agent.coins += 1

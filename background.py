@@ -444,7 +444,7 @@ class PauseScreen:
                     aRendered = self.font.render(a,True,(0,0,0))
                     aRenderedRect = (xOff + 8, yC + qRendered.get_height()+8 ,self.font.size(a)[0] +8,self.font.size(a)[1] + 8,)
                     answers.append((a,aRendered,aRenderedRect,False))
-                    xOff += aRendered.get_width(startRect) + 20
+                    xOff += aRendered.get_width() + 20
                     
             elif qType == 2:
                 (x,y,lenX,lenY) = qRenderedRect
