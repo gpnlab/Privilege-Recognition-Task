@@ -305,6 +305,7 @@ class PauseScreen:
           agents: a list of agents
           levelStart: the time at which the level started. Defaults to 0
         """
+ 
         self.level = level
         self.round = round
         self.levelStart = levelStart
@@ -331,6 +332,10 @@ class PauseScreen:
         self.inQuestions = False
 
         if "questions" in self.config:
+            if pygame.mouse.get_pressed()[0] == True:
+                self.selected = 1000
+            else:
+                self.selected = -1
             self.inQuestions = True 
             self.renderQuestions()
 
@@ -647,7 +652,9 @@ class PauseScreen:
             
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.menuInteraction(pygame.mouse.get_pos())                
-            
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                self.selected = -1 
+                
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_RETURN]:
@@ -660,10 +667,10 @@ class PauseScreen:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: #Quitting out of fullScreen
                 pygame.quit()
                 exit()
-        #moved outside the event loop to support holding mouse button
-        if pygame.mouse.get_pressed()[0] == True: 
-            self.sliderInteraction(pygame.mouse.get_pos())
-    
+            #moved outside the event loop to support holding mouse button
+            if pygame.mouse.get_pressed()[0] == True: 
+                self.sliderInteraction(pygame.mouse.get_pos())
+
         self.updateName()
         
     def drawAll(self,x):
@@ -809,8 +816,8 @@ class PauseScreen:
                 inX = aCenter[0] - aRadius * 4 < x and x < aCenter[0] + aRadius * 4
                 
 
-                if inY:
-
+                if inY and (self.selected < 0 or self.selected == currInd1):
+                    self.selected = currInd1
                     #set new center according to where mouse is in the circle
                     #make sure it does not go out of bounds
                     if x <= aLim[0] + aRadius:
