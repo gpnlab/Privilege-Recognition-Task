@@ -328,7 +328,10 @@ class PauseScreen:
         #a list of tuples: (font render, rect)
         self.aTextList = []
 
-        if "questions" in self.config:  
+        self.inQuestions = False
+
+        if "questions" in self.config:
+            self.inQuestions = True 
             self.renderQuestions()
 
 
@@ -719,25 +722,28 @@ class PauseScreen:
         x,y = mousePos
 
         #starting game
-        inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
-        inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
-        if (inX and inY):
-            #check if all answered
-            self.paused = False
-            self.startText = self.font.render('Start',True,(0,255,0))
-            self.endLevelText = self.font.render('End Level',True,(0,255,0))
-        else: 
-            self.startText = self.font.render('Start',True,(0,0,0))
-            self.endLevelText = self.font.render('End Level',True,(0,0,0))
+        if self.inQuestions:
+            inX = x in range(self.startRect[0], self.startRect[0] + self.startRect[2])
+            inY = y in range(self.startRect[1], self.startRect[1] + self.startRect[3])
 
-        #next round
-        inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
-        inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
-        if (inX and inY):
-            self.paused = False
-            self.nextText = self.font.render('Next Round',True,(0,255,0))
+            if (inX and inY):
+                #check if all answered
+                self.paused = False
+                self.startText = self.font.render('Start',True,(0,255,0))
+                self.endLevelText = self.font.render('End Level',True,(0,255,0))
+            else: 
+                self.startText = self.font.render('Start',True,(0,0,0))
+                self.endLevelText = self.font.render('End Level',True,(0,0,0))
         else:
-            self.nextText = self.font.render('Next Round',True,(0,0,0))
+            #next round
+            inX = x in range(self.nextRoundRect[0], self.nextRoundRect[0] + self.nextRoundRect[2])
+            inY = y in range(self.nextRoundRect[1], self.nextRoundRect[1] + self.nextRoundRect[3])
+
+            if (inX and inY):
+                self.paused = False
+                self.nextText = self.font.render('Next Round',True,(0,255,0))
+            else:
+                self.nextText = self.font.render('Next Round',True,(0,0,0))
 
         #answering questions - aTextList is indexed by the question number, list list of answers
         currInd1 = 0

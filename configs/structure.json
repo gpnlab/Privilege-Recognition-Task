@@ -27,7 +27,7 @@
     "test" :
     {
         "description" : "test",
-        "layout" : [["after_block_questions",1]]
+        "layout" : [["goodSpeed",1],["questions",1],["after_block_questions",1]]
     }
 },
 
