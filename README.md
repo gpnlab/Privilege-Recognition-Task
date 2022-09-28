@@ -38,7 +38,7 @@ This should install git
 #### Instructions:
 1. press 'cmd' + 'space'
 2. Type terminal and enter
-3. in the terminal, enter 'git clone https://github.com/gpnlab/Privilege-Recognition-Task'
+3. in the terminal, enter `git clone https://github.com/gpnlab/Privilege-Recognition-Task`
 4. Enter the following:
 ```bash
 cd Privilege-Recognition-Task
