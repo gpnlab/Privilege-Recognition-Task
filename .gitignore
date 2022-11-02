@@ -4,3 +4,5 @@ build/main/Tree-00.toc
 *.exe
 dist/*
 build/*
+*.DS_Store
+*__pycache__
