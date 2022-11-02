@@ -1,5 +1,16 @@
 # Privilege-Recognition-Task
 
+## Structs available
+
+0. Coin Distribution (Negative --> Positive) --> Players' Speed (Negative --> Positive)
+1. Coin Distribution (Positive --> Negative) --> Players' Speed (Positive --> Negative)
+2. Players' Speed (Negative --> Positive) --> Coin Distribution (Negative --> Positive)
+3. Players' Speed (Positive --> Negative) --> Coin Distribution (Positive --> Negative)
+4. Coin Distribution (Negative --> Positive) --> Players' Speed (Positive --> Negative)
+5. Coin Distribution (Positive --> Negative) --> Players' Speed (Negative --> Positive)
+6. Players' Speed (Negative --> Positive) --> Coin Distribution (Positive --> Negative)
+7. Players' Speed (Positive --> Negative) --> Coin Distribution (Negative --> Positive)
+
 ## Todo
 1. Fix slider bugs
 
