@@ -2,7 +2,7 @@ import numpy
 from numpy.random import mtrand
 import pygame
 from configReader import ConfigReader, ConfigContainer
-from logWriter import LogWriter
+from src.io import LogWriter
 from background import *
 from objects import *
 from datetime import date, datetime,time
