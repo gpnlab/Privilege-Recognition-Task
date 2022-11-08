@@ -55,6 +55,7 @@ class PAT:
         while not self.start.finished:
             self.start.mainLoop()
         self.participantID = self.start.name
+        breakpoint()
 
         # organize levels based on chosen configuration
         self.parseStructure(self.start.chosenStruct)
