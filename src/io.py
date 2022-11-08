@@ -19,13 +19,18 @@ class LogWriter:
         self.timeStamp = timeStamp
         self.seed = seed
     
+    def get_path(self) -> Path:
+        """Generate the directory for writing log-related files."""
+        path = Path.cwd() / self.name / self.timeStamp
+        path.mkdir(exist_ok=True)
+        return path
+    
     def writeSeed(self):
         """
         It creates a folder with the name of the current time stamp, and then creates a file
         called seed.txt inside of that folder
         """
-        path = Path.cwd() / self.name / self.timeStamp / "seed.txt"
-        path.mkdir(exist_ok=True)
+        path = self.get_path() / "seed.txt"
         with open(os.fspath(path), "w+") as seedfile:
             seedfile.write(str(self.seed))
 
@@ -38,9 +43,8 @@ class LogWriter:
         Args:
           log: the log object
         """
-        path = Path.cwd() / self.name / self.timeStamp / "data.json"
+        path = self.get_path() / "data.json"
         print(f"log writing to: {os.fspath(path)}")
-        path.mkdir(exist_ok=True)
         with open(os.fspath(path), "w+") as logfile:
             parsed = json.dumps(qDict, indent=5)
             logfile.write(parsed)      
@@ -55,8 +59,7 @@ class LogWriter:
           levelName: The name of the level
           roundNum: the round number of the level. Defaults to 0
         """
-        path = Path.cwd() / self.name / self.timeStamp / "data.json"
-        path.mkdir(exist_ok=True)
+        path = self.get_path() / "data.json"
         with open(os.fspath(path), "a") as logfile:
             parsed = json.dumps(qDict, indent=5)
             logfile.write(parsed)      
@@ -71,8 +74,7 @@ class LogWriter:
         Args:
           qDict: A dictionary of the questions and answers.
         """
-        path = Path.cwd() / self.name / self.timeStamp / "data.json"
-        path.mkdir(exist_ok=True)
+        path = self.get_path() / "data.json"
         with open(os.fspath(path), "w+") as logfile:
             parsed = json.dumps(qDict, indent=5)
             logfile.write(parsed)      
