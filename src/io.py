@@ -1,5 +1,5 @@
 import os
-from os import path
+from pathlib import Path
 from datetime import datetime
 import json
 
@@ -18,28 +18,21 @@ class LogWriter:
         self.name = name
         self.timeStamp = timeStamp
         self.seed = seed
-
-    def getPath(self):
-        """
-        It returns the path of the directory where the Python executable is located
-        
-        Returns:
-          The path to the directory containing the Python interpreter.
-        """
-        return os.path.dirname(os.sys.executable)
+    
+    def get_path(self) -> Path:
+        """Generate the directory for writing log-related files."""
+        path = Path.cwd() / self.name / self.timeStamp
+        path.mkdir(exist_ok=True)
+        return path
     
     def writeSeed(self):
         """
         It creates a folder with the name of the current time stamp, and then creates a file
         called seed.txt inside of that folder
         """
-        url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
-        if not path.exists(url):
-            os.makedirs(url)
-        
-        newFile = open(url + "/seed.txt","w+")
-
-        newFile.write(str(self.seed))
+        path = self.get_path() / "seed.txt"
+        with open(os.fspath(path), "w+") as seedfile:
+            seedfile.write(str(self.seed))
 
     #TODO: replace all csv writing to json writing
     #pass log as a list of a list of strings (every sub list is a single tick)
@@ -50,17 +43,11 @@ class LogWriter:
         Args:
           log: the log object
         """
-        url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
-        print("log writing to: " + url)
-        if not path.exists(url):
-            os.makedirs(url)
-        url += "/data.json"  
-        #assumed that file will be created via qa write so we can append      
-        logFile = open(url,"w+")
-        
-        parsed = json.dumps(log, indent = 5)
-        logFile.write(parsed)
-        logFile.close()
+        path = self.get_path() / "data.json"
+        print(f"log writing to: {os.fspath(path)}")
+        with open(os.fspath(path), "w+") as logfile:
+            parsed = json.dumps(qDict, indent=5)
+            logfile.write(parsed)      
 
     # UNUSED
     def writeLevelLog(self,log,levelName,roundNum = 0):
@@ -72,20 +59,10 @@ class LogWriter:
           levelName: The name of the level
           roundNum: the round number of the level. Defaults to 0
         """
-        url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
-        
-        if not path.exists(url):
-            os.makedirs(url)
-
-        url += "/data.json"  
-        #assumed that file will be created via qa write so we can append      
-        logFile = open(url,"a")
-        
-        parsed = json.dumps(log, indent = 5)
-
-        logFile.write(parsed)
-
-        logFile.close()
+        path = self.get_path() / "data.json"
+        with open(os.fspath(path), "a") as logfile:
+            parsed = json.dumps(qDict, indent=5)
+            logfile.write(parsed)      
 
     #questions passed in as a list of strings
     #answers passed in as a list of lists (multiple answers)
@@ -97,18 +74,8 @@ class LogWriter:
         Args:
           qDict: A dictionary of the questions and answers.
         """
-        url = path.join(self.getPath(),f"logs/{self.name}/{self.timeStamp}")
-        
-        if not path.exists(url):
-            os.makedirs(url)
-        
-        url += f"/data.json"
-
-        logFile = open(url,"w+")
-
-        parsed = json.dumps(qDict, indent = 5)
-        logFile.write(parsed)
-
-        logFile.close()
-        
+        path = self.get_path() / "data.json"
+        with open(os.fspath(path), "w+") as logfile:
+            parsed = json.dumps(qDict, indent=5)
+            logfile.write(parsed)      
     
