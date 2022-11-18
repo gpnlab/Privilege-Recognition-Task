@@ -1,3 +1,4 @@
+"""The Behavior of this code depends on the resolution of the screen that you run it on."""
 import numpy
 from numpy.random import mtrand
 import pygame
@@ -9,9 +10,9 @@ from datetime import date, datetime,time
 import sys
 from pygame import mixer
 from exe import EXE
-# code is resolution dependent
 
 seed = 0
+
 
 class PAT:
     """ This class contains code that wraps the individual components of the game.
@@ -71,10 +72,6 @@ class PAT:
 
         while not instructions.proceed:
             instructions.mainLoop()
-
-        
-        
-
         
     
     def countTotalRounds(self):
@@ -86,13 +83,11 @@ class PAT:
         for level in self.levels:
             config = ConfigReader.parseToDict(f"{level}","levelconfigs")
             print("config: \n", config)
-
             #question 'levels' do not have rounds, count them as a single round
             if 'questions' in config:
                 continue
             else:
                 rounds = int(config["rounds"]) 
-
                 print(f"level {level} has {rounds} rounds")
                 res += rounds
 
@@ -109,20 +104,17 @@ class PAT:
         self.mainConfig = ConfigReader.parseToDict("structure")
         self.structure = self.mainConfig[structName]
         self.blocks = self.mainConfig["blocks"]
-
         self.levels = []
-
-        
         #loop through the structure and add levels
         for blockType in self.structure: 
             block = self.blocks[blockType]["layout"]
-
             for b in block:
                 level = b[0]
                 freq = int(b[1])
                 for i in range(freq):
                     self.levels.append(level)
-
+        # # DEBUG: Uncomment this to shorten the experiment to a single round for dev purposes
+        # self.levels = [self.levels[0]]
 
     def main_loop(self):
         """
@@ -133,14 +125,11 @@ class PAT:
         runs a game round with the corresponding manipulation.
         """
         levelnum = 1 
-
         roundsCompleted = 0
-
         for currLevel in range(len(self.levels)):
             #print(f"The current level is {self.levels[currLevel]}")
             level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownList,roundsCompleted,self.totalRounds)
             level.main_loop()
-
             if "questions" in level.config:
                 #questions will occur after, so -1 is "safe"
                 self.info[f"questions {levelnum - 1}"] = level.info
@@ -149,22 +138,18 @@ class PAT:
                 self.info[f"level {levelnum}"] = level.info
                 levelnum += 1
             roundsCompleted = level.prevRoundsCompleted
-
-            
             #print("writing log")
             self.logWriter.writeLog(self.info)
 
         final = FinalScreen(self.background)
         final.mainLoop()
-
             
     def finalScreen(self):
         """End screen function to show how to exit
         """
-        
         self.background.screen.fill((200,200,200))
-
         finalTxt = "Game Complete! Press esc on your keyboard to exit."
+
 
 class Level:
     def __init__(self,Pat,timestamp,patientName,presetName,level,levelList,countdownList,roundsCompleted,totalRounds):
@@ -186,7 +171,6 @@ class Level:
         self.levelNum = level
         self.levels = len(levelList)
         self.config = ConfigReader.parseToDict(f"{levelList[level]}","levelconfigs")
-        #print(self.config)
         self.background = Pat.background
         self.res = Pat.res
         self.pauseFlag = True
@@ -195,14 +179,11 @@ class Level:
         self.prevRoundsCompleted = roundsCompleted
         self.totalRounds = totalRounds
         
-
         self.logWriter = LogWriter(presetName,patientName,timestamp,seed)
-
         self.logWriter.writeSeed()
 
         self.info = dict()
         #will only be set if it is a 'questions' level
-        
 
         #not a questions block
         if "questions" not in self.config:
@@ -278,9 +259,7 @@ class Level:
         else:
             for currRound in range(self.rounds):
                 round = Round(self.Pat,self.levelNum,currRound,self.config,self.totalRounds)
-                
                 self.countdown(round.aGroup,round.cGroup)
-
                 round.updateAgentVelocity()
 
                 while round.inProgress:
@@ -290,15 +269,10 @@ class Level:
                 self.e1Coins += round.enemy1.coins
                 self.e2Coins += round.enemy2.coins
                 self.e3Coins += round.enemy3.coins
-
-                
                 self.prevRoundsCompleted += 1
                 
-
-
                 #blit the round completed here 
                 pauseScreen = PauseScreen(self.levelNum,self.levels,self.prevRoundsCompleted,self.totalRounds,self.background,round.config,round.aGroup,1)
-
 
                 while pauseScreen.paused:
                     pauseScreen.updateLoop() 
@@ -306,10 +280,8 @@ class Level:
                 #save round info
                 self.info[f"level {self.levelNum} round {self.currRound}"] = round.info
                 self.currRound += 1
-
                 round.reset()
     
-
 
     def countdown(self,agents,coins):
         """
@@ -326,9 +298,6 @@ class Level:
                 pygame.event.get()
                 if pygame.time.get_ticks() - prev_time > 1000:
                     break
-
-
- 
         
     def reset(self):
         """
@@ -338,7 +307,6 @@ class Level:
         pygame.sprite.Group.empty(self.aGroup)
         pygame.sprite.Group.empty(self.eGroup)
         pygame.sprite.Group.empty(self.cGroup)
-
     
 
 class Round:
@@ -358,10 +326,6 @@ class Round:
         self.inProgress = True
         self.background = Pat.background
         self.res = Pat.res
-
-
-
-        
 
         self.config = config
         self.totalRounds = totalRounds
@@ -411,24 +375,18 @@ class Round:
             dy =  meanCoor[1] - self.enemy3.y 
             meanCoor = ((meanCoor[0] - config["enemy3Bias"] * dx),(meanCoor[1] - config["enemy3Bias"] * dy))
 
-
         for i in range(int(config["numberOfCoins"])):
             spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 8),numpy.random.normal(meanCoor[1],self.res[1] / 8)
-            
             while spawnCoord[0] < 100 or spawnCoord[0] > self.res[0] - 100 or spawnCoord[1] < 100 or spawnCoord[1] > self.res[1] - 100:
                 spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
-            
             coin = Coin(self.cGroup,self.background,spawnCoord)
-            #print(spawnCoord)
         
+        self.info["coin_coordinates"] = [[coin.x, coin.y] for coin in self.cGroup.sprites()]
         
         for e in self.eGroup:
             e.coinObj = e.getNearestCoinCoord(self.cGroup)
             #print(f"initial objective set to {e.coinObj}")
 
-        
-
-    
     def initGroups(self):
         #why is this here twice?
         self.player = Player(self.background,self.aGroup,(self.res[0] // 8, self.res[1] // 8), self.config["playerVel"], "p1.png",seed)
@@ -449,7 +407,6 @@ class Round:
         self.enemy1.update_velocity()
         self.enemy2.update_velocity()
         self.enemy3.update_velocity()
-
 
     #main loop will check what 
     def main_loop(self):
@@ -510,9 +467,6 @@ class Round:
             for e in self.eGroup:
                 e.setObj(self.cGroup) 
 
-        
-        
-
         for e in self.eGroup:
             if self.coinsLeft > 0 and self.time > 10:
                 e.randomWalk()
@@ -534,8 +488,6 @@ class Round:
         #Clock updates
         self.HUD.updateTimer(self.time_passed)
         self.updateInfo(keys)
-
-
 
     def _draw(self):
         """
@@ -587,13 +539,13 @@ class Round:
         info["enemy1 position"] = str((self.enemy1.x,self.enemy1.y))
         info["enemy2 position"] = str((self.enemy2.x,self.enemy2.y))
         info["enemy3 position"] = str((self.enemy3.x,self.enemy3.y))
-
         self.info[str(self.time)] = info    
         
     def reset(self):
         pygame.sprite.Group.empty(self.aGroup)
         pygame.sprite.Group.empty(self.eGroup)
         pygame.sprite.Group.empty(self.cGroup)
+
 
 if __name__ == "__main__":
     pat = PAT()
