@@ -3,15 +3,16 @@ import numpy
 from numpy.random import mtrand
 import pygame
 from configReader import ConfigReader, ConfigContainer
-from src.io import LogWriter
+from src.pat_io import LogWriter
 from background import *
 from objects import *
 from datetime import date, datetime,time
 import sys
 from pygame import mixer
 from exe import EXE
+import time    
 
-seed = 0
+seed = int(time.time())
 
 
 class PAT:
