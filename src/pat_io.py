@@ -36,7 +36,7 @@ class LogWriter:
 
     #TODO: replace all csv writing to json writing
     #pass log as a list of a list of strings (every sub list is a single tick)
-    def writeLog(self,log):
+    def writeLog(self,log: dict):
         """
         It takes a log object, converts it to a json string, and writes it to a file
         
