@@ -21,8 +21,8 @@ class LogWriter:
     
     def get_path(self) -> Path:
         """Generate the directory for writing log-related files."""
-        path = Path.cwd() / self.name / self.timeStamp
-        path.mkdir(exist_ok=True)
+        path = Path.cwd() / "logs" / self.name / self.timeStamp
+        path.mkdir(parents=True, exist_ok=True)
         return path
     
     def writeSeed(self):
@@ -46,7 +46,7 @@ class LogWriter:
         path = self.get_path() / "data.json"
         print(f"log writing to: {os.fspath(path)}")
         with open(os.fspath(path), "w+") as logfile:
-            parsed = json.dumps(qDict, indent=5)
+            parsed = json.dumps(log, indent=5)
             logfile.write(parsed)      
 
     # UNUSED
