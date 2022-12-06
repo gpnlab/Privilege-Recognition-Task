@@ -12,7 +12,7 @@ from pygame import mixer
 from exe import EXE
 import time    
 
-seed = int(time.time())
+seed = 0
 
 
 class PAT:
