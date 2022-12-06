@@ -11,6 +11,10 @@
 6. Players' Speed (Negative --> Positive) --> Coin Distribution (Positive --> Negative)
 7. Players' Speed (Positive --> Negative) --> Coin Distribution (Negative --> Positive)
 
+## OS Support
+
+Release v0.1.4 only supports windows. Mac is only supported up to v0.1.2.
+
 ## Todo
 1. Fix slider bugs
 
