@@ -69,8 +69,7 @@ class PAT:
 
         print("levels: ", self.levels)
 
-        self.totalRounds = self.countTotalRounds()
-
+        self.totalRounds = 24 #changed to constant with current study design
         
         # initiallize logwriter class to track participant responses and inputs
         self.logWriter = LogWriter(self.presetName,self.participantID,self.time,seed)
@@ -79,22 +78,6 @@ class PAT:
 
         while not instructions.proceed:
             instructions.mainLoop()
-        
-    
-    def countTotalRounds(self):
-        """
-        Uses the game config reader to get number of rounds
-        """
-        res = 0
-
-        for level in self.levels:
-            config = ConfigReader.parseToDict(f"{level}",dirName = "levelconfigs")
-            #question 'levels' do not have rounds, count them as a single round
-            if not 'questions' in config:
-                rounds = int(config["rounds"]) 
-                res += rounds
-
-        return res
     
     def parseStructure(self,structName="structure1"):
         """
