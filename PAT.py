@@ -240,7 +240,7 @@ class Level:
         else:
             for currRound in range(self.rounds):
                 round = Round(self.Pat,self.levelNum,currRound,self.config,self.totalRounds)
-                self.countdown(round.aGroup,round.cGroup)
+                self.countdown(round.agentGroup,round.coinGroup)
                 round.updateAgentVelocity()
 
                 while round.inProgress:
@@ -253,7 +253,7 @@ class Level:
                 self.prevRoundsCompleted += 1
                 
                 #blit the round completed here 
-                pauseScreen = PauseScreen(self.levelNum,self.levels,self.prevRoundsCompleted,self.totalRounds,self.background,round.config,round.aGroup,1)
+                pauseScreen = PauseScreen(self.levelNum,self.levels,self.prevRoundsCompleted,self.totalRounds,self.background,round.config,round.agentGroup,1)
 
                 while pauseScreen.paused:
                     pauseScreen.updateLoop() 
@@ -320,12 +320,12 @@ class Round:
         self.info["level"] = levelNum
         self.info["round"] = roundNum
         
-        self.aGroup = pygame.sprite.Group()
-        self.eGroup = pygame.sprite.Group()
-        self.cGroup = pygame.sprite.Group()
+        self.agentGroup = pygame.sprite.Group()
+        self.enemyGroup = pygame.sprite.Group()
+        self.coinGroup = pygame.sprite.Group()
 
         #Pass background and player into HUD
-        self.HUD = HUD(self.background, self.aGroup) 
+        self.HUD = HUD(self.background, self.agentGroup) 
         self.initGroups()
  
         #set mean acoording to biases:
@@ -360,28 +360,28 @@ class Round:
             spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 8),numpy.random.normal(meanCoor[1],self.res[1] / 8)
             while spawnCoord[0] < 100 or spawnCoord[0] > self.res[0] - 100 or spawnCoord[1] < 100 or spawnCoord[1] > self.res[1] - 100:
                 spawnCoord = numpy.random.normal(meanCoor[0],self.res[0] / 4),numpy.random.normal(meanCoor[1],self.res[1] / 6)
-            coin = Coin(self.cGroup,self.background,spawnCoord)
+            coin = Coin(self.coinGroup,self.background,spawnCoord)
         
-        self.info["coin_coordinates"] = [[coin.x, coin.y] for coin in self.cGroup.sprites()]
+        self.info["coin_coordinates"] = [[coin.x, coin.y] for coin in self.coinGroup.sprites()]
         
-        for e in self.eGroup:
-            e.coinObj = e.getNearestCoinCoord(self.cGroup)
+        for e in self.enemyGroup:
+            e.coinObj = e.getNearestCoinCoord(self.coinGroup)
             #print(f"initial objective set to {e.coinObj}")
 
     def initGroups(self):
         #why is this here twice?
-        self.player = Player(self.background,self.aGroup,(self.res[0] // 8, self.res[1] // 8), self.config["playerVel"], "p1.png",seed)
+        self.player = Player(self.background,self.agentGroup,(self.res[0] // 8, self.res[1] // 8), self.config["playerVel"], "p1.png",seed)
         
         #TODO: change the temporary spawn points of enemies, and change sprite
-        self.enemy1 = Enemy("player 2",self.background,self.aGroup,self.cGroup,(7 * self.res[0] // 8,self.res[1] // 8),self.config["enemy1Vel"],"p2.png",seed)
+        self.enemy1 = Enemy("player 2",self.background,self.agentGroup,self.coinGroup,(7 * self.res[0] // 8,self.res[1] // 8),self.config["enemy1Vel"],"p2.png",seed)
 
-        self.enemy2 = Enemy("player 3",self.background,self.aGroup,self.cGroup,(self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy2Vel"],"p3.png",seed)
+        self.enemy2 = Enemy("player 3",self.background,self.agentGroup,self.coinGroup,(self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy2Vel"],"p3.png",seed)
         
-        self.enemy3 = Enemy("player 4",self.background,self.aGroup,self.cGroup,(7 * self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy3Vel"],"p4.png",seed)
+        self.enemy3 = Enemy("player 4",self.background,self.agentGroup,self.coinGroup,(7 * self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy3Vel"],"p4.png",seed)
 
-        self.eGroup.add(self.enemy1)
-        self.eGroup.add(self.enemy2)
-        self.eGroup.add(self.enemy3)
+        self.enemyGroup.add(self.enemy1)
+        self.enemyGroup.add(self.enemy2)
+        self.enemyGroup.add(self.enemy3)
 
     def updateAgentVelocity(self):
         self.player.update_velocity()
@@ -432,25 +432,29 @@ class Round:
         events = pygame.event.get()
 
         #collisions
-        collectFlag = pygame.sprite.groupcollide(self.aGroup,self.cGroup,False,True)
-
+        collectFlag = pygame.sprite.groupcollide(self.agentGroup,self.coinGroup,False,True)
+        coins_collected = {}
         #allows us to access and update selected agent coin count
-        for (agent,_) in collectFlag.items(): 
-            if not agent in self.eGroup:
+        for (agent,coin_list) in collectFlag.items(): 
+            if not agent in self.enemyGroup:
                 pygame.mixer.Sound.play(coin_sound)
+
+            coins_collected[agent.name] = [
+                (coin.x, coin.y) for coin in coin_list if isinstance(coin, Coin)
+                ]
             agent.coins += 1
             self.coinsLeft -= 1
 
         if len(collectFlag) > 0:
             #reupdate the coin objectives
-            for e in self.eGroup:
-                e.setCoinObjective(self.cGroup) 
+            for e in self.enemyGroup:
+                e.setCoinObjective(self.coinGroup) 
 
-        for e in self.eGroup:
+        for e in self.enemyGroup:
             if self.coinsLeft > 0 and self.time > 10:
                 e.optimalMove()
 
-        if self.coinsLeft <= 0 or len(self.cGroup) == 0:
+        if self.coinsLeft <= 0 or len(self.coinGroup) == 0:
             print("finished level")
             self.inProgress = False
 
@@ -466,7 +470,7 @@ class Round:
         self.time += self.time_passed
         #Clock updates
         self.HUD.updateTimer(self.time_passed)
-        self.updateInfo(keys)
+        self.updateInfo(keys,coins_collected)
 
     def _draw(self):
         """
@@ -477,14 +481,14 @@ class Round:
 
         #sprite groups are great because they allow you
         #to draw all sprites of the group at the same time
-        self.aGroup.draw(self.background.screen)
-        self.cGroup.draw(self.background.screen)
+        self.agentGroup.draw(self.background.screen)
+        self.coinGroup.draw(self.background.screen)
         self.HUD.drawHUD()
         
         pygame.display.flip()
         pygame.display.update()
 
-    def updateInfo(self,keys):
+    def updateInfo(self,keys,coins_collected):
         """
         This function updates the info dictionary with the current time, the number of coins
         left, the number of coins each player has, the keys pressed, and the position of each
@@ -510,6 +514,7 @@ class Round:
         info["tick"] = str(self.time)
         info["coins left"] = str(self.coinsLeft)
         info["player coins"] = str(self.player.coins)
+        info["collected coins"] = coins_collected
         info["keys pressed"] = keysPressedStr
         info["e1 coins"] = str(self.enemy1.coins)
         info["e2 coins"] = str(self.enemy2.coins)
@@ -521,9 +526,9 @@ class Round:
         self.info[str(self.time)] = info    
         
     def reset(self):
-        pygame.sprite.Group.empty(self.aGroup)
-        pygame.sprite.Group.empty(self.eGroup)
-        pygame.sprite.Group.empty(self.cGroup)
+        pygame.sprite.Group.empty(self.agentGroup)
+        pygame.sprite.Group.empty(self.enemyGroup)
+        pygame.sprite.Group.empty(self.coinGroup)
 
 
 if __name__ == "__main__":
