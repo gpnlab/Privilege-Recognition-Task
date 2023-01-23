@@ -18,7 +18,7 @@ class Background(pygame.sprite.Sprite):
         """
         pygame.sprite.Sprite.__init__(self)
         self.res = res
-        self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode((0, 0), pygame.NOFRAME)
         self.surface = pygame.Surface(res)
         
         if image != "NA":
@@ -288,7 +288,6 @@ class StartScreen:
                 elif len(self.name) < 20:
                     self.name += event.unicode
         self.updateName()
-
 
 class PauseScreen:
     def __init__(self,level,levels,round,rounds,background,config,agents = [],levelStart = 0):
@@ -944,10 +943,6 @@ class InstrScreen:
                 self.nextInstr = True
             else:
                 self.proceed = True 
-
-    
-
-
 
 class FinalScreen:
     def __init__(self, background):

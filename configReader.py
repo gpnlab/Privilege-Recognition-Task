@@ -22,7 +22,7 @@ class ConfigReader:
         if dirName == "default":
             asset_url = EXE.resource_path(f"configs/{filename}.json")
         else:
-            asset_url = EXE.resource_path(f"configs/levelconfigs/{filename}.json") 
+            asset_url = EXE.resource_path(f"configs/{dirName}/{filename}.json") 
 
         d = ConfigContainer(asset_url)
         

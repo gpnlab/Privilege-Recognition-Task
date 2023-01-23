@@ -4,7 +4,7 @@ from numpy.random import mtrand
 import pygame
 from configReader import ConfigReader, ConfigContainer
 from src.pat_io import LogWriter
-from background import Background, StartScreen, InstrScreen, PauseScreen, HUD, FinalScreen
+from screens import Background, StartScreen, InstrScreen, PauseScreen, HUD, FinalScreen
 from objects import Player, Enemy, Coin
 from datetime import date, datetime,time
 import sys
@@ -83,19 +83,15 @@ class PAT:
     
     def countTotalRounds(self):
         """
-        returns a count of the total amount of rounds
+        Uses the game config reader to get number of rounds
         """
         res = 0
 
         for level in self.levels:
-            config = ConfigReader.parseToDict(f"{level}","levelconfigs")
-            print("config: \n", config)
+            config = ConfigReader.parseToDict(f"{level}",dirName = "levelconfigs")
             #question 'levels' do not have rounds, count them as a single round
-            if 'questions' in config:
-                continue
-            else:
+            if not 'questions' in config:
                 rounds = int(config["rounds"]) 
-                print(f"level {level} has {rounds} rounds")
                 res += rounds
 
         return res
@@ -149,13 +145,8 @@ class PAT:
             self.logWriter.writeLog(self.info)
 
         final = FinalScreen(self.background)
-        final.mainLoop()
+        final.mainLoop() #screen will exit pygame when done
             
-    def finalScreen(self):
-        """End screen function to show how to exit
-        """
-        self.background.screen.fill((200,200,200))
-        finalTxt = "Game Complete! Press esc on your keyboard to exit."
 
 
 class Level:
