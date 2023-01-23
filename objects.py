@@ -83,8 +83,6 @@ class GameObject(pygame.sprite.Sprite):
         playerImg = pygame.transform.scale(playerImg,resizeDim)
         return playerImg
 
-    
-
     def setRect(self):
         """
         The function takes the x and y coordinates of the center of the rectangle and the x
@@ -106,7 +104,6 @@ class GameObject(pygame.sprite.Sprite):
         
         # to correct for different framerates
         self.correct_vel = self.vel * self.time_passed / 5  # this is a good speed
-
 
     #direction is horizontal, then veritical
     def move(self,horizontal = 0, vertical = 0):
@@ -144,10 +141,6 @@ class GameObject(pygame.sprite.Sprite):
 
 #Agent as in player/enemies
 class Agent(GameObject):
-
-    #TODO: preload sprites for each eight direcitons
-    def preload(self):
-        return
     
     def __init__(self,name,background,group,coord,velocity,imgName = "placeholder.png",seed = 0):
         """
@@ -206,8 +199,6 @@ class Player(Agent):
         
         if keys[pygame.K_s] or keys[pygame.K_DOWN]:
             yInd += 1
-        
-
             
         if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             xInd -= 1 
@@ -224,7 +215,6 @@ class Player(Agent):
 #TODO: improve AI
 #   1. Don't allow "half" movements
 #   2. If keeping markov chain approach, change states to be more "human"
-#   3. Try to use less """"Quotations""""
 class Enemy(Agent):
     #need to pass in coin group for AI to find nearest coin
     def __init__(self,name,background,group,cGroup,coord,velocity,imgName = "placeholder.png",seed=0):
@@ -259,7 +249,7 @@ class Enemy(Agent):
         self.coinObj = (0,0)
 
 
-    def dist(self,c1,c2):
+    def _dist(self,c1,c2):
         """
         It calculates the distance between two points.
         
@@ -302,7 +292,7 @@ class Enemy(Agent):
         bestDist = self.bg.res[0]
 
         for coin in cGroup:
-            currDist = self.dist((self.x,self.y),(coin.x,coin.y))
+            currDist = self._dist((self.x,self.y),(coin.x,coin.y))
 
             if currDist < bestDist:
                 bestCoin = coin
@@ -314,32 +304,14 @@ class Enemy(Agent):
     #should be ran whenever coin is obtained
     #for now, have it be 50/50 whether ai chooses opt or random coin
     # What is this function for? - Linghai
-    def setObj(self,cGroup):
+    def setCoinObjective(self,cGroup):
         """
         If the coin is still in the group, don't change the objective
-        """
-        #check if coin is still in group, if yes, maybe don't change obj
-        inFlag = False
-        try:
-            x,y = self.coinObj
-        except:
-            x,y = (0,0)
-        #for coin in self.coinGroup:
-        #    if (x == coin.x and y == coin.y):
-        #        inFlag = True
-                
-        
-        if (random.randint(0,1) == 0):
-            #print("choosing opt")
-            self.coinObj = self.getNearestCoinCoord(cGroup)
-        elif (random.randint(0,1) == 0):
-            #print("choosing rand")
-            self.coinObj = self.getRandCoinCoord(cGroup)
-            #print(f"set objective to {self.coinObj}")
-
+        """               
+        self.coinObj = self.getNearestCoinCoord(cGroup)
 
     #optimal movement toward nearest coin
-    def optMove(self):
+    def optimalMove(self):
         """
         The function takes the coordinates of the nearest coin and moves the ai towards it
         """
@@ -348,12 +320,12 @@ class Enemy(Agent):
         #except:
         #    (cX,cY) = (0,0)
         (cX,cY) = self.coinObj
-        d = self.dist((cX,cY),(self.x,self.y))
-
+        d = self._dist((cX,cY),(self.x,self.y))
+        
         #normalize - this is a relic of ai surpemacy
         xMov = self.vel * (cX - self.x) / d
         yMov = self.vel * (self.y - cY) / d
-
+        
         #indicators for which direction
         xInd,yInd = 0,0
         #prevent half movements
@@ -396,22 +368,6 @@ class Enemy(Agent):
         pMatrix corresponding to the current state.
         """
         return random.choices([0,1,2],self.pMatrix[self.state])[0]
-
-    def randomWalk(self):
-        # Unused
-        #0 - optimal path towards closest coin
-        #1 - random direction
-        #2 - stay still
-        #Currently, wait 10 - 60 ticks before considering state chang
-        #if time % random.randint(10,60) == 0: 
-        #    self.state = self.getNewState()
-        #    if self.state == 1: self.getRandMove() #get new random movement
-
-        #if self.state == 0:
-        self.optMove()
-
-
-
 
 
 class Coin(GameObject):

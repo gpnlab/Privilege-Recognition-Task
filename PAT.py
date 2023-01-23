@@ -436,21 +436,19 @@ class Round:
 
         #allows us to access and update selected agent coin count
         for (agent,_) in collectFlag.items(): 
-            #print(agent)
             if not agent in self.eGroup:
                 pygame.mixer.Sound.play(coin_sound)
             agent.coins += 1
             self.coinsLeft -= 1
 
         if len(collectFlag) > 0:
-            #print("setting new objectives")
             #reupdate the coin objectives
             for e in self.eGroup:
-                e.setObj(self.cGroup) 
+                e.setCoinObjective(self.cGroup) 
 
         for e in self.eGroup:
             if self.coinsLeft > 0 and self.time > 10:
-                e.randomWalk()
+                e.optimalMove()
 
         if self.coinsLeft <= 0 or len(self.cGroup) == 0:
             print("finished level")

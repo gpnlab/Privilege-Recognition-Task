@@ -85,6 +85,16 @@ class Background(pygame.sprite.Sprite):
         if self.image:
             self.screen.blit(self.image,(0,0))
 
+class Screen:
+    def __init__(self, background: Background) -> None:
+        pass
+    
+    def draw(self) -> None:
+        pass
+    
+    def mainloop(self) -> None:
+        pass
+    
 class HUD:
     def __init__(self, background, agents):
         """
@@ -141,7 +151,7 @@ class HUD:
         self.background.screen.blit(timerTxt,timerRect)
         """
 
-class StartScreen:
+class StartScreen(Screen):
     def __init__(self,background):
         """
         The function takes the name the user has entered and saves it to a file. This 
@@ -289,7 +299,7 @@ class StartScreen:
                     self.name += event.unicode
         self.updateName()
 
-class PauseScreen:
+class PauseScreen(Screen):
     def __init__(self,level,levels,round,rounds,background,config,agents = [],levelStart = 0):
         """
         It's a function that initializes the round start screen or the question screen
@@ -629,13 +639,12 @@ class PauseScreen:
         self.background.screen.blit(self.endLevelText,self.startTextRect)
 
     def updateLoop(self,x=[]):
-        self.drawAll(x)
+        self.draw(x)
         self.startInteraction()
 
 
         pygame.display.flip()
         pygame.display.update()
-
 
     #custom designed for start menu
     def startInteraction(self):
@@ -672,7 +681,7 @@ class PauseScreen:
 
         self.updateName()
         
-    def drawAll(self,x):
+    def draw(self,x):
         """
         Chooses different blit functions depending on levelStart variable
         
@@ -844,7 +853,7 @@ class PauseScreen:
 
                     self.aTextList[currInd1][0] = (newCenter,aRadius,aLim,currVal,currValRender,True)
             
-class InstrScreen:
+class InstrScreen(Screen):
     def __init__(self,res):
         self.desc = Background(res,image="desc.png",isBackground=True)
         self.instr = Background(res,image="instructions.png",isBackground=True)
@@ -868,8 +877,7 @@ class InstrScreen:
         self.interaction()
         pygame.display.flip()
         pygame.display.update()
-        
-    
+          
     def draw(self):
         '''
         draws the instructions as a background and a button to start
@@ -902,7 +910,6 @@ class InstrScreen:
                 pygame.quit()
                 exit()
 
-    
     def hoverText(self,pos):
         """
         It's a function that changes the color of the text in the menu depending on whether
@@ -944,7 +951,7 @@ class InstrScreen:
             else:
                 self.proceed = True 
 
-class FinalScreen:
+class FinalScreen(Screen):
     def __init__(self, background):
         """
         Initializes the end screen for the game
@@ -961,7 +968,6 @@ class FinalScreen:
 
         drawTxt = "You have completed the game! Press esc on your keyboard to exit."
         self.txt = self.font.render(drawTxt,True,(0,0,0))
-
 
     def draw(self):
         """
