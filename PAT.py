@@ -373,11 +373,11 @@ class Round:
         self.player = Player(self.background,self.agentGroup,(self.res[0] // 8, self.res[1] // 8), self.config["playerVel"], "p1.png",seed)
         
         #TODO: change the temporary spawn points of enemies, and change sprite
-        self.enemy1 = Enemy("player 2",self.background,self.agentGroup,self.coinGroup,(7 * self.res[0] // 8,self.res[1] // 8),self.config["enemy1Vel"],"p2.png",seed)
+        self.enemy1 = Enemy("Player 2",self.background,self.agentGroup,self.coinGroup,(7 * self.res[0] // 8,self.res[1] // 8),self.config["enemy1Vel"],"p2.png",seed)
 
-        self.enemy2 = Enemy("player 3",self.background,self.agentGroup,self.coinGroup,(self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy2Vel"],"p3.png",seed)
+        self.enemy2 = Enemy("Player 3",self.background,self.agentGroup,self.coinGroup,(self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy2Vel"],"p3.png",seed)
         
-        self.enemy3 = Enemy("player 4",self.background,self.agentGroup,self.coinGroup,(7 * self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy3Vel"],"p4.png",seed)
+        self.enemy3 = Enemy("Player 4",self.background,self.agentGroup,self.coinGroup,(7 * self.res[0] // 8,7 * self.res[1] // 8),self.config["enemy3Vel"],"p4.png",seed)
 
         self.enemyGroup.add(self.enemy1)
         self.enemyGroup.add(self.enemy2)
