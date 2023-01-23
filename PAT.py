@@ -4,8 +4,8 @@ from numpy.random import mtrand
 import pygame
 from configReader import ConfigReader, ConfigContainer
 from src.pat_io import LogWriter
-from background import *
-from objects import *
+from background import Background, StartScreen, InstrScreen, PauseScreen, HUD, FinalScreen
+from objects import Player, Enemy, Coin
 from datetime import date, datetime,time
 import sys
 from pygame import mixer
@@ -40,26 +40,32 @@ class PAT:
         
         self.displayInfo = pygame.display.Info()
         #get resolution of the current display
-        self.res = (self.displayInfo.current_w, self.displayInfo.current_h)
+        self.res = (1920, 1080)
         # initialize game clock
         self.clock = pygame.time.Clock()
 
         self.time = datetime.now().strftime("%H_%M_%S")
         
         self.background = Background(self.res)
-        self.countdownList = [Background(self.res,image="3.png",isBackground=True),Background(self.res,image="2.png",isBackground=True),Background(self.res,image="1.png",isBackground=True),Background(self.res,image="start.png",isBackground=True)]
+        
+        self.countdownBackgroundsList = [
+            Background(self.res,image="countdown_3.png",isBackground=True),
+            Background(self.res,image="countdown_2.png",isBackground=True),
+            Background(self.res,image="countdown_1.png",isBackground=True),
+            Background(self.res,image="start.png",isBackground=True)
+            ]
         
 
         # startscreen is responsible for letting the player select which configuration
         # the code is defined in the background.py file
-        self.start = StartScreen(self.background)
+        self.startScreen = StartScreen(self.background)
 
-        while not self.start.finished:
-            self.start.mainLoop()
-        self.participantID = self.start.name
+        while not self.startScreen.finished:
+            self.startScreen.mainLoop()
+        self.participantID = self.startScreen.name
 
         # organize levels based on chosen configuration
-        self.parseStructure(self.start.chosenStruct)
+        self.parseStructure(self.startScreen.chosenStruct)
 
         print("levels: ", self.levels)
 
@@ -129,7 +135,7 @@ class PAT:
         roundsCompleted = 0
         for currLevel in range(len(self.levels)):
             #print(f"The current level is {self.levels[currLevel]}")
-            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownList,roundsCompleted,self.totalRounds)
+            level = Level(self,self.time,self.participantID,self.presetName,currLevel,self.levels,self.countdownBackgroundsList,roundsCompleted,self.totalRounds)
             level.main_loop()
             if "questions" in level.config:
                 #questions will occur after, so -1 is "safe"
