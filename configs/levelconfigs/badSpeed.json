@@ -1,7 +1,7 @@
 {
     "rounds" : 1,
     "numberOfCoins" : 30,
-    "playerVel": 0.75,
+    "playerVel": 0.875,
     "enemy1Vel": 1,
     "enemy2Vel": 1,
     "enemy3Vel": 1,
