@@ -2,19 +2,21 @@ from os import path
 from exe import EXE
 import json
 from exe import EXE
+
+
 class ConfigReader:
 
-    #requires a json formated as in the default directory
-    def parseToDict(filename,dirName = "default"):
+    # requires a json formated as in the default directory
+    def parseToDict(filename, dirName="default"):
         """
         It takes a file name and a directory name, and returns a dictionary of the file's
         contents
-        
+
         Args:
           filename: the name of the file you want to parse
           dirName: The directory the file is in. If it's in the default directory, leave it
         blank. Defaults to default
-        
+
         Returns:
           A dictionary of dictionaries.
         """
@@ -22,10 +24,10 @@ class ConfigReader:
         if dirName == "default":
             asset_url = EXE.resource_path(f"configs/{filename}.json")
         else:
-            asset_url = EXE.resource_path(f"configs/{dirName}/{filename}.json") 
+            asset_url = EXE.resource_path(f"configs/{dirName}/{filename}.json")
 
         d = ConfigContainer(asset_url)
-        
+
         return d
 
     @staticmethod
@@ -33,7 +35,7 @@ class ConfigReader:
         """
         It takes a list of dictionaries, and returns a list of the values of the "question"
         key in each dictionary
-        
+
         Returns:
           A list of strings.
         """
@@ -41,13 +43,13 @@ class ConfigReader:
         for q in self.config["questions"]:
             retList.append(q["question"])
         return retList
-    
+
     @staticmethod
     def returnQuestionText(self):
         """
         It takes a list of dictionaries, and returns a list of the values of the "question"
         key in each dictionary
-        
+
         Returns:
           A list of strings.
         """
@@ -55,7 +57,7 @@ class ConfigReader:
         for q in self.config["questions"]:
             retList.append(q["question"])
         return retList
-    
+
 
 # copied from my files need to make package at sometime
 class ConfigContainer(dict):
@@ -86,7 +88,7 @@ class ConfigContainer(dict):
 
     def __init__(self, json_filename: str = None, *args, **kwargs):
         super(ConfigContainer, self).__init__(*args, **kwargs)
-        
+
         if json_filename is not None:
             self.set_json(json_filename)
             self.read_json()
@@ -128,8 +130,7 @@ class ConfigContainer(dict):
                     self[k] = v
 
     def update_json(self) -> None:
-        """Dumps parameters to json file
-        """
+        """Dumps parameters to json file"""
         with open(self.json_file, "w") as f:
             dict_copy = self.copy()
             del dict_copy["json_file"]

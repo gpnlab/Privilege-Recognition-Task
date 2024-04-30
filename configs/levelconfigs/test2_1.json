@@ -1,0 +1,12 @@
+{
+    "rounds" : 1,
+    "numberOfCoins" : 20,
+    "playerVel": 1.125,
+    "enemy1Vel": 1,
+    "enemy2Vel": 1,
+    "enemy3Vel": 1,
+    "playerBias": 0,
+    "enemy1Bias": 1,
+    "enemy2Bias": 0,
+    "enemy3Bias": 0
+}

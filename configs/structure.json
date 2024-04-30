@@ -28,6 +28,16 @@
     {
         "description" : "test",
         "layout" : [["goodSpeed",1],["questions",1],["after_block_questions",1]]
+    },
+    "test2":
+    {
+        "description" : "test2",
+        "layout" : [["test2_2",2],["testing_questions",1],["test2_1",2],["testing_questions",1],["test2_3",2],["testing_questions",1],["test2_6",2],["testing_questions",1],["test2_7",2],["testing_questions",1],["test2_5",2],["testing_questions",1],["test2_4",2],["testing_questions",1]]
+    },
+    "test3":
+    {
+        "description" : "test2",
+        "layout" : [["test3_6",2],["testing_questions",1],["test3_5",2],["testing_questions",1],["test3_7",2],["testing_questions",1],["test3_4",2],["testing_questions",1],["test3_1",2],["testing_questions",1],["test3_3",2],["testing_questions",1],["test3_2",2],["testing_questions",1]]
     }
 },
 
@@ -39,5 +49,7 @@
     "structure5" : ["block2","block1","block3","block4","end"],
     "structure6" : ["block3","block4","block2","block1","end"],
     "structure7" : ["block4","block3","block1","block2","end"],
-    "structure8" : ["test","end"]
+    "structure8" : ["test","end"],
+    "structure9" : ["test2","end"],
+    "structure10" : ["test3","end"]
 }
