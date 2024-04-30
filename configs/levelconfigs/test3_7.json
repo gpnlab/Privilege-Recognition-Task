@@ -6,7 +6,7 @@
     "enemy2Vel": 1,
     "enemy3Vel": 1,
     "playerBias": 0,
-    "enemy1Bias": 1,
+    "enemy1Bias": 0,
     "enemy2Bias": 0,
-    "enemy3Bias": 0
+    "enemy3Bias": 0.125
 }
