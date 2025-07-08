@@ -227,6 +227,29 @@ class Player(Agent):
         else:
             self.move(xInd, yInd)
 
+    def move_joystick(self, joystick):
+        threshold = 0.2
+        horiz = joystick.get_axis(0)
+        vert = joystick.get_axis(1)
+
+        xInd, yInd = 0, 0
+
+        if horiz > threshold:
+            xInd = 1
+        elif horiz < -threshold:
+            xInd = -1
+
+        if vert > threshold:
+            yInd = 1
+        elif vert < -threshold:
+            yInd = -1
+
+        if xInd != 0 and yInd != 0:
+            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        else:
+            self.move(xInd, yInd)
+
+
 
 # TODO: improve AI
 #   1. Don't allow "half" movements

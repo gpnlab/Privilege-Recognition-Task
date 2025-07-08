@@ -28,6 +28,14 @@ class PAT:
         """
 
         pygame.init()
+        pygame.joystick.init()
+
+        self.joystick = None
+
+        if pygame.joystick.get_count() > 0:
+            self.joystick = pygame.joystick.Joystick(0)
+            self.joystick.init()
+        
         global coin_sound
         path = EXE.resource_path("sounds/coin_sound.mp3")
         coin_sound = pygame.mixer.Sound(path)
@@ -54,6 +62,7 @@ class PAT:
             Background(self.res, image="countdown_1.png", isBackground=True),
             Background(self.res, image="start.png", isBackground=True),
         ]
+
 
         # startscreen is responsible for letting the player select which configuration
         # the code is defined in the background.py file
@@ -294,7 +303,7 @@ class Level:
         else:
             for currRound in range(self.rounds):
                 round = Round(
-                    self.Pat, self.levelNum, currRound, self.config, self.totalRounds
+                    self.Pat, self.levelNum, currRound, self.config, self.totalRounds, self.Pat.joystick
                 )
                 self.countdown(round.agentGroup, round.coinGroup)
                 round.updateAgentVelocity()
@@ -355,7 +364,7 @@ class Level:
 
 
 class Round:
-    def __init__(self, Pat, levelNum, roundNum, config, totalRounds):
+    def __init__(self, Pat, levelNum, roundNum, config, totalRounds, joystick=None):
         """
         It initializes the game
 
@@ -374,6 +383,8 @@ class Round:
 
         self.config = config
         self.totalRounds = totalRounds
+
+        self.joystick = joystick
 
         # ticks in milliseconds
         self.prev_time = pygame.time.get_ticks()
@@ -536,8 +547,12 @@ class Round:
           keys: a list of keys that are currently being pressed
         """
 
-        # player moves with WASD
-        self.player.getInput(keys, self.time_passed)
+        if self.joystick:
+            print("JOYSTIC DETECTED")
+            self.player.move_joystick(self.joystick)
+        else:
+            # player moves with WASD
+            self.player.getInput(keys, self.time_passed)
 
     def _process_game_logic(self, keys):
         # print(self.time)
@@ -584,6 +599,7 @@ class Round:
             # if event.type == pygame.QUIT:
             #    pygame.quit()
             #    exit()
+
             if (
                 event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
             ):  # Quitting out of fullScreen
