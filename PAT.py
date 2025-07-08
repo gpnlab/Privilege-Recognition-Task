@@ -548,7 +548,6 @@ class Round:
         """
 
         if self.joystick:
-            print("JOYSTIC DETECTED")
             self.player.move_joystick(self.joystick)
         else:
             # player moves with WASD

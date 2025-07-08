@@ -1074,6 +1074,12 @@ class InstrScreen(Screen):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.menuInteraction(pygame.mouse.get_pos())
 
+            if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
+                if not self.nextInstr:
+                    self.nextInstr = True
+                else:
+                    self.proceed = True
+
             if (
                 event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
             ):  # Quitting out of fullScreen
