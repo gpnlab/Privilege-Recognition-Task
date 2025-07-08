@@ -439,6 +439,8 @@ class PauseScreen(Screen):
         self.startText = self.font.render("Start", True, (0, 0, 0))
         self.nextText = self.font.render("Next Round", True, (0, 0, 0))
         self.endLevelText = self.font.render("End Level", True, (0, 0, 0))
+        self.questionInd = 0
+        self.joystickCooldown = 0
 
     def returnQuestionText(self):
         """
@@ -797,6 +799,41 @@ class PauseScreen(Screen):
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 self.selected = -1
 
+            if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
+                self.paused = False
+
+
+            # if pygame.joystick.get_count() > 0:
+            #     joystick = pygame.joystick.Joystick(0)
+            #     joystick.init()
+
+            #     threshold = 0.2
+            #     horiz = joystick.get_axis(0)
+            #     vert = joystick.get_axis(1)
+
+            #     curr = pygame.time.get_ticks()
+
+            #     if curr - self.joystickCooldown > 200:
+            #         print("EHYT")
+            #         if vert > threshold:
+            #             print("UP DETECTED")
+            #             self.joystickSwitchQuestion(question="previous")
+            #             self.joystickCooldown = pygame.time.get_ticks()
+
+            #         elif vert < -threshold:
+            #             print("DOWN DETECTED")
+            #             self.joystickSwitchQuestion(question="next")
+            #             self.joystickCooldown = pygame.time.get_ticks()
+
+            #         elif abs(horiz) > threshold:
+            #             print("LEFT/RIGHT DETECTED")
+            #             self.joystickMoveSlider(horiz)
+            #             self.joystickCooldown = pygame.time.get_ticks()
+            # else:
+            #     print("WHAT")
+
+
+
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_RETURN]:
@@ -1012,6 +1049,64 @@ class PauseScreen(Screen):
                         currValRender,
                         True,
                     )
+
+
+    def joystickMoveSlider(self, horiz):
+        if len(self.qTextList) == 0:
+            return
+
+        if self.questionInd < 0 or self.questionInd >= len(self.qTextList):
+            return
+
+        question = self.qTextList[self.questionInd]
+        qType = question[2]
+        if qType != 2:
+            return
+
+        slider = self.aTextList[self.questionInd][0]
+        (center, radius, (lowLim, highLim), currVal, currValRender, choice) = slider
+
+        if horiz > 0:
+            currVal = min(currVal + 1, 10)
+        elif horiz < 0:
+            currVal = max(currVal - 1, 0)
+
+        sMin = lowLim + radius - 1
+        sMax = highLim + radius
+
+        newCenter = ((currVal * (sMax - sMin) / 10) + sMin, center[1])
+
+        self.aTextList[self.questionInd][0] = (
+            newCenter,
+            radius,
+            (lowLim, highLim),
+            currVal,
+            currValRender,
+            True,
+        )
+
+
+
+    def joystickSwitchQuestion(self, question):
+        questions = [i for i, (_, _, qType) in enumerate(self.qTextList) if qType == 2]
+        if not questions:
+            return
+
+        if self.questionInd not in questions:
+            self.questionInd = questions[0]
+        else:
+            idx = questions.index(self.questionInd)
+
+            if question == "next":
+                idx = (idx + 1) % len(questions)
+            elif question == "previous":
+                idx = (idx - 1) % len(questions)
+
+            self.questionInd = questions[idx]
+
+        
+
+    
 
 
 class InstrScreen(Screen):
