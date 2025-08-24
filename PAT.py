@@ -375,7 +375,7 @@ class Round:
         """
 
         # print(f"starting level {levelNum}, round {roundNum}")
-        self.coinsLeft = config["numberOfCoins"]
+        self.coinsLeft = config["numberOfCoins"] * 2
         self.inProgress = True
         self.background = Pat.background
         self.res = Pat.res
@@ -388,6 +388,7 @@ class Round:
         # ticks in milliseconds
         self.prev_time = pygame.time.get_ticks()
         self.time = 0
+        self.round_time_limit = 15000
         # add time prev and time passed param
         # add calculation/update before player input and pass time
         self.info = dict()
@@ -441,7 +442,9 @@ class Round:
                 (meanCoor[1] - config["enemy3Bias"] * dy),
             )
 
-        for i in range(int(config["numberOfCoins"])):
+        print(f"spawning {self.coinsLeft} coins around {meanCoor} {config['playerBias']} {config['enemy1Bias']} {config['enemy2Bias']} {config['enemy3Bias']}")
+        
+        for i in range(self.coinsLeft):   # for i in range(int(config["numberOfCoins"])):
             spawnCoord = numpy.random.normal(
                 meanCoor[0], self.res[0] / 8
             ), numpy.random.normal(meanCoor[1], self.res[1] / 8)
@@ -589,8 +592,13 @@ class Round:
             if self.coinsLeft > 0 and self.time > 10:
                 e.optimalMove()
 
+        # print("coins", self.coinsLeft)
         if self.coinsLeft <= 0 or len(self.coinGroup) == 0:
             print("finished level")
+            self.inProgress = False
+
+        if self.time > self.round_time_limit:
+            print("time up")
             self.inProgress = False
 
         for event in events:
