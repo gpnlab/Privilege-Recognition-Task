@@ -388,7 +388,7 @@ class Round:
         # ticks in milliseconds
         self.prev_time = pygame.time.get_ticks()
         self.time = 0
-        self.round_time_limit = 15000
+        self.round_time_limit = 11500
         # add time prev and time passed param
         # add calculation/update before player input and pass time
         self.info = dict()
