@@ -304,6 +304,8 @@ class Enemy(Agent):
         self.sum_x = 0
         self.sum_y = 0
 
+        self.curr_tick = 0
+
     def add_to_buffer(self, x, y):
         if len(self.movement_buffer) == self.sliding_window:
             old_x, old_y = self.movement_buffer[0]
@@ -398,6 +400,12 @@ class Enemy(Agent):
         """
         The function takes the coordinates of the nearest coin and moves the ai towards it
         """
+
+        self.curr_tick += 1
+        
+        if self.curr_tick % 2 != 0:
+            return
+        
         # try:
         #    (cX,cY) = self.getNearestCoinCoord()
         # except:
