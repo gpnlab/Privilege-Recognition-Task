@@ -3,6 +3,7 @@ import math
 import random
 from os import path, stat
 from exe import EXE
+import collections
 
 
 class GameObject(pygame.sprite.Sprite):
@@ -265,6 +266,7 @@ class Enemy(Agent):
         velocity,
         imgName="placeholder.png",
         seed=0,
+        sliding_window=10
     ):
         """
         The constructor for the class, which sets the state of the object to 0, and sets the
@@ -295,6 +297,30 @@ class Enemy(Agent):
 
         # keep current objective (coin coord)
         self.coinObj = (0, 0)
+        self.sliding_window = sliding_window
+        self.movement_buffer = collections.deque(maxlen=sliding_window)
+        self.curr_target_coin = None
+
+        self.sum_x = 0
+        self.sum_y = 0
+
+    def add_to_buffer(self, x, y):
+        if len(self.movement_buffer) == self.sliding_window:
+            old_x, old_y = self.movement_buffer[0]
+            self.sum_x -= old_x
+            self.sum_y -= old_y
+        self.movement_buffer.append((x, y))
+        self.sum_x += x
+        self.sum_y += y
+
+    def smooth_movement(self):
+        if not self.movement_buffer:
+            return (0, 0)
+        
+        avg_x = self.sum_x / len(self.movement_buffer)
+        avg_y = self.sum_y / len(self.movement_buffer)
+
+        return (avg_x, avg_y)
 
     def _dist(self, c1, c2):
         """
@@ -355,7 +381,17 @@ class Enemy(Agent):
         """
         If the coin is still in the group, don't change the objective
         """
-        self.coinObj = self.getNearestCoinCoord(cGroup)
+        # self.coinObj = self.getNearestCoinCoord(cGroup)
+
+        new_coin_obj = self.getNearestCoinCoord(cGroup)
+
+        if new_coin_obj != self.coinObj:
+            self.coinObj = new_coin_obj
+            self.movement_buffer = collections.deque(maxlen=self.sliding_window)
+            self.curr_target_coin = new_coin_obj
+
+            self.sum_x = 0
+            self.sum_y = 0
 
     # optimal movement toward nearest coin
     def optimalMove(self):
@@ -386,10 +422,22 @@ class Enemy(Agent):
         elif yMov < 0:
             yInd = 1
 
-        if yInd != 0 and xInd != 0:
-            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        # if yInd != 0 and xInd != 0:
+        #     self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        # else:
+        #     self.move(xInd, yInd)
+
+        self.add_to_buffer(xInd, yInd)
+        smooth_x, smooth_y = self.smooth_movement()
+
+        if smooth_x != 0 and smooth_y != 0:
+            magnitude = math.sqrt(smooth_x**2 + smooth_y**2)
+            smooth_x /= magnitude
+            smooth_y /= magnitude
+            self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2)
         else:
-            self.move(xInd, yInd)
+            self.move(smooth_x, smooth_y)
+
 
     def getRandMove(self):
         """

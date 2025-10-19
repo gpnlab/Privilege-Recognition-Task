@@ -74,7 +74,7 @@ class PAT:
         # organize levels based on chosen configuration
         self.parseStructure(self.startScreen.chosenStruct)
 
-        print("levels: ", self.levels)
+        # print("levels: ", self.levels)
 
         self.totalRounds = 24  # changed to constant with current study design
 
@@ -442,7 +442,6 @@ class Round:
                 (meanCoor[1] - config["enemy3Bias"] * dy),
             )
 
-        print(f"spawning {self.coinsLeft} coins around {meanCoor} {config['playerBias']} {config['enemy1Bias']} {config['enemy2Bias']} {config['enemy3Bias']}")
         
         for i in range(self.coinsLeft):   # for i in range(int(config["numberOfCoins"])):
             spawnCoord = numpy.random.normal(
@@ -594,11 +593,9 @@ class Round:
 
         # print("coins", self.coinsLeft)
         if self.coinsLeft <= 0 or len(self.coinGroup) == 0:
-            print("finished level")
             self.inProgress = False
 
         if self.time > self.round_time_limit:
-            print("time up")
             self.inProgress = False
 
         for event in events:
