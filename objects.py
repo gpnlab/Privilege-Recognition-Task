@@ -311,6 +311,7 @@ class Enemy(Agent):
             old_x, old_y = self.movement_buffer[0]
             self.sum_x -= old_x
             self.sum_y -= old_y
+
         self.movement_buffer.append((x, y))
         self.sum_x += x
         self.sum_y += y
@@ -401,10 +402,11 @@ class Enemy(Agent):
         The function takes the coordinates of the nearest coin and moves the ai towards it
         """
 
-        self.curr_tick += 1
-        
-        if self.curr_tick % 2 != 0:
-            return
+        # cache prev movement vector, call move afterwards
+            # uses prev movement vector every other vector
+            # on tick of normal, see dir
+            # test tick freq (1 in 3, 1 in 4, etc)
+
         
         # try:
         #    (cX,cY) = self.getNearestCoinCoord()
@@ -442,9 +444,11 @@ class Enemy(Agent):
             magnitude = math.sqrt(smooth_x**2 + smooth_y**2)
             smooth_x /= magnitude
             smooth_y /= magnitude
-            self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2)
+            self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2) # save what's being calculated here
         else:
             self.move(smooth_x, smooth_y)
+
+
 
 
     def getRandMove(self):
