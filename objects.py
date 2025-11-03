@@ -305,6 +305,8 @@ class Enemy(Agent):
         self.sum_y = 0
 
         self.curr_tick = 0
+        self.cached_move = (0, 0)
+        self.tick_freq = 2  
 
     def add_to_buffer(self, x, y):
         if len(self.movement_buffer) == self.sliding_window:
@@ -396,6 +398,9 @@ class Enemy(Agent):
             self.sum_x = 0
             self.sum_y = 0
 
+            self.cached_move = (0, 0)
+            self.curr_tick = 0
+
     # optimal movement toward nearest coin
     def optimalMove(self):
         """
@@ -413,40 +418,58 @@ class Enemy(Agent):
         # except:
         #    (cX,cY) = (0,0)
         (cX, cY) = self.coinObj
-        d = self._dist((cX, cY), (self.x, self.y))
 
-        # normalize - this is a relic of ai surpemacy
-        xMov = self.vel * (cX - self.x) / d
-        yMov = self.vel * (self.y - cY) / d
+        use_cached = (self.curr_tick % self.tick_freq != 0) and self.cached_move != (0.0, 0.0)
 
-        # indicators for which direction
-        xInd, yInd = 0, 0
-        # prevent half movements
-        if xMov < 0:
-            xInd = -1
-        elif xMov > 0:
-            xInd = 1
+        if use_cached:
 
-        if yMov > 0:
-            yInd = -1
-        elif yMov < 0:
-            yInd = 1
+            d = self._dist((cX, cY), (self.x, self.y))
 
-        # if yInd != 0 and xInd != 0:
-        #     self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
-        # else:
-        #     self.move(xInd, yInd)
+            # normalize - this is a relic of ai surpemacy
+            xMov = self.vel * (cX - self.x) / d
+            yMov = self.vel * (self.y - cY) / d
 
-        self.add_to_buffer(xInd, yInd)
-        smooth_x, smooth_y = self.smooth_movement()
+            # indicators for which direction
+            xInd, yInd = 0, 0
+            # prevent half movements
+            if xMov < 0:
+                xInd = -1
+            elif xMov > 0:
+                xInd = 1
 
-        if smooth_x != 0 and smooth_y != 0:
-            magnitude = math.sqrt(smooth_x**2 + smooth_y**2)
-            smooth_x /= magnitude
-            smooth_y /= magnitude
-            self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2) # save what's being calculated here
+            if yMov > 0:
+                yInd = -1
+            elif yMov < 0:
+                yInd = 1
+
+            # if yInd != 0 and xInd != 0:
+            #     self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+            # else:
+            #     self.move(xInd, yInd)
+
+            self.add_to_buffer(xInd, yInd)
+            smooth_x, smooth_y = self.smooth_movement()
+
+            if smooth_x != 0 and smooth_y != 0:
+                magnitude = math.sqrt(smooth_x**2 + smooth_y**2)
+                smooth_x /= magnitude
+                smooth_y /= magnitude
+                # self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2) # save what's being calculated here
+                curr_vec = (math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2)
+            
+            else:
+                # self.move(smooth_x, smooth_y)
+                curr_vec = (smooth_x, smooth_y)
+
+            self.cached_move = curr_vec
+
+            self.move(curr_vec[0], curr_vec[1])
+
         else:
-            self.move(smooth_x, smooth_y)
+            self.move(self.cached_move[0], self.cached_move[1])
+
+        
+        self.curr_tick += 1
 
 
 
