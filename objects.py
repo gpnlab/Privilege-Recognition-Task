@@ -399,7 +399,7 @@ class Enemy(Agent):
             self.sum_y = 0
 
             self.cached_move = (0, 0)
-            self.curr_tick = 0
+            # self.curr_tick = 0
 
     # optimal movement toward nearest coin
     def optimalMove(self):
@@ -419,15 +419,19 @@ class Enemy(Agent):
         #    (cX,cY) = (0,0)
         (cX, cY) = self.coinObj
 
-        use_cached = (self.curr_tick % self.tick_freq != 0) and self.cached_move != (0.0, 0.0)
+        use_cached = (self.curr_tick % self.tick_freq != 0)
 
-        if use_cached:
+        if not use_cached:
 
             d = self._dist((cX, cY), (self.x, self.y))
 
+            if d == 0:
+                xMov, yMov = 0, 0
+
+            else:
             # normalize - this is a relic of ai surpemacy
-            xMov = self.vel * (cX - self.x) / d
-            yMov = self.vel * (self.y - cY) / d
+                xMov = self.vel * (cX - self.x) / d
+                yMov = self.vel * (self.y - cY) / d
 
             # indicators for which direction
             xInd, yInd = 0, 0
@@ -468,7 +472,6 @@ class Enemy(Agent):
         else:
             self.move(self.cached_move[0], self.cached_move[1])
 
-        
         self.curr_tick += 1
 
 
