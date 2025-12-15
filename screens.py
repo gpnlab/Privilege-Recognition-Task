@@ -1286,7 +1286,8 @@ class QuestionScreen(Screen):
         WAVE_OUTPUT_FILENAME = f"{participant_id}_{date_str}_{time_str}_{self.block}.wav"
         print(WAVE_OUTPUT_FILENAME)
 
-        recording_max_length = 5
+        # in seconds 
+        recording_max_length = 120
         
         if "recording_time" in self.config.keys():
             recording_max_length = self.config["recording_time"]
