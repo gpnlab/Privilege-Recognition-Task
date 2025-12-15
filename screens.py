@@ -4,6 +4,10 @@ from os import path
 from configReader import *
 from sys import exit
 from pygame.constants import QUIT
+import pyaudio
+import wave
+import time
+import datetime
 
 
 class Background(pygame.sprite.Sprite):
@@ -1176,3 +1180,160 @@ class FinalScreen(Screen):
 
             pygame.display.flip()
             pygame.display.update()
+
+
+class WaitingScreen(Screen):
+    def __init__(self, background):
+        """
+        Initializes the waiting for fMRI screen for the game
+
+        Args:
+          background: The background object that the text will be drawn on.
+        """
+        self.background = background
+        self.size = int(min(self.background.res[0], self.background.res[1]) * 0.04)
+
+        fontPath = path.join("fonts", "arial.TTF")
+
+        self.font = pygame.font.SysFont("arial", self.size)
+
+        drawTxt = "Waiting for fMRI..."
+        self.txt = self.font.render(drawTxt, True, (0, 0, 0))
+
+        self.f_or_t = False
+
+    def draw(self):
+        """
+        The function draws the background of the screen white, then draws the text in the
+        middle of the screen
+        """
+        self.background.screen.fill((255, 255, 255))
+
+        txt_rect = self.txt.get_rect(center=(
+            self.background.res[0] // 2,
+            self.background.res[1] // 2
+        ))
+        self.background.screen.blit(self.txt, txt_rect)
+
+    def mainLoop(self):
+        while not self.f_or_t:
+            self.draw()
+            pygame.display.flip()
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
+
+                    elif event.key == pygame.K_f or event.key == pygame.K_t:
+                        self.f_or_t = True
+
+        self.f_or_t = False
+
+
+class QuestionScreen(Screen):
+    def __init__(self, background, participant, currBlock, config):
+        """
+        Initializes the question screen for the game
+
+        Args:
+          background: The background object that the text will be drawn on.
+        """
+        self.background = background
+        self.size = int(min(self.background.res[0], self.background.res[1]) * 0.04)
+
+        self.font = pygame.font.SysFont("arial", self.size)
+
+        self.Pat = participant
+        self.block = currBlock
+        self.config = config
+
+
+    def draw(self):
+        self.background.screen.fill((255, 255, 255))
+
+        q1 = "1. How do you feel right now?"
+        q1_render = self.font.render(q1, True, (0, 0, 0))
+        self.background.screen.blit(q1_render, (50, 50))
+        self.background.screen.blit(pygame.image.load("images/questions/question_1_scale.png"), (50, 100))
+
+        q2 = "2. Which player do you think collected the most coins?"
+        q2_render = self.font.render(q2, True, (0, 0, 0))
+        self.background.screen.blit(q2_render, (50, 550))
+        self.background.screen.blit(pygame.image.load("images/questions/question_2_players.png"), (50, 600))
+
+    def recordAudio(self):
+        CHUNK = 8192
+        FORMAT = pyaudio.paInt16
+        CHANNELS = 1
+        RATE = 44100
+
+        participant_id = getattr(self.Pat, "participantID", "unknown")
+        # block_name = self.config.get("block_name", "error")
+        now = datetime.datetime.now()
+        date_str = now.strftime("%Y%m%d")
+        time_str = now.strftime("%H%M%S")
+        # block_type = self.Pat.blocks[block_type]["layout"]
+
+        print(self.block)
+
+        WAVE_OUTPUT_FILENAME = f"{participant_id}_{date_str}_{time_str}_{self.block}.wav"
+        print(WAVE_OUTPUT_FILENAME)
+
+        recording_max_length = 5
+        
+        if "recording_time" in self.config.keys():
+            recording_max_length = self.config["recording_time"]
+
+        p = pyaudio.PyAudio()
+
+        stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
+
+        frames = []
+        start_time = time.time()
+        while time.time() - start_time < recording_max_length:
+            try:
+                data = stream.read(CHUNK)
+                frames.append(data)
+            except KeyboardInterrupt:
+                break
+
+        time.sleep(0.2)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(RATE)
+        wf.writeframes(b''.join(frames))
+        wf.close()
+
+    def mainLoop(self):
+        recorded = False
+        while not recorded:
+            self.draw()
+            pygame.display.flip()
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+                elif (
+                    event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
+                ):  # Quitting out of fullScreen
+                    pygame.quit()
+                    exit()
+                
+
+            self.recordAudio()
+            recorded = True

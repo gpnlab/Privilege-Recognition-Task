@@ -5,7 +5,7 @@ from numpy.random import mtrand
 import pygame
 from configReader import ConfigReader, ConfigContainer
 from src.pat_io import LogWriter
-from screens import Background, StartScreen, InstrScreen, PauseScreen, HUD, FinalScreen
+from screens import Background, StartScreen, InstrScreen, PauseScreen, HUD, FinalScreen, WaitingScreen, QuestionScreen
 from objects import Player, Enemy, Coin
 from datetime import date, datetime, time
 import sys
@@ -14,7 +14,6 @@ from exe import EXE
 import time
 
 seed = 0
-
 
 class PAT:
     """This class contains code that wraps the individual components of the game.
@@ -282,28 +281,36 @@ class Level:
 
         # blit questions here if a question block
         if "questions" in self.config:
-            levelStartPause = PauseScreen(
-                self.levelNum, self.levels, 0, 0, self.background, self.config
-            )
-            while levelStartPause.paused:
-                levelStartPause.updateLoop()
+            # levelStartPause = PauseScreen(
+            #     self.levelNum, self.levels, 0, 0, self.background, self.config
+            # )
+            # while levelStartPause.paused:
+            #     levelStartPause.updateLoop()
             # record what answers were chosen
 
             answersDict = dict()
             answersDict["level"] = self.levelNum
-            questions = levelStartPause.returnQuestionText()
-            answers = levelStartPause.returnAnswerText()
+            # questions = levelStartPause.returnQuestionText()
+            # answers = levelStartPause.returnAnswerText()
 
-            for i in range(len(questions)):
-                answersDict[questions[i]] = answers[i]
+            # for i in range(len(questions)):
+            #     answersDict[questions[i]] = answers[i]
 
             # self.logWriter.writeLevelQA(answersDict)
-            self.info = answersDict
+            # self.info = answersDict
+            
+            questionScreen = QuestionScreen(self.background, self.Pat, self.levelList[self.levelNum - 1], self.config)
+            questionScreen.mainLoop()
+
+            waitingScreen = WaitingScreen(self.background)
+            waitingScreen.mainLoop()
+        
         else:
             for currRound in range(self.rounds):
                 round = Round(
                     self.Pat, self.levelNum, currRound, self.config, self.totalRounds, self.Pat.joystick
                 )
+
                 self.countdown(round.agentGroup, round.coinGroup)
                 round.updateAgentVelocity()
 
