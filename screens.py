@@ -1253,20 +1253,22 @@ class QuestionScreen(Screen):
         self.Pat = participant
         self.block = currBlock
         self.config = config
-
+        print(config)
+        self.type = self.config["type"]
 
     def draw(self):
         self.background.screen.fill((255, 255, 255))
+        if self.type == 1:
+            q1 = "1. How do you feel right now?"
+            self.drawQuestion(q1, "images/questions/question_1_scale.png", (50, 50))
+        else:
+            q2 = "2. Which player do you think collected the most coins?"
+            self.drawQuestion(q2, "images/questions/question_2_players.png", (50, 50))
 
-        q1 = "1. How do you feel right now?"
-        q1_render = self.font.render(q1, True, (0, 0, 0))
-        self.background.screen.blit(q1_render, (50, 50))
-        self.background.screen.blit(pygame.image.load("images/questions/question_1_scale.png"), (50, 100))
-
-        q2 = "2. Which player do you think collected the most coins?"
-        q2_render = self.font.render(q2, True, (0, 0, 0))
-        self.background.screen.blit(q2_render, (50, 550))
-        self.background.screen.blit(pygame.image.load("images/questions/question_2_players.png"), (50, 600))
+    def drawQuestion(self, text: str, image_path: str, position: tuple):
+        question_render = self.font.render(text, True, (0, 0, 0))
+        self.background.screen.blit(question_render, position)
+        self.background.screen.blit(pygame.image.load(image_path), (position[0], position[1] + 50))
 
     def recordAudio(self):
         CHUNK = 8192

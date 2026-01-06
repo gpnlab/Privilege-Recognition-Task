@@ -1,4 +1,9 @@
 {  "blocks" : {
+    "block0":
+    {
+        "description" : "Practice block: neutral",
+        "layout" : [["neutral",6], ["questions",1]]
+    },
     "block1" :
     {
         "description" : "coin: neutral -> negative",
@@ -32,7 +37,7 @@
     "test2":
     {
         "description" : "test2",
-        "layout" : [["test2_2",2],["testing_questions",1],["test2_1",2],["testing_questions",1],["test2_3",2],["testing_questions",1],["test2_6",2],["testing_questions",1],["test2_7",2],["testing_questions",1],["test2_5",2],["testing_questions",1],["test2_4",2],["testing_questions",1]]
+        "layout" : [["test2_2",1],["questions",1],["test2_1",2],["testing_questions",1],["test2_3",2],["testing_questions",1],["test2_6",2],["testing_questions",1],["test2_7",2],["testing_questions",1],["test2_5",2],["testing_questions",1],["test2_4",2],["testing_questions",1]]
     },
     "test3":
     {
