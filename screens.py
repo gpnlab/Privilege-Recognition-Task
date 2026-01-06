@@ -753,6 +753,7 @@ class PauseScreen(Screen):
         levelTxt = self.font.render(
             f"Round {self.round}/{self.rounds} finished!", True, (0, 0, 0)
         )
+
         self.background.screen.blit(
             levelTxt, (260, 260, self.background.res[0], self.background.res[1])
         )
@@ -1258,15 +1259,17 @@ class QuestionScreen(Screen):
     def draw(self):
         self.background.screen.fill((255, 255, 255))
 
-        q1 = "1. How do you feel right now?"
-        q1_render = self.font.render(q1, True, (0, 0, 0))
-        self.background.screen.blit(q1_render, (50, 50))
-        self.background.screen.blit(pygame.image.load("images/questions/question_1_scale.png"), (50, 100))
+        question_pos_offset = 50
+        for idx, q in enumerate(self.config["questions"]):
+            question_text = f"{idx + 1}. {q['question']}"
+            q_render = self.font.render(question_text, True, (0, 0, 0))
+            self.background.screen.blit(q_render, (50, question_pos_offset))
+            question_pos_offset += q_render.get_height() + 10
 
-        q2 = "2. Which player do you think collected the most coins?"
-        q2_render = self.font.render(q2, True, (0, 0, 0))
-        self.background.screen.blit(q2_render, (50, 550))
-        self.background.screen.blit(pygame.image.load("images/questions/question_2_players.png"), (50, 600))
+            img = pygame.image.load(q["img_src"])
+            img_rect = img.get_rect(topleft=(50, question_pos_offset))
+            self.background.screen.blit(img, img_rect)
+            question_pos_offset += img_rect.height + 30
 
     def recordAudio(self):
         CHUNK = 8192
@@ -1275,19 +1278,16 @@ class QuestionScreen(Screen):
         RATE = 44100
 
         participant_id = getattr(self.Pat, "participantID", "unknown")
-        # block_name = self.config.get("block_name", "error")
         now = datetime.datetime.now()
         date_str = now.strftime("%Y%m%d")
         time_str = now.strftime("%H%M%S")
-        # block_type = self.Pat.blocks[block_type]["layout"]
 
         print(self.block)
 
         WAVE_OUTPUT_FILENAME = f"{participant_id}_{date_str}_{time_str}_{self.block}.wav"
         print(WAVE_OUTPUT_FILENAME)
 
-        # in seconds 
-        recording_max_length = 120
+        recording_max_length = 120  # seconds
         
         if "recording_time" in self.config.keys():
             recording_max_length = self.config["recording_time"]
@@ -1298,12 +1298,20 @@ class QuestionScreen(Screen):
 
         frames = []
         start_time = time.time()
-        while time.time() - start_time < recording_max_length:
+        recording = True
+
+        while recording and time.time() - start_time < recording_max_length:
             try:
                 data = stream.read(CHUNK)
                 frames.append(data)
             except KeyboardInterrupt:
                 break
+
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_f or event.key == pygame.K_t:
+                        recording = False
+                        break
 
         time.sleep(0.2)
 

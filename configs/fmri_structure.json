@@ -1,0 +1,60 @@
+{  "blocks" : {
+    "block1" :
+    {
+        "description" : "coin: neutral -> negative",
+        "layout" : [["neutral",2],["badCoin",4],["fmri_questions",1]]
+    },
+    "block2" :
+    {
+        "description" : "coin: neutral -> positive",
+        "layout" : [["neutral",2],["goodCoin",4],["fmri_questions",1]]
+    },
+    "block3" :
+    {
+        "description" : "speed: neutral -> negative",
+        "layout" : [["neutral",2],["badSpeed",4],["fmri_questions",1]]
+    },
+    "block4" :
+    {
+        "description" : "speed: neutral -> positive",
+        "layout" : [["neutral",2],["goodSpeed",4],["fmri_questions",1]]
+    },
+    "end" :
+    {
+        "description": "End of game questions",
+        "layout" : [["end_game_questions",1]]
+    },
+    "test" :
+    {
+        "description" : "test",
+        "layout" : [["goodSpeed",1],["questions",1],["after_block_questions",1]]
+    },
+    "test2":
+    {
+        "description" : "test2",
+        "layout" : [["test2_2",2],["testing_questions",1],["test2_1",2],["testing_questions",1],["test2_3",2],["testing_questions",1],["test2_6",2],["testing_questions",1],["test2_7",2],["testing_questions",1],["test2_5",2],["testing_questions",1],["test2_4",2],["testing_questions",1]]
+    },
+    "test3":
+    {
+        "description" : "test2",
+        "layout" : [["test3_6",2],["testing_questions",1],["test3_5",2],["testing_questions",1],["test3_7",2],["testing_questions",1],["test3_4",2],["testing_questions",1],["test3_1",2],["testing_questions",1],["test3_3",2],["testing_questions",1],["test3_2",2],["testing_questions",1]]
+    },
+    "practice":
+    {
+        "description" : "practice round",
+        "layout" : [["neutral",6], ["fmri_questions",1]]
+    }
+},
+
+    "structure0" : ["block1","block2","block3","block4"],
+    "structure1" : ["block2","block1","block4","block3"],
+    "structure2" : ["block3","block4","block1","block2"],
+    "structure3" : ["block4","block3","block2","block1"],
+    "structure4" : ["block1","block2","block4","block3"], 
+    "structure5" : ["block2","block1","block3","block4"],
+    "structure6" : ["block3","block4","block2","block1"],
+    "structure7" : ["block4","block3","block1","block2"],
+    "structure8" : ["test","end"],
+    "structure9" : ["test2","end"],
+    "structure10" : ["practice"]
+}
