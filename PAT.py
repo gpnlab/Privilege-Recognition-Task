@@ -93,7 +93,7 @@ class PAT:
           structName: the name of the structure to parse. Defaults to structure1
         """
 
-        self.mainConfig = ConfigReader.parseToDict("structure")
+        self.mainConfig = ConfigReader.parseToDict("fmri_structure")
         self.structure = self.mainConfig[structName]
         self.blocks = self.mainConfig["blocks"]
         self.levels = []
@@ -395,7 +395,7 @@ class Round:
         # ticks in milliseconds
         self.prev_time = pygame.time.get_ticks()
         self.time = 0
-        self.round_time_limit = 11500
+        self.round_time_limit = 45000   # milliseconds
         # add time prev and time passed param
         # add calculation/update before player input and pass time
         self.info = dict()
