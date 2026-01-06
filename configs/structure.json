@@ -2,27 +2,52 @@
     "block0":
     {
         "description" : "Practice block: neutral",
-        "layout" : [["neutral",6], ["questions",1]]
+        "layout" : [["neutral",6]]
     },
     "block1" :
     {
         "description" : "coin: neutral -> negative",
         "layout" : [["neutral",2],["questions",1],["badCoin",4],["questions",1],["after_block_questions",1]]
     },
+    "fmriBlock1":
+    {
+        "description" : "fmri coin: neutral -> negative",
+        "layout" : [["neutral",2],["badCoin",4]]
+    },
     "block2" :
     {
         "description" : "coin: neutral -> positive",
         "layout" : [["neutral",2],["questions",1],["goodCoin",4],["questions",1],["after_block_questions",1]]
+    },
+    "fmriBlock2":
+    {
+        "description" : "fmri coin: neutral -> positive",
+        "layout" : [["neutral",2],["goodCoin",4]]
     },
     "block3" :
     {
         "description" : "speed: neutral -> negative",
         "layout" : [["neutral",2],["questions",1],["badSpeed",4],["questions",1],["after_block_questions",1]]
     },
+    "fmriBlock3":
+    {
+        "description" : "fmri speed: neutral -> negative",
+        "layout" : [["neutral",2],["badSpeed",4]]
+    },
     "block4" :
     {
         "description" : "speed: neutral -> positive",
         "layout" : [["neutral",2],["questions",1],["goodSpeed",4],["questions",1],["after_block_questions",1]]
+    },
+    "fmriBlock4":
+    {
+        "description" : "fmri speed: neutral -> positive",
+        "layout" : [["neutral",2],["goodSpeed",4]]
+    },
+    "fmriQuestions":
+    {
+        "description" : "fmri questions",
+        "layout" : [["fmri_questions",1],["fmri_questions2",1],["Waiting",1]]
     },
     "end" :
     {
@@ -43,18 +68,26 @@
     {
         "description" : "test2",
         "layout" : [["test3_6",2],["testing_questions",1],["test3_5",2],["testing_questions",1],["test3_7",2],["testing_questions",1],["test3_4",2],["testing_questions",1],["test3_1",2],["testing_questions",1],["test3_3",2],["testing_questions",1],["test3_2",2],["testing_questions",1]]
+    },
+    "practice":
+    {
+        "description" : "practice round",
+        "layout" : [["neutral",1],["goodCoin", 0], ["badCoin", 0], ["fmri_questions",1],["fmri_questions2",1],["Waiting",1]]
+    },
+    "wait":
+    {
+        "description" : "waiting period",
+        "layout" : [["Waiting",1]]
     }
 },
 
-    "structure0" : ["block1","block2","block3","block4","end"],
-    "structure1" : ["block2","block1","block4","block3","end"],
-    "structure2" : ["block3","block4","block1","block2","end"],
-    "structure3" : ["block4","block3","block2","block1","end"],
-    "structure4" : ["block1","block2","block4","block3","end"], 
-    "structure5" : ["block2","block1","block3","block4","end"],
-    "structure6" : ["block3","block4","block2","block1","end"],
-    "structure7" : ["block4","block3","block1","block2","end"],
-    "structure8" : ["test","end"],
-    "structure9" : ["test2","end"],
-    "structure10" : ["test3","end"]
+    "structure0" : ["wait","block0","fmriBlock1","fmriBlock2","fmriBlock3","fmriBlock4","end"],
+    "structure1" : ["wait","block0","fmriBlock2","fmriBlock1","fmriBlock4","fmriBlock3","end"],
+    "structure2" : ["wait","block0","fmriBlock3","fmriBlock4","fmriBlock1","fmriBlock2","end"],
+    "structure3" : ["wait","block0","fmriBlock4","fmriBlock3","fmriBlock2","fmriBlock1","end"],
+    "structure4" : ["wait","block0","fmriBlock1","fmriBlock2","fmriBlock4","fmriBlock3","end"], 
+    "structure5" : ["wait","block0","fmriBlock2","fmriBlock1","fmriBlock3","fmriBlock4","end"],
+    "structure6" : ["wait","block0","fmriBlock3","fmriBlock4","fmriBlock2","fmriBlock1","end"],
+    "structure7" : ["wait","block0","fmriBlock4","fmriBlock3","fmriBlock1","fmriBlock2","end"],
+    "structure8" : ["wait","practice"]
 }

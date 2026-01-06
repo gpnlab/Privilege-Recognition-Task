@@ -13,7 +13,7 @@ class ConfigReader:
         contents
 
         Args:
-          filename: the name of the file you want to parse
+          filename: the name of the file you want to parse without the .json extension
           dirName: The directory the file is in. If it's in the default directory, leave it
         blank. Defaults to default
 

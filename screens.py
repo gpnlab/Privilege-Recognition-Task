@@ -8,7 +8,7 @@ import pyaudio
 import wave
 import time
 import datetime
-
+from pathlib import Path
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, res, image="NA", isBackground=False):
@@ -215,7 +215,7 @@ class StartScreen(Screen):
         self.structRectList = []
         self.structNameList = []
 
-        for i in range(11):
+        for i in range(9):
             self.structRectList.append(
                 (
                     40 + self.background.res[0] // 5,
@@ -361,6 +361,8 @@ class PauseScreen(Screen):
           levelStart: the time at which the level started. Defaults to 0
         """
 
+        self.duration = 1000
+        
         self.level = level
         self.round = round
         self.levelStart = levelStart
@@ -385,7 +387,9 @@ class PauseScreen(Screen):
         self.aTextList = []
 
         self.inQuestions = False
-
+        
+        self.startTime = pygame.time.get_ticks()
+        
         if "questions" in self.config:
             if pygame.mouse.get_pressed()[0] == True:
                 self.selected = 1000
@@ -757,8 +761,8 @@ class PauseScreen(Screen):
         self.background.screen.blit(
             levelTxt, (260, 260, self.background.res[0], self.background.res[1])
         )
-
-        self.background.screen.blit(self.nextText, self.nextRoundTextRect)
+        # commented for fmri study
+        # self.background.screen.blit(self.nextText, self.nextRoundTextRect)
 
     def blitFinalStats(self, cList):
         """
@@ -781,7 +785,12 @@ class PauseScreen(Screen):
     def updateLoop(self, x=[]):
         self.draw(x)
         self.startInteraction()
-
+        
+        if self.levelStart == 1:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.startTime >= self.duration:
+                self.paused = False            
+        
         pygame.display.flip()
         pygame.display.update()
 
@@ -1025,7 +1034,7 @@ class PauseScreen(Screen):
 class InstrScreen(Screen):
     def __init__(self, res):
         self.desc = Background(res, image="desc.png", isBackground=True)
-        self.instr = Background(res, image="instructions.png", isBackground=True)
+        self.instr = Background(res, image="fmriInstructions.png", isBackground=True)
         self.size = int(min(self.desc.res[0], self.desc.res[1]) * 0.02)
         self.font = pygame.font.SysFont("arial", self.size)
 
@@ -1198,7 +1207,7 @@ class WaitingScreen(Screen):
 
         self.font = pygame.font.SysFont("arial", self.size)
 
-        drawTxt = "Waiting for fMRI..."
+        drawTxt = "Waiting for Scanner..."
         self.txt = self.font.render(drawTxt, True, (0, 0, 0))
 
         self.f_or_t = False
@@ -1239,7 +1248,7 @@ class WaitingScreen(Screen):
 
 
 class QuestionScreen(Screen):
-    def __init__(self, background, participant, currBlock, config):
+    def __init__(self, background, participant, currBlock, config, path):
         """
         Initializes the question screen for the game
 
@@ -1254,14 +1263,14 @@ class QuestionScreen(Screen):
         self.Pat = participant
         self.block = currBlock
         self.config = config
+        self.path = path
         print(config)
-        self.type = self.config["type"]
 
     def draw(self):
         self.background.screen.fill((255, 255, 255))
 
         question_pos_offset = 50
-        for idx, q in enumerate(self.config["questions"]):
+        for idx, q in enumerate(self.config["fmri"]):
             question_text = f"{idx + 1}. {q['question']}"
             q_render = self.font.render(question_text, True, (0, 0, 0))
             self.background.screen.blit(q_render, (50, question_pos_offset))
@@ -1284,8 +1293,9 @@ class QuestionScreen(Screen):
         time_str = now.strftime("%H%M%S")
 
         print(self.block)
-
-        WAVE_OUTPUT_FILENAME = f"{participant_id}_{date_str}_{time_str}_{self.block}.wav"
+        print(self.path)
+        # TODO fix this to write to right path and filename
+        WAVE_OUTPUT_FILENAME = f"{self.path}/{participant_id}_{date_str}_{time_str}_{self.block}.wav"
         print(WAVE_OUTPUT_FILENAME)
 
         recording_max_length = 120  # seconds
@@ -1294,7 +1304,18 @@ class QuestionScreen(Screen):
             recording_max_length = self.config["recording_time"]
 
         p = pyaudio.PyAudio()
+        
+        # List devices
+        for i in range(p.get_device_count()):
+            info = p.get_device_info_by_index(i)
+            print(i, info['name'], 'maxInputChannels:', info['maxInputChannels'])
 
+        # Default input device info (may raise if none)
+        try:
+            print("Default input device:", p.get_default_input_device_info())
+        except IOError:
+            print("No default input device")
+        
         stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
         frames = []

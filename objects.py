@@ -111,7 +111,7 @@ class GameObject(pygame.sprite.Sprite):
         self.prev_time = pygame.time.get_ticks()
 
         # to correct for different framerates
-        self.correct_vel = self.vel * self.time_passed / 5  # this is a good speed
+        self.correct_vel = self.vel * self.time_passed / 7  # this is a good speed
 
     # direction is horizontal, then veritical
     def move(self, horizontal=0, vertical=0):
