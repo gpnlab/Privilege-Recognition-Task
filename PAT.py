@@ -70,6 +70,8 @@ class PAT:
         self.background = Background(self.res)
 
         self.countdownBackgroundsList = [
+            Background(self.res, image="countdown_5.png", isBackground=True),
+            Background(self.res, image="countdown_4.png", isBackground=True),
             Background(self.res, image="countdown_3.png", isBackground=True),
             Background(self.res, image="countdown_2.png", isBackground=True),
             Background(self.res, image="countdown_1.png", isBackground=True),
@@ -366,18 +368,20 @@ class Level:
         """
         Blits a countdown screen. Duration is roughly 3 seconds (on my end)
         """
+        countdown_duration_total = 5000
+        countdown_duration_interval = countdown_duration_total // len(self.countdownList)
         for curr in self.countdownList:
             prev_time = pygame.time.get_ticks()
             while True:
                 curr.draw()
                 agents.draw(self.background.screen)
-                coins.draw(self.background.screen)
+                # coins.draw(self.background.screen) # removed for countdown
                 pygame.display.flip()
                 pygame.display.update()
                 pygame.event.get()
-                if pygame.time.get_ticks() - prev_time > 1000:
+                if pygame.time.get_ticks() - prev_time > countdown_duration_interval:
                     break
-
+            
     def reset(self):
         """
         It clears the sprite groups
@@ -401,7 +405,7 @@ class Round:
         """
 
         # print(f"starting level {levelNum}, round {roundNum}")
-        self.coinsLeft = config["numberOfCoins"] * 3
+        self.coinsLeft = int(config["numberOfCoins"] * 4)
         self.inProgress = True
         self.background = Pat.background
         self.res = Pat.res
@@ -414,7 +418,7 @@ class Round:
         # ticks in milliseconds
         self.prev_time = pygame.time.get_ticks()
         self.time = 0
-        self.round_time_limit = 20000   # milliseconds
+        self.round_time_limit = 30000   # milliseconds
         # add time prev and time passed param
         # add calculation/update before player input and pass time
         self.info = dict()

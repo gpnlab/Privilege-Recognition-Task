@@ -15,7 +15,7 @@ class GameObject(pygame.sprite.Sprite):
         imgName,
         velocity=0.5,
         acceleration=0,
-        resize=(40, 40),
+        resize=(30, 30),
         seed=0,
     ):
         """
@@ -111,7 +111,7 @@ class GameObject(pygame.sprite.Sprite):
         self.prev_time = pygame.time.get_ticks()
 
         # to correct for different framerates
-        self.correct_vel = self.vel * self.time_passed / 7  # this is a good speed
+        self.correct_vel = self.vel * self.time_passed / 11  # this is a good speed
 
     # direction is horizontal, then veritical
     def move(self, horizontal=0, vertical=0):
@@ -158,6 +158,7 @@ class Agent(GameObject):
         velocity,
         imgName="placeholder.png",
         seed=0,
+        
     ):
         """
         This function is the constructor for the Player class. It takes in a name, background,
