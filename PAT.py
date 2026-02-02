@@ -92,6 +92,7 @@ class PAT:
         # print("levels: ", self.levels)
 
         self.totalRounds = 24  # changed to constant with current study design
+        self.currentFmriBlock = None
 
         # initiallize logwriter class to track participant responses and inputs
         self.logWriter = LogWriter(self.presetName, self.participantID, self.time, seed)
@@ -113,6 +114,8 @@ class PAT:
         self.structure = self.mainConfig[structName]
         self.blocks = self.mainConfig["blocks"]
         self.levels = []
+        self.blockTypes = []
+
         # loop through the structure and add levels
         for blockType in self.structure:
             block = self.blocks[blockType]["layout"]
@@ -121,6 +124,7 @@ class PAT:
                 freq = int(b[1])
                 for i in range(freq):
                     self.levels.append(level)
+                    self.blockTypes.append(blockType)
         # # DEBUG: Uncomment this to shorten the experiment to a single round for dev purposes
         # self.levels = [self.levels[0]]
 
@@ -137,6 +141,9 @@ class PAT:
 
         for currLevel in range(len(self.levels)):
             # print(f"The current level is {self.levels[currLevel]}")
+            if self.blockTypes[currLevel].startswith("fmriBlock"):
+                self.currentFmriBlock = self.blockTypes[currLevel]
+
             level = Level(
                 self,
                 self.time,
@@ -144,6 +151,8 @@ class PAT:
                 self.presetName,
                 currLevel,
                 self.levels,
+                self.blockTypes,
+                self.currentFmriBlock,
                 self.countdownBackgroundsList,
                 roundsCompleted,
                 self.totalRounds,
@@ -151,7 +160,7 @@ class PAT:
             )
 
             level.main_loop()
-            if "questions" in level.config or "fmri" in level.config or "waiting" in level.config:
+            if "questions" in level.config or "fmri" in level.config or "waiting" in level.config or "mid_block" in level.config:
                 # questions will occur after, so -1 is "safe"
                 self.info[f"questions {levelnum - 1}"] = level.info
                 levelnum += 1
@@ -175,6 +184,8 @@ class Level:
         presetName,
         level,
         levelList,
+        blockTypes,
+        currFmriBlock,
         countdownList,
         roundsCompleted,
         totalRounds,
@@ -197,6 +208,8 @@ class Level:
         self.levelList = levelList
         self.levelNum = level
         self.levels = len(levelList)
+        self.blockTypes = blockTypes
+        self.currFmriBlock = currFmriBlock
         self.config = ConfigReader.parseToDict(f"{levelList[level]}", "levelconfigs")
         self.background = Pat.background
         self.res = Pat.res
@@ -215,7 +228,7 @@ class Level:
         # will only be set if it is a 'questions' level
 
         # not a questions block
-        if "questions" not in self.config and "fmri" not in self.config and "Waiting" not in self.config:
+        if "questions" not in self.config and "fmri" not in self.config and "Waiting" not in self.config and "mid_block" not in self.config:
             self.aGroup = pygame.sprite.Group()
             self.eGroup = pygame.sprite.Group()
             self.cGroup = pygame.sprite.Group()
@@ -316,16 +329,16 @@ class Level:
                 answersDict[questions[i]] = answers[i]
             self.info = answersDict
                    
-        elif "fmri" in self.config:
+        elif "fmri" in self.config or "mid_block" in self.config:
             answersDict = dict()
             answersDict["level"] = self.levelNum
-            questionScreen = QuestionScreen(self.background, self.Pat, self.levelList[self.levelNum], self.config, self.path)
+            questionScreen = QuestionScreen(self.background, self.Pat, self.levelList[self.levelNum], self.currFmriBlock, self.config, self.path)
             questionScreen.mainLoop()
             
         elif "Waiting" in self.config:
             waitingScreen = WaitingScreen(self.background)
             waitingScreen.mainLoop()
-            
+
         else:
             for currRound in range(self.rounds):
                 round = Round(

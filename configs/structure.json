@@ -12,7 +12,7 @@
     "fmriBlock1":
     {
         "description" : "fmri coin: neutral -> negative",
-        "layout" : [["neutral",2],["badCoin",4]]
+        "layout" : [["neutral",2],["badCoin",3],["mid_block_question",1],["badCoin",3]]
     },
     "block2" :
     {
@@ -22,7 +22,7 @@
     "fmriBlock2":
     {
         "description" : "fmri coin: neutral -> positive",
-        "layout" : [["neutral",2],["goodCoin",4]]
+        "layout" : [["neutral",2],["goodCoin",3],["mid_block_question",1],["goodCoin",3]]
     },
     "block3" :
     {
@@ -32,7 +32,7 @@
     "fmriBlock3":
     {
         "description" : "fmri speed: neutral -> negative",
-        "layout" : [["neutral",2],["badSpeed",4]]
+        "layout" : [["neutral",2],["badSpeed",3],["mid_block_question",1],["badSpeed",3]]
     },
     "block4" :
     {
@@ -42,12 +42,12 @@
     "fmriBlock4":
     {
         "description" : "fmri speed: neutral -> positive",
-        "layout" : [["neutral",2],["goodSpeed",4]]
+        "layout" : [["neutral",2],["goodSpeed",3],["mid_block_question",1],["goodSpeed",3]]
     },
     "fmriQuestions":
     {
         "description" : "fmri questions",
-        "layout" : [["fmri_questions",1],["fmri_questions2",1],["Waiting",1]]
+        "layout" : [["fmri_questions",1],["fmri_questions2",1],["fmri_questions3",1],["Waiting",1]]
     },
     "end" :
     {
@@ -72,7 +72,7 @@
     "practice":
     {
         "description" : "practice round",
-        "layout" : [["neutral",1],["goodCoin", 0], ["badCoin", 0], ["fmri_questions",1],["fmri_questions2",1],["Waiting",1]]
+        "layout" : [["neutral",1],["goodCoin", 0],["badCoin", 0],["fmri_questions",1],["fmri_questions2",1],["Waiting",1]]
     },
     "wait":
     {
@@ -81,13 +81,13 @@
     }
 },
 
-    "structure0" : ["wait","block0","fmriBlock1","fmriBlock2","fmriBlock3","fmriBlock4","end"],
-    "structure1" : ["wait","block0","fmriBlock2","fmriBlock1","fmriBlock4","fmriBlock3","end"],
-    "structure2" : ["wait","block0","fmriBlock3","fmriBlock4","fmriBlock1","fmriBlock2","end"],
-    "structure3" : ["wait","block0","fmriBlock4","fmriBlock3","fmriBlock2","fmriBlock1","end"],
-    "structure4" : ["wait","block0","fmriBlock1","fmriBlock2","fmriBlock4","fmriBlock3","end"], 
-    "structure5" : ["wait","block0","fmriBlock2","fmriBlock1","fmriBlock3","fmriBlock4","end"],
-    "structure6" : ["wait","block0","fmriBlock3","fmriBlock4","fmriBlock2","fmriBlock1","end"],
-    "structure7" : ["wait","block0","fmriBlock4","fmriBlock3","fmriBlock1","fmriBlock2","end"],
+    "structure0" : ["wait","block0","wait","fmriBlock1","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait"],
+    "structure1" : ["wait","block0","wait","fmriBlock2","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait"],
+    "structure2" : ["wait","block0","wait","fmriBlock3","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait"],
+    "structure3" : ["wait","block0","wait","fmriBlock4","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait"],
+    "structure4" : ["wait","block0","wait","fmriBlock1","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait"],
+    "structure5" : ["wait","block0","wait","fmriBlock2","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait"],
+    "structure6" : ["wait","block0","wait","fmriBlock3","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait"],
+    "structure7" : ["wait","block0","wait","fmriBlock4","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait"],
     "structure8" : ["wait","practice"]
 }

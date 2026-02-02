@@ -1,7 +1,7 @@
 {
-  "fmri": [
+  "mid_block": [
     {
-      "question": "Which player do you think collected the most coins? (select one)",
+      "question": "Which player do you predict will collect the most coins?",
       "type": 0,
       "answers": [
         "1", 

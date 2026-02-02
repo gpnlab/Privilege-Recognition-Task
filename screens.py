@@ -755,7 +755,7 @@ class PauseScreen(Screen):
         )
 
         levelTxt = self.font.render(
-            f"Round {self.round}/{self.rounds} finished!", True, (0, 0, 0)
+            f"Round {self.round} completed!", True, (0, 0, 0)
         )
 
         self.background.screen.blit(
@@ -1246,9 +1246,8 @@ class WaitingScreen(Screen):
 
         self.f_or_t = False
 
-
 class QuestionScreen(Screen):
-    def __init__(self, background, participant, currBlock, config, path):
+    def __init__(self, background, participant, subBlock, blockType, config, path):
         """
         Initializes the question screen for the game
 
@@ -1261,51 +1260,61 @@ class QuestionScreen(Screen):
         self.font = pygame.font.SysFont("arial", self.size)
 
         self.Pat = participant
-        self.block = currBlock
+        self.subBlock = subBlock
+        self.block = blockType
         self.config = config
         self.path = path
-        print(config)
+        self.max_question_time = int(self.config.get("recording_time", 30))
 
-    def draw(self):
+    def draw(self, remaining_time):
         self.background.screen.fill((255, 255, 255))
 
         question_pos_offset = 50
-        for idx, q in enumerate(self.config["fmri"]):
-            question_text = f"{idx + 1}. {q['question']}"
+        if "fmri" in self.config and self.config["fmri"]:
+            q = self.config["fmri"][0]
+            question_text = q['question']
             q_render = self.font.render(question_text, True, (0, 0, 0))
             self.background.screen.blit(q_render, (50, question_pos_offset))
             question_pos_offset += q_render.get_height() + 10
 
-            img = pygame.image.load(q["img_src"])
-            img_rect = img.get_rect(topleft=(50, question_pos_offset))
-            self.background.screen.blit(img, img_rect)
-            question_pos_offset += img_rect.height + 30
+            if "img_src" in q and q["img_src"]:
+                img = pygame.image.load(q["img_src"])
+                img_rect = img.get_rect(topleft=(50, question_pos_offset))
+                self.background.screen.blit(img, img_rect)
+                question_pos_offset += img_rect.height + 30
 
-    def recordAudio(self):
+        elif "mid_block" in self.config and self.config["mid_block"]:
+            q = self.config["mid_block"][0]
+            question_text = q['question']
+            q_render = self.font.render(question_text, True, (0, 0, 0))
+            self.background.screen.blit(q_render, (50, question_pos_offset))
+            question_pos_offset += q_render.get_height() + 10
+
+            if "img_src" in q and q["img_src"]:
+                img = pygame.image.load(q["img_src"])
+                img_rect = img.get_rect(topleft=(50, question_pos_offset))
+                self.background.screen.blit(img, img_rect)
+                question_pos_offset += img_rect.height + 30
+
+        timer_text = self.font.render(str(remaining_time), True, (0, 0, 0), (255, 255, 255))
+        screen_rect = self.background.screen.get_rect()
+        timer_rect = timer_text.get_rect(
+            topright=(screen_rect.right - 10, screen_rect.top + 25)
+        )
+        self.background.screen.blit(timer_text, timer_rect)
+
+    def mainLoop(self):
         CHUNK = 8192
         FORMAT = pyaudio.paInt16
         CHANNELS = 1
         RATE = 44100
 
-        participant_id = getattr(self.Pat, "participantID", "unknown")
-        now = datetime.datetime.now()
-        date_str = now.strftime("%Y%m%d")
-        time_str = now.strftime("%H%M%S")
-
-        print(self.block)
-        print(self.path)
-        # TODO fix this to write to right path and filename
-        WAVE_OUTPUT_FILENAME = f"{self.path}/{participant_id}_{date_str}_{time_str}_{self.block}.wav"
-        print(WAVE_OUTPUT_FILENAME)
-
-        recording_max_length = 120  # seconds
-        
-        if "recording_time" in self.config.keys():
-            recording_max_length = self.config["recording_time"]
+        recorded = False
+        start_time = time.time()
+        end_time = self.max_question_time
 
         p = pyaudio.PyAudio()
-        
-        # List devices
+
         for i in range(p.get_device_count()):
             info = p.get_device_info_by_index(i)
             print(i, info['name'], 'maxInputChannels:', info['maxInputChannels'])
@@ -1315,25 +1324,39 @@ class QuestionScreen(Screen):
             print("Default input device:", p.get_default_input_device_info())
         except IOError:
             print("No default input device")
-        
+
         stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
         frames = []
-        start_time = time.time()
-        recording = True
 
-        while recording and time.time() - start_time < recording_max_length:
+        while not recorded:
+            elapsed_time = int(time.time() - start_time)
+            remaining_time = max(0, end_time - elapsed_time)
+
+            self.draw(remaining_time)
+            pygame.display.flip()
+            pygame.display.update()
+
             try:
                 data = stream.read(CHUNK)
                 frames.append(data)
             except KeyboardInterrupt:
                 break
-
+    
             for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
                 if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
                     if event.key == pygame.K_f or event.key == pygame.K_t:
-                        recording = False
-                        break
+                        recorded = True
+
+            if remaining_time <= 0:
+                recorded = True
 
         time.sleep(0.2)
 
@@ -1341,30 +1364,19 @@ class QuestionScreen(Screen):
         stream.close()
         p.terminate()
 
-        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(p.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
+        participant_id = getattr(self.Pat, "participantID", "unknown")
+        now = datetime.datetime.now()
+
+        filename = (
+            f"{self.path}/"
+            f"{participant_id}_{now:%Y%m%d_%H%M%S}_{self.block}_{self.subBlock}.wav"
+        )
+
+        print(f"Saving audio to {filename}")
+
+        wf = wave.open(filename, 'wb')
+        wf.setnchannels(1)
+        wf.setsampwidth(pyaudio.PyAudio().get_sample_size(pyaudio.paInt16))
+        wf.setframerate(44100)
         wf.writeframes(b''.join(frames))
         wf.close()
-
-    def mainLoop(self):
-        recorded = False
-        while not recorded:
-            self.draw()
-            pygame.display.flip()
-            pygame.display.update()
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    exit()
-                elif (
-                    event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
-                ):  # Quitting out of fullScreen
-                    pygame.quit()
-                    exit()
-                
-
-            self.recordAudio()
-            recorded = True

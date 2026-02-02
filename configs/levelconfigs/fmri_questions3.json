@@ -1,7 +1,7 @@
 {
   "fmri": [
     {
-      "question": "Which player do you think collected the most coins? (select one)",
+      "question": "Who do you think played the game best and why?",
       "type": 0,
       "answers": [
         "1", 
