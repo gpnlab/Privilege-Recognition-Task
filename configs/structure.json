@@ -82,7 +82,7 @@
     "test_manipulation":
     {
         "description" : "test manipulation",
-        "layout" : [["neutral",1],["badCoin", 1],["badSpeed", 1]]
+        "layout" : [["neutral",1],["goodCoin", 1],["badCoin", 1],["goodSpeed", 1],["badSpeed", 1]]
     }
 },
 
