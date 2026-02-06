@@ -215,7 +215,7 @@ class StartScreen(Screen):
         self.structRectList = []
         self.structNameList = []
 
-        for i in range(9):
+        for i in range(10):
             self.structRectList.append(
                 (
                     40 + self.background.res[0] // 5,

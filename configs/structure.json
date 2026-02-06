@@ -78,6 +78,11 @@
     {
         "description" : "waiting period",
         "layout" : [["Waiting",1]]
+    },
+    "test_manipulation":
+    {
+        "description" : "test manipulation",
+        "layout" : [["neutral",1],["badCoin", 1],["badSpeed", 1]]
     }
 },
 
@@ -89,5 +94,6 @@
     "structure5" : ["wait","block0","wait","fmriBlock2","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait"],
     "structure6" : ["wait","block0","wait","fmriBlock3","fmriQuestions","wait","fmriBlock4","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait"],
     "structure7" : ["wait","block0","wait","fmriBlock4","fmriQuestions","wait","fmriBlock3","fmriQuestions","wait","fmriBlock1","fmriQuestions","wait","fmriBlock2","fmriQuestions","wait"],
-    "structure8" : ["wait","practice"]
+    "structure8" : ["wait","practice"],
+    "structure9" : ["wait","test_manipulation"]
 }
