@@ -1241,7 +1241,10 @@ class WaitingScreen(Screen):
         self.background.screen.blit(self.txt, txt_rect)
 
     def mainLoop(self):
+        clock = pygame.time.Clock()
+
         while not self.f_or_t:
+            clock.tick(60)
             self.draw()
             pygame.display.flip()
             pygame.display.update()
