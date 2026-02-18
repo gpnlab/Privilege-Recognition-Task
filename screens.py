@@ -100,7 +100,7 @@ class Screen:
 
 
 class HUD:
-    def __init__(self, background, agents):
+    def __init__(self, background, agents, timer):
         """
         The function is a constructor that initializes the class HUD. It sets the background,
         agents, font, font size, and timer
@@ -117,22 +117,25 @@ class HUD:
         fontPath = path.join("fonts", "arial.TTF")
 
         self.fontHUD = pygame.font.SysFont("arial", self.size)
-        self.timer = 0
 
-    def updateTimer(self, time_passed):
-        """
-        The function updateTimer() takes in a parameter called time_passed, and adds to
-        the current amount of time passed
+        self.start_time = time.time()
+        self.timer = timer / 1000
 
-        Args:
-          time_passed: The amount of time that has passed since the last time the function was
-        called.
-        """
-        self.timer += time_passed
+
+    # def updateTimer(self, time_passed):
+    #     """
+    #     The function updateTimer() takes in a parameter called time_passed, and adds to
+    #     the current amount of time passed
+
+    #     Args:
+    #       time_passed: The amount of time that has passed since the last time the function was
+    #     called.
+    #     """
+    #     self.timer += time_passed
 
     def resetTimer(self):
         """Sets the time passed to 0"""
-        self.timer = 0
+        self.start_time = time.time() / 1000
 
     def drawHUD(self):
         """
@@ -146,13 +149,25 @@ class HUD:
         #    i += 1
 
         # Timer
-        """ 
+    
         # remove timer for now 
-        timerTxt = self.fontHUD.render(f"Time: {(self.timer // 1000)}" ,True,(0,0,0))
-        timerRect = timerTxt.get_rect()
-        timerRect.topright = (self.background.res[0],0)
-        self.background.screen.blit(timerTxt,timerRect)
-        """
+        # timerTxt = self.fontHUD.render(f"Time: {(self.timer // 1000)}" ,True,(0,0,0))
+        # timerRect = timerTxt.get_rect()
+        # timerRect.topright = (self.background.res[0],0)
+        # self.background.screen.blit(timerTxt,timerRect)
+
+        elapsed = int(time.time() - self.start_time)
+        remaining = max(0, int(self.timer - elapsed))
+        timerTxt = self.fontHUD.render(
+            str(remaining),
+            True,
+            (0, 0, 0)
+        )
+        screen_rect = self.background.screen.get_rect()
+        timerRect = timerTxt.get_rect(
+            topright=(screen_rect.right - 10, screen_rect.top + 25)
+        )
+        self.background.screen.blit(timerTxt, timerRect)
 
 
 class StartScreen(Screen):

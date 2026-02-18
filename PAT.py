@@ -346,6 +346,9 @@ class Level:
                 )
 
                 self.countdown(round.agentGroup, round.coinGroup)
+                round.HUD.start_time = time.time()
+                round.prev_time = pygame.time.get_ticks()
+                round.time = 0
                 round.updateAgentVelocity()
 
                 while round.inProgress:
@@ -443,7 +446,7 @@ class Round:
         self.coinGroup = pygame.sprite.Group()
 
         # Pass background and player into HUD
-        self.HUD = HUD(self.background, self.agentGroup)
+        self.HUD = HUD(self.background, self.agentGroup, self.round_time_limit)
         self.initGroups()
 
         # set mean acoording to biases:
@@ -656,7 +659,7 @@ class Round:
         # TODO fix time stuff
         self.time += self.time_passed
         # Clock updates
-        self.HUD.updateTimer(self.time_passed)
+        # self.HUD.updateTimer(self.time_passed)
         self.updateInfo(keys, coins_collected)
 
     def _draw(self):
