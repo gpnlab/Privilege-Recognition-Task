@@ -267,7 +267,7 @@ class Enemy(Agent):
         velocity,
         imgName="placeholder.png",
         seed=0,
-        sliding_window=10
+        sliding_window=13
     ):
         """
         The constructor for the class, which sets the state of the object to 0, and sets the
@@ -307,7 +307,7 @@ class Enemy(Agent):
 
         self.curr_tick = 0
         self.cached_move = (0, 0)
-        self.tick_freq = 2  
+        self.tick_freq = 2
 
     def add_to_buffer(self, x, y):
         if len(self.movement_buffer) == self.sliding_window:
@@ -420,7 +420,13 @@ class Enemy(Agent):
         #    (cX,cY) = (0,0)
         (cX, cY) = self.coinObj
 
-        use_cached = (self.curr_tick % self.tick_freq != 0)
+        d = self._dist((cX, cY), (self.x, self.y))
+
+        update_threshold = 15
+
+        use_cached = (self.curr_tick % self.tick_freq != 0) or (d < update_threshold)
+
+        # use_cached = (self.curr_tick % self.tick_freq != 0)
 
         if not use_cached:
 
