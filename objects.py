@@ -267,7 +267,7 @@ class Enemy(Agent):
         velocity,
         imgName="placeholder.png",
         seed=0,
-        sliding_window=10
+        sliding_window=13
     ):
         """
         The constructor for the class, which sets the state of the object to 0, and sets the
@@ -307,7 +307,7 @@ class Enemy(Agent):
 
         self.curr_tick = 0
         self.cached_move = (0, 0)
-        self.tick_freq = 2  
+        self.tick_freq = 2
 
     def add_to_buffer(self, x, y):
         if len(self.movement_buffer) == self.sliding_window:
@@ -452,23 +452,27 @@ class Enemy(Agent):
             # else:
             #     self.move(xInd, yInd)
 
-            self.add_to_buffer(xInd, yInd)
-            smooth_x, smooth_y = self.smooth_movement()
+            if d <= 100:
+                self.move(xInd, yInd)
 
-            if smooth_x != 0 and smooth_y != 0:
-                magnitude = math.sqrt(smooth_x**2 + smooth_y**2)
-                smooth_x /= magnitude
-                smooth_y /= magnitude
-                # self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2) # save what's being calculated here
-                curr_vec = (math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2)
-            
             else:
-                # self.move(smooth_x, smooth_y)
-                curr_vec = (smooth_x, smooth_y)
+                self.add_to_buffer(xInd, yInd)
+                smooth_x, smooth_y = self.smooth_movement()
 
-            self.cached_move = curr_vec
+                if smooth_x != 0 and smooth_y != 0:
+                    magnitude = math.sqrt(smooth_x**2 + smooth_y**2)
+                    smooth_x /= magnitude
+                    smooth_y /= magnitude
+                    # self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2) # save what's being calculated here
+                    curr_vec = (math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2)
+                
+                else:
+                    # self.move(smooth_x, smooth_y)
+                    curr_vec = (smooth_x, smooth_y)
 
-            self.move(curr_vec[0], curr_vec[1])
+                self.cached_move = curr_vec
+
+                self.move(curr_vec[0], curr_vec[1])
 
         else:
             self.move(self.cached_move[0], self.cached_move[1])
