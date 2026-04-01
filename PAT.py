@@ -13,6 +13,7 @@ from pygame import mixer
 from exe import EXE
 import time
 import pyaudio
+from src.pat_io import COLUMNS
 
 seed = 0
 
@@ -97,6 +98,9 @@ class PAT:
         # initiallize logwriter class to track participant responses and inputs
         self.logWriter = LogWriter(self.presetName, self.participantID, self.time, seed)
 
+        self.all_rows = []
+        self.all_coin_coords = {}
+
         instructions = InstrScreen(self.res)
 
         while not instructions.proceed:
@@ -170,6 +174,26 @@ class PAT:
             roundsCompleted = level.prevRoundsCompleted
             # print("writing log")
             self.logWriter.writeLog(self.info)
+
+        max_ticks = max(len(r) for r in self.all_rows)
+        tick_arr = numpy.full((len(self.all_rows), max_ticks, len(COLUMNS)), numpy.nan)
+        for i, rows in enumerate(self.all_rows):
+            tick_arr[i, :len(rows), :] = rows
+
+        coin_arr = numpy.array(list(self.all_coin_coords.values()))
+
+        numpy.savez(
+            f'{self.logWriter.get_path()}/{self.participantID}_data.npz',
+            ticks=tick_arr,
+            coins=coin_arr,
+            coin_round_keys=numpy.array(list(self.all_coin_coords.keys())),
+            columns=numpy.array(COLUMNS),
+            participant_id=numpy.array([self.participantID]),
+            date=numpy.array([datetime.now().strftime('%d-%m-%Y')]),
+            timestamp=numpy.array([self.time]),
+            n_rounds=numpy.array([len(self.all_rows)]),
+            file_location=numpy.array([str(self.logWriter.get_path())]),
+        )
 
         final = FinalScreen(self.background)
         final.mainLoop()  # screen will exit pygame when done
@@ -375,8 +399,12 @@ class Level:
                 while pauseScreen.paused:
                     pauseScreen.updateLoop()
 
-                # save round info
-                self.info[f"level {self.levelNum} round {self.currRound}"] = round.info
+                # # save round info
+                # self.info[f"level {self.levelNum} round {self.currRound}"] = round.info
+
+                self.Pat.all_rows.append(round.rows)
+                self.Pat.all_coin_coords[f"level {self.levelNum} round {self.currRound}"] = round.info['coin_coordinates']
+
                 self.currRound += 1
                 round.reset()
 
@@ -440,6 +468,8 @@ class Round:
         self.info = dict()
         self.info["level"] = levelNum
         self.info["round"] = roundNum
+
+        self.rows = []
 
         self.agentGroup = pygame.sprite.Group()
         self.enemyGroup = pygame.sprite.Group()
@@ -714,6 +744,20 @@ class Round:
         info["enemy2 position"] = str((self.enemy2.x, self.enemy2.y))
         info["enemy3 position"] = str((self.enemy3.x, self.enemy3.y))
         self.info[str(self.time)] = info
+
+        row = [
+            self.time,
+            self.coinsLeft,
+            self.player.coins,
+            self.enemy1.coins,
+            self.enemy2.coins,
+            self.enemy3.coins,
+            self.player.x,  self.player.y,
+            self.enemy1.x,  self.enemy1.y,
+            self.enemy2.x,  self.enemy2.y,
+            self.enemy3.x,  self.enemy3.y,
+        ]
+        self.rows.append(row)
 
     def reset(self):
         pygame.sprite.Group.empty(self.agentGroup)
