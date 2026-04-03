@@ -1,0 +1,16 @@
+{
+  "mid_block": [
+    {
+      "question": "Which player do you predict will collect the most coins?",
+      "type": 0,
+      "answers": [
+        "1", 
+        "2", 
+        "3", 
+        "4"
+      ],
+      "img_src": "images/questions/question_players.png"
+    }
+  ],
+    "recording_time": 30
+}

@@ -3,6 +3,7 @@ import math
 import random
 from os import path, stat
 from exe import EXE
+import collections
 
 
 class GameObject(pygame.sprite.Sprite):
@@ -14,7 +15,7 @@ class GameObject(pygame.sprite.Sprite):
         imgName,
         velocity=0.5,
         acceleration=0,
-        resize=(40, 40),
+        resize=(30, 30),
         seed=0,
     ):
         """
@@ -110,7 +111,7 @@ class GameObject(pygame.sprite.Sprite):
         self.prev_time = pygame.time.get_ticks()
 
         # to correct for different framerates
-        self.correct_vel = self.vel * self.time_passed / 5  # this is a good speed
+        self.correct_vel = self.vel * self.time_passed / 11  # this is a good speed
 
     # direction is horizontal, then veritical
     def move(self, horizontal=0, vertical=0):
@@ -157,6 +158,7 @@ class Agent(GameObject):
         velocity,
         imgName="placeholder.png",
         seed=0,
+        
     ):
         """
         This function is the constructor for the Player class. It takes in a name, background,
@@ -227,6 +229,28 @@ class Player(Agent):
         else:
             self.move(xInd, yInd)
 
+    def move_joystick(self, joystick):
+        threshold = 0.2
+        horiz = joystick.get_axis(0)
+        vert = joystick.get_axis(1)
+
+        xInd, yInd = 0, 0
+
+        if horiz > threshold:
+            xInd = 1
+        elif horiz < -threshold:
+            xInd = -1
+
+        if vert > threshold:
+            yInd = 1
+        elif vert < -threshold:
+            yInd = -1
+
+        if xInd != 0 and yInd != 0:
+            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+        else:
+            self.move(xInd, yInd)
+
 
 # TODO: improve AI
 #   1. Don't allow "half" movements
@@ -243,6 +267,7 @@ class Enemy(Agent):
         velocity,
         imgName="placeholder.png",
         seed=0,
+        sliding_window=13
     ):
         """
         The constructor for the class, which sets the state of the object to 0, and sets the
@@ -273,6 +298,35 @@ class Enemy(Agent):
 
         # keep current objective (coin coord)
         self.coinObj = (0, 0)
+        self.sliding_window = sliding_window
+        self.movement_buffer = collections.deque(maxlen=sliding_window)
+        self.curr_target_coin = None
+
+        self.sum_x = 0
+        self.sum_y = 0
+
+        self.curr_tick = 0
+        self.cached_move = (0, 0)
+        self.tick_freq = 2
+
+    def add_to_buffer(self, x, y):
+        if len(self.movement_buffer) == self.sliding_window:
+            old_x, old_y = self.movement_buffer[0]
+            self.sum_x -= old_x
+            self.sum_y -= old_y
+
+        self.movement_buffer.append((x, y))
+        self.sum_x += x
+        self.sum_y += y
+
+    def smooth_movement(self):
+        if not self.movement_buffer:
+            return (0, 0)
+        
+        avg_x = self.sum_x / len(self.movement_buffer)
+        avg_y = self.sum_y / len(self.movement_buffer)
+
+        return (avg_x, avg_y)
 
     def _dist(self, c1, c2):
         """
@@ -333,41 +387,100 @@ class Enemy(Agent):
         """
         If the coin is still in the group, don't change the objective
         """
-        self.coinObj = self.getNearestCoinCoord(cGroup)
+        # self.coinObj = self.getNearestCoinCoord(cGroup)
+
+        new_coin_obj = self.getNearestCoinCoord(cGroup)
+
+        if new_coin_obj != self.coinObj:
+            self.coinObj = new_coin_obj
+            self.movement_buffer = collections.deque(maxlen=self.sliding_window)
+            self.curr_target_coin = new_coin_obj
+
+            self.sum_x = 0
+            self.sum_y = 0
+
+            self.cached_move = (0, 0)
+            # self.curr_tick = 0
 
     # optimal movement toward nearest coin
     def optimalMove(self):
         """
         The function takes the coordinates of the nearest coin and moves the ai towards it
         """
+
+        # cache prev movement vector, call move afterwards
+            # uses prev movement vector every other vector
+            # on tick of normal, see dir
+            # test tick freq (1 in 3, 1 in 4, etc)
+
+        
         # try:
         #    (cX,cY) = self.getNearestCoinCoord()
         # except:
         #    (cX,cY) = (0,0)
         (cX, cY) = self.coinObj
-        d = self._dist((cX, cY), (self.x, self.y))
 
-        # normalize - this is a relic of ai surpemacy
-        xMov = self.vel * (cX - self.x) / d
-        yMov = self.vel * (self.y - cY) / d
+        use_cached = (self.curr_tick % self.tick_freq != 0)
 
-        # indicators for which direction
-        xInd, yInd = 0, 0
-        # prevent half movements
-        if xMov < 0:
-            xInd = -1
-        elif xMov > 0:
-            xInd = 1
+        if not use_cached:
 
-        if yMov > 0:
-            yInd = -1
-        elif yMov < 0:
-            yInd = 1
+            d = self._dist((cX, cY), (self.x, self.y))
 
-        if yInd != 0 and xInd != 0:
-            self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+            if d == 0:
+                xMov, yMov = 0, 0
+
+            else:
+            # normalize - this is a relic of ai surpemacy
+                xMov = self.vel * (cX - self.x) / d
+                yMov = self.vel * (self.y - cY) / d
+
+            # indicators for which direction
+            xInd, yInd = 0, 0
+            # prevent half movements
+            if xMov < 0:
+                xInd = -1
+            elif xMov > 0:
+                xInd = 1
+
+            if yMov > 0:
+                yInd = -1
+            elif yMov < 0:
+                yInd = 1
+
+            # if yInd != 0 and xInd != 0:
+            #     self.move(math.sqrt(2) * xInd / 2, math.sqrt(2) * yInd / 2)
+            # else:
+            #     self.move(xInd, yInd)
+
+            if d <= 100:
+                self.move(xInd, yInd)
+
+            else:
+                self.add_to_buffer(xInd, yInd)
+                smooth_x, smooth_y = self.smooth_movement()
+
+                if smooth_x != 0 and smooth_y != 0:
+                    magnitude = math.sqrt(smooth_x**2 + smooth_y**2)
+                    smooth_x /= magnitude
+                    smooth_y /= magnitude
+                    # self.move(math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2) # save what's being calculated here
+                    curr_vec = (math.sqrt(2) * smooth_x / 2, math.sqrt(2) * smooth_y / 2)
+                
+                else:
+                    # self.move(smooth_x, smooth_y)
+                    curr_vec = (smooth_x, smooth_y)
+
+                self.cached_move = curr_vec
+
+                self.move(curr_vec[0], curr_vec[1])
+
         else:
-            self.move(xInd, yInd)
+            self.move(self.cached_move[0], self.cached_move[1])
+
+        self.curr_tick += 1
+
+
+
 
     def getRandMove(self):
         """

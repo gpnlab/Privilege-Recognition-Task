@@ -5,16 +5,16 @@ from numpy.random import mtrand
 import pygame
 from configReader import ConfigReader, ConfigContainer
 from src.pat_io import LogWriter
-from screens import Background, StartScreen, InstrScreen, PauseScreen, HUD, FinalScreen
+from screens import Background, StartScreen, InstrScreen, PauseScreen, HUD, FinalScreen, WaitingScreen, QuestionScreen
 from objects import Player, Enemy, Coin
 from datetime import date, datetime, time
 import sys
 from pygame import mixer
 from exe import EXE
 import time
+import pyaudio
 
 seed = 0
-
 
 class PAT:
     """This class contains code that wraps the individual components of the game.
@@ -28,6 +28,27 @@ class PAT:
         """
 
         pygame.init()
+        pygame.joystick.init()
+
+        self.joystick = None
+
+        if pygame.joystick.get_count() > 0:
+            self.joystick = pygame.joystick.Joystick(0)
+            self.joystick.init()
+            
+        p = pyaudio.PyAudio()
+        
+        # List devices
+        for i in range(p.get_device_count()):
+            info = p.get_device_info_by_index(i)
+            print(i, info['name'], 'maxInputChannels:', info['maxInputChannels'])
+
+        # Default input device info (may raise if none)
+        try:
+            print("Default input device:", p.get_default_input_device_info())
+        except IOError:
+            print("No default input device")
+        
         global coin_sound
         path = EXE.resource_path("sounds/coin_sound.mp3")
         coin_sound = pygame.mixer.Sound(path)
@@ -49,6 +70,8 @@ class PAT:
         self.background = Background(self.res)
 
         self.countdownBackgroundsList = [
+            Background(self.res, image="countdown_5.png", isBackground=True),
+            Background(self.res, image="countdown_4.png", isBackground=True),
             Background(self.res, image="countdown_3.png", isBackground=True),
             Background(self.res, image="countdown_2.png", isBackground=True),
             Background(self.res, image="countdown_1.png", isBackground=True),
@@ -66,9 +89,10 @@ class PAT:
         # organize levels based on chosen configuration
         self.parseStructure(self.startScreen.chosenStruct)
 
-        print("levels: ", self.levels)
+        # print("levels: ", self.levels)
 
         self.totalRounds = 24  # changed to constant with current study design
+        self.currentFmriBlock = None
 
         # initiallize logwriter class to track participant responses and inputs
         self.logWriter = LogWriter(self.presetName, self.participantID, self.time, seed)
@@ -90,6 +114,8 @@ class PAT:
         self.structure = self.mainConfig[structName]
         self.blocks = self.mainConfig["blocks"]
         self.levels = []
+        self.blockTypes = []
+
         # loop through the structure and add levels
         for blockType in self.structure:
             block = self.blocks[blockType]["layout"]
@@ -98,6 +124,7 @@ class PAT:
                 freq = int(b[1])
                 for i in range(freq):
                     self.levels.append(level)
+                    self.blockTypes.append(blockType)
         # # DEBUG: Uncomment this to shorten the experiment to a single round for dev purposes
         # self.levels = [self.levels[0]]
 
@@ -114,6 +141,9 @@ class PAT:
 
         for currLevel in range(len(self.levels)):
             # print(f"The current level is {self.levels[currLevel]}")
+            if self.blockTypes[currLevel].startswith("fmriBlock"):
+                self.currentFmriBlock = self.blockTypes[currLevel]
+
             level = Level(
                 self,
                 self.time,
@@ -121,13 +151,16 @@ class PAT:
                 self.presetName,
                 currLevel,
                 self.levels,
+                self.blockTypes,
+                self.currentFmriBlock,
                 self.countdownBackgroundsList,
                 roundsCompleted,
                 self.totalRounds,
+                path=self.logWriter.get_path()
             )
 
             level.main_loop()
-            if "questions" in level.config:
+            if "questions" in level.config or "fmri" in level.config or "waiting" in level.config or "mid_block" in level.config:
                 # questions will occur after, so -1 is "safe"
                 self.info[f"questions {levelnum - 1}"] = level.info
                 levelnum += 1
@@ -151,9 +184,12 @@ class Level:
         presetName,
         level,
         levelList,
+        blockTypes,
+        currFmriBlock,
         countdownList,
         roundsCompleted,
         totalRounds,
+        path = None,
     ):
         """
         It initializes the level, and if it's not a questions level, it initializes the
@@ -172,10 +208,13 @@ class Level:
         self.levelList = levelList
         self.levelNum = level
         self.levels = len(levelList)
+        self.blockTypes = blockTypes
+        self.currFmriBlock = currFmriBlock
         self.config = ConfigReader.parseToDict(f"{levelList[level]}", "levelconfigs")
         self.background = Pat.background
         self.res = Pat.res
         self.pauseFlag = True
+        self.path = path
 
         self.countdownList = countdownList
         self.prevRoundsCompleted = roundsCompleted
@@ -189,7 +228,7 @@ class Level:
         # will only be set if it is a 'questions' level
 
         # not a questions block
-        if "questions" not in self.config:
+        if "questions" not in self.config and "fmri" not in self.config and "Waiting" not in self.config and "mid_block" not in self.config:
             self.aGroup = pygame.sprite.Group()
             self.eGroup = pygame.sprite.Group()
             self.cGroup = pygame.sprite.Group()
@@ -271,7 +310,7 @@ class Level:
 
         The function ends when all the rounds are completed.
         """
-
+        print(self.config)
         # blit questions here if a question block
         if "questions" in self.config:
             levelStartPause = PauseScreen(
@@ -288,15 +327,28 @@ class Level:
 
             for i in range(len(questions)):
                 answersDict[questions[i]] = answers[i]
-
-            # self.logWriter.writeLevelQA(answersDict)
             self.info = answersDict
+                   
+        elif "fmri" in self.config or "mid_block" in self.config:
+            answersDict = dict()
+            answersDict["level"] = self.levelNum
+            questionScreen = QuestionScreen(self.background, self.Pat, self.levelList[self.levelNum], self.currFmriBlock, self.config, self.path)
+            questionScreen.mainLoop()
+            
+        elif "Waiting" in self.config:
+            waitingScreen = WaitingScreen(self.background)
+            waitingScreen.mainLoop()
+
         else:
             for currRound in range(self.rounds):
                 round = Round(
-                    self.Pat, self.levelNum, currRound, self.config, self.totalRounds
+                    self.Pat, self.levelNum, currRound, self.config, self.totalRounds, self.Pat.joystick
                 )
+
                 self.countdown(round.agentGroup, round.coinGroup)
+                round.HUD.start_time = time.time()
+                round.prev_time = pygame.time.get_ticks()
+                round.time = 0
                 round.updateAgentVelocity()
 
                 while round.inProgress:
@@ -332,18 +384,20 @@ class Level:
         """
         Blits a countdown screen. Duration is roughly 3 seconds (on my end)
         """
+        countdown_duration_total = 5000
+        countdown_duration_interval = countdown_duration_total // len(self.countdownList)
         for curr in self.countdownList:
             prev_time = pygame.time.get_ticks()
             while True:
                 curr.draw()
                 agents.draw(self.background.screen)
-                coins.draw(self.background.screen)
+                # coins.draw(self.background.screen) # removed for countdown
                 pygame.display.flip()
                 pygame.display.update()
                 pygame.event.get()
-                if pygame.time.get_ticks() - prev_time > 1000:
+                if pygame.time.get_ticks() - prev_time > countdown_duration_interval:
                     break
-
+            
     def reset(self):
         """
         It clears the sprite groups
@@ -355,7 +409,7 @@ class Level:
 
 
 class Round:
-    def __init__(self, Pat, levelNum, roundNum, config, totalRounds):
+    def __init__(self, Pat, levelNum, roundNum, config, totalRounds, joystick=None):
         """
         It initializes the game
 
@@ -367,7 +421,7 @@ class Round:
         """
 
         # print(f"starting level {levelNum}, round {roundNum}")
-        self.coinsLeft = config["numberOfCoins"]
+        self.coinsLeft = int(config["numberOfCoins"] * 4)
         self.inProgress = True
         self.background = Pat.background
         self.res = Pat.res
@@ -375,9 +429,12 @@ class Round:
         self.config = config
         self.totalRounds = totalRounds
 
+        self.joystick = joystick
+
         # ticks in milliseconds
         self.prev_time = pygame.time.get_ticks()
         self.time = 0
+        self.round_time_limit = 30000   # milliseconds
         # add time prev and time passed param
         # add calculation/update before player input and pass time
         self.info = dict()
@@ -389,7 +446,7 @@ class Round:
         self.coinGroup = pygame.sprite.Group()
 
         # Pass background and player into HUD
-        self.HUD = HUD(self.background, self.agentGroup)
+        self.HUD = HUD(self.background, self.agentGroup, self.round_time_limit)
         self.initGroups()
 
         # set mean acoording to biases:
@@ -431,10 +488,11 @@ class Round:
                 (meanCoor[1] - config["enemy3Bias"] * dy),
             )
 
-        for i in range(int(config["numberOfCoins"])):
+        
+        for i in range(self.coinsLeft):   # for i in range(int(config["numberOfCoins"])):
             spawnCoord = numpy.random.normal(
-                meanCoor[0], self.res[0] / 8
-            ), numpy.random.normal(meanCoor[1], self.res[1] / 8)
+                meanCoor[0], self.res[0] / 6
+            ), numpy.random.normal(meanCoor[1], self.res[1] / 6)
             while (
                 spawnCoord[0] < 100
                 or spawnCoord[0] > self.res[0] - 100
@@ -442,13 +500,15 @@ class Round:
                 or spawnCoord[1] > self.res[1] - 100
             ):
                 spawnCoord = numpy.random.normal(
-                    meanCoor[0], self.res[0] / 4
-                ), numpy.random.normal(meanCoor[1], self.res[1] / 6)
+                    meanCoor[0], self.res[0] / 3
+                ), numpy.random.normal(meanCoor[1], self.res[1] / 5)
             coin = Coin(self.coinGroup, self.background, spawnCoord)
-
+            
         self.info["coin_coordinates"] = [
             [coin.x, coin.y] for coin in self.coinGroup.sprites()
         ]
+        
+        print("Coins: ", len(self.info["coin_coordinates"]))
 
         for e in self.enemyGroup:
             e.coinObj = e.getNearestCoinCoord(self.coinGroup)
@@ -536,8 +596,11 @@ class Round:
           keys: a list of keys that are currently being pressed
         """
 
-        # player moves with WASD
-        self.player.getInput(keys, self.time_passed)
+        if self.joystick:
+            self.player.move_joystick(self.joystick)
+        else:
+            # player moves with WASD
+            self.player.getInput(keys, self.time_passed)
 
     def _process_game_logic(self, keys):
         # print(self.time)
@@ -576,8 +639,11 @@ class Round:
             if self.coinsLeft > 0 and self.time > 10:
                 e.optimalMove()
 
+        # print("coins", self.coinsLeft)
         if self.coinsLeft <= 0 or len(self.coinGroup) == 0:
-            print("finished level")
+            self.inProgress = False
+
+        if self.time > self.round_time_limit:
             self.inProgress = False
 
         for event in events:
@@ -593,7 +659,7 @@ class Round:
         # TODO fix time stuff
         self.time += self.time_passed
         # Clock updates
-        self.HUD.updateTimer(self.time_passed)
+        # self.HUD.updateTimer(self.time_passed)
         self.updateInfo(keys, coins_collected)
 
     def _draw(self):

@@ -9,3 +9,5 @@ build/*
 logs/
 *.psd
 feedback.md
+*.wav
+log_verification/*

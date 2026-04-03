@@ -1,0 +1,16 @@
+{
+  "fmri": [
+    {
+      "question": "Which player do you think collected the most coins? (select one)",
+      "type": 0,
+      "answers": [
+        "1", 
+        "2", 
+        "3", 
+        "4"
+      ],
+      "img_src": "images/questions/question_players.png"
+    }
+  ],
+    "recording_time": 30
+}

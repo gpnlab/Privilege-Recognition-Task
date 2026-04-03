@@ -4,7 +4,11 @@ from os import path
 from configReader import *
 from sys import exit
 from pygame.constants import QUIT
-
+import pyaudio
+import wave
+import time
+import datetime
+from pathlib import Path
 
 class Background(pygame.sprite.Sprite):
     def __init__(self, res, image="NA", isBackground=False):
@@ -96,7 +100,7 @@ class Screen:
 
 
 class HUD:
-    def __init__(self, background, agents):
+    def __init__(self, background, agents, timer):
         """
         The function is a constructor that initializes the class HUD. It sets the background,
         agents, font, font size, and timer
@@ -113,22 +117,25 @@ class HUD:
         fontPath = path.join("fonts", "arial.TTF")
 
         self.fontHUD = pygame.font.SysFont("arial", self.size)
-        self.timer = 0
 
-    def updateTimer(self, time_passed):
-        """
-        The function updateTimer() takes in a parameter called time_passed, and adds to
-        the current amount of time passed
+        self.start_time = time.time()
+        self.timer = timer / 1000
 
-        Args:
-          time_passed: The amount of time that has passed since the last time the function was
-        called.
-        """
-        self.timer += time_passed
+
+    # def updateTimer(self, time_passed):
+    #     """
+    #     The function updateTimer() takes in a parameter called time_passed, and adds to
+    #     the current amount of time passed
+
+    #     Args:
+    #       time_passed: The amount of time that has passed since the last time the function was
+    #     called.
+    #     """
+    #     self.timer += time_passed
 
     def resetTimer(self):
         """Sets the time passed to 0"""
-        self.timer = 0
+        self.start_time = time.time() / 1000
 
     def drawHUD(self):
         """
@@ -142,13 +149,25 @@ class HUD:
         #    i += 1
 
         # Timer
-        """ 
+    
         # remove timer for now 
-        timerTxt = self.fontHUD.render(f"Time: {(self.timer // 1000)}" ,True,(0,0,0))
-        timerRect = timerTxt.get_rect()
-        timerRect.topright = (self.background.res[0],0)
-        self.background.screen.blit(timerTxt,timerRect)
-        """
+        # timerTxt = self.fontHUD.render(f"Time: {(self.timer // 1000)}" ,True,(0,0,0))
+        # timerRect = timerTxt.get_rect()
+        # timerRect.topright = (self.background.res[0],0)
+        # self.background.screen.blit(timerTxt,timerRect)
+
+        elapsed = int(time.time() - self.start_time)
+        remaining = max(0, int(self.timer - elapsed))
+        timerTxt = self.fontHUD.render(
+            str(remaining),
+            True,
+            (0, 0, 0)
+        )
+        screen_rect = self.background.screen.get_rect()
+        timerRect = timerTxt.get_rect(
+            topright=(screen_rect.right - 10, screen_rect.top + 25)
+        )
+        self.background.screen.blit(timerTxt, timerRect)
 
 
 class StartScreen(Screen):
@@ -211,7 +230,7 @@ class StartScreen(Screen):
         self.structRectList = []
         self.structNameList = []
 
-        for i in range(11):
+        for i in range(10):
             self.structRectList.append(
                 (
                     40 + self.background.res[0] // 5,
@@ -357,6 +376,8 @@ class PauseScreen(Screen):
           levelStart: the time at which the level started. Defaults to 0
         """
 
+        self.duration = 1000
+        
         self.level = level
         self.round = round
         self.levelStart = levelStart
@@ -381,7 +402,9 @@ class PauseScreen(Screen):
         self.aTextList = []
 
         self.inQuestions = False
-
+        
+        self.startTime = pygame.time.get_ticks()
+        
         if "questions" in self.config:
             if pygame.mouse.get_pressed()[0] == True:
                 self.selected = 1000
@@ -747,13 +770,14 @@ class PauseScreen(Screen):
         )
 
         levelTxt = self.font.render(
-            f"Round {self.round}/{self.rounds} finished!", True, (0, 0, 0)
+            f"Round {self.round} completed!", True, (0, 0, 0)
         )
+
         self.background.screen.blit(
             levelTxt, (260, 260, self.background.res[0], self.background.res[1])
         )
-
-        self.background.screen.blit(self.nextText, self.nextRoundTextRect)
+        # commented for fmri study
+        # self.background.screen.blit(self.nextText, self.nextRoundTextRect)
 
     def blitFinalStats(self, cList):
         """
@@ -776,7 +800,12 @@ class PauseScreen(Screen):
     def updateLoop(self, x=[]):
         self.draw(x)
         self.startInteraction()
-
+        
+        if self.levelStart == 1:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.startTime >= self.duration:
+                self.paused = False            
+        
         pygame.display.flip()
         pygame.display.update()
 
@@ -796,6 +825,9 @@ class PauseScreen(Screen):
                 self.menuInteraction(pygame.mouse.get_pos())
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 self.selected = -1
+
+            if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
+                self.paused = False
 
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
@@ -1017,7 +1049,7 @@ class PauseScreen(Screen):
 class InstrScreen(Screen):
     def __init__(self, res):
         self.desc = Background(res, image="desc.png", isBackground=True)
-        self.instr = Background(res, image="instructions.png", isBackground=True)
+        self.instr = Background(res, image="fmriInstructions.png", isBackground=True)
         self.size = int(min(self.desc.res[0], self.desc.res[1]) * 0.02)
         self.font = pygame.font.SysFont("arial", self.size)
 
@@ -1073,6 +1105,12 @@ class InstrScreen(Screen):
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 self.menuInteraction(pygame.mouse.get_pos())
+
+            if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
+                if not self.nextInstr:
+                    self.nextInstr = True
+                else:
+                    self.proceed = True
 
             if (
                 event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
@@ -1167,3 +1205,196 @@ class FinalScreen(Screen):
 
             pygame.display.flip()
             pygame.display.update()
+
+
+class WaitingScreen(Screen):
+    def __init__(self, background):
+        """
+        Initializes the waiting for fMRI screen for the game
+
+        Args:
+          background: The background object that the text will be drawn on.
+        """
+        self.background = background
+        self.size = int(min(self.background.res[0], self.background.res[1]) * 0.04)
+
+        fontPath = path.join("fonts", "arial.TTF")
+
+        self.font = pygame.font.SysFont("arial", self.size)
+
+        drawTxt = "Waiting for Scanner..."
+        self.txt = self.font.render(drawTxt, True, (0, 0, 0))
+
+        self.f_or_t = False
+
+    def draw(self):
+        """
+        The function draws the background of the screen white, then draws the text in the
+        middle of the screen
+        """
+        self.background.screen.fill((255, 255, 255))
+
+        txt_rect = self.txt.get_rect(center=(
+            self.background.res[0] // 2,
+            self.background.res[1] // 2
+        ))
+        self.background.screen.blit(self.txt, txt_rect)
+
+    def mainLoop(self):
+        clock = pygame.time.Clock()
+
+        while not self.f_or_t:
+            clock.tick(60)
+            self.draw()
+            pygame.display.flip()
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
+
+                    elif event.key == pygame.K_f or event.key == pygame.K_t:
+                        self.f_or_t = True
+
+        self.f_or_t = False
+
+class QuestionScreen(Screen):
+    def __init__(self, background, participant, subBlock, blockType, config, path):
+        """
+        Initializes the question screen for the game
+
+        Args:
+          background: The background object that the text will be drawn on.
+        """
+        self.background = background
+        self.size = int(min(self.background.res[0], self.background.res[1]) * 0.04)
+
+        self.font = pygame.font.SysFont("arial", self.size)
+
+        self.Pat = participant
+        self.subBlock = subBlock
+        self.block = blockType
+        self.config = config
+        self.path = path
+        self.max_question_time = int(self.config.get("recording_time", 30))
+
+    def draw(self, remaining_time):
+        self.background.screen.fill((255, 255, 255))
+
+        question_pos_offset = 50
+        if "fmri" in self.config and self.config["fmri"]:
+            q = self.config["fmri"][0]
+            question_text = q['question']
+            q_render = self.font.render(question_text, True, (0, 0, 0))
+            self.background.screen.blit(q_render, (50, question_pos_offset))
+            question_pos_offset += q_render.get_height() + 10
+
+            if "img_src" in q and q["img_src"]:
+                img = pygame.image.load(q["img_src"])
+                img_rect = img.get_rect(topleft=(50, question_pos_offset))
+                self.background.screen.blit(img, img_rect)
+                question_pos_offset += img_rect.height + 30
+
+        elif "mid_block" in self.config and self.config["mid_block"]:
+            q = self.config["mid_block"][0]
+            question_text = q['question']
+            q_render = self.font.render(question_text, True, (0, 0, 0))
+            self.background.screen.blit(q_render, (50, question_pos_offset))
+            question_pos_offset += q_render.get_height() + 10
+
+            if "img_src" in q and q["img_src"]:
+                img = pygame.image.load(q["img_src"])
+                img_rect = img.get_rect(topleft=(50, question_pos_offset))
+                self.background.screen.blit(img, img_rect)
+                question_pos_offset += img_rect.height + 30
+
+        timer_text = self.font.render(str(remaining_time), True, (0, 0, 0), (255, 255, 255))
+        screen_rect = self.background.screen.get_rect()
+        timer_rect = timer_text.get_rect(
+            topright=(screen_rect.right - 10, screen_rect.top + 25)
+        )
+        self.background.screen.blit(timer_text, timer_rect)
+
+    def mainLoop(self):
+        CHUNK = 8192
+        FORMAT = pyaudio.paInt16
+        CHANNELS = 1
+        RATE = 44100
+
+        recorded = False
+        start_time = time.time()
+        end_time = self.max_question_time
+
+        p = pyaudio.PyAudio()
+
+        for i in range(p.get_device_count()):
+            info = p.get_device_info_by_index(i)
+            print(i, info['name'], 'maxInputChannels:', info['maxInputChannels'])
+
+        # Default input device info (may raise if none)
+        try:
+            print("Default input device:", p.get_default_input_device_info())
+        except IOError:
+            print("No default input device")
+
+        stream = p.open(format=FORMAT, channels=CHANNELS, rate=RATE, input=True, frames_per_buffer=CHUNK)
+
+        frames = []
+
+        while not recorded:
+            elapsed_time = int(time.time() - start_time)
+            remaining_time = max(0, end_time - elapsed_time)
+
+            self.draw(remaining_time)
+            pygame.display.flip()
+            pygame.display.update()
+
+            try:
+                data = stream.read(CHUNK)
+                frames.append(data)
+            except KeyboardInterrupt:
+                break
+    
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        exit()
+                    if event.key == pygame.K_f or event.key == pygame.K_t:
+                        recorded = True
+
+            if remaining_time <= 0:
+                recorded = True
+
+        time.sleep(0.2)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
+
+        participant_id = getattr(self.Pat, "participantID", "unknown")
+        now = datetime.datetime.now()
+
+        filename = (
+            f"{self.path}/"
+            f"{participant_id}_{now:%Y%m%d_%H%M%S}_{self.block}_{self.subBlock}.wav"
+        )
+
+        print(f"Saving audio to {filename}")
+
+        wf = wave.open(filename, 'wb')
+        wf.setnchannels(1)
+        wf.setsampwidth(pyaudio.PyAudio().get_sample_size(pyaudio.paInt16))
+        wf.setframerate(44100)
+        wf.writeframes(b''.join(frames))
+        wf.close()
