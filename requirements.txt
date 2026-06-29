@@ -1,3 +1,5 @@
 numpy
 pygame
 pyinstaller
+pyaudio 
+# `sudo apt install python3-pyaudio` for GNU/Linux
